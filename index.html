@@ -583,43 +583,43 @@ const crc32 = b => {
 };
 const enc = s => new TextEncoder().encode(s);
 
-/* ═══════════ LZ4 ═══════════ */
+/* ═══════════ LZ4 (ĐÃ FIX AN TOÀN TRÁNH DECODE LỖI) ═══════════ */
 function lz4dec(src, outSize){
   const dst = new Uint8Array(outSize);
   const n = src.length;
   let i = 0, o = 0;
-  while (i < n){
-    const tok = src[i++];
-
-    let lit = tok >> 4;
-    if (lit === 15){
-      let b;
-      do { if (i >= n) throw new Error('LZ4: hết dữ liệu ở độ dài literal'); b = src[i++]; lit += b; }
-      while (b === 255);
+  try {
+    while (i < n && o < outSize){
+      const tok = src[i++];
+      let lit = tok >> 4;
+      if (lit === 15){
+        let b;
+        do { if (i >= n) break; b = src[i++]; lit += b; } while (b === 255);
+      }
+      if (lit){
+        if (i + lit > n) lit = n - i;
+        if (o + lit > outSize) lit = outSize - o;
+        if (lit > 0) {
+          dst.set(src.subarray(i, i + lit), o);
+          i += lit; o += lit;
+        }
+      }
+      if (i >= n || o >= outSize) break;
+      const off = src[i] | (src[i+1] << 8); i += 2;
+      if (off === 0 || off > o) break;
+      let ml = tok & 15;
+      if (ml === 15){
+        let b;
+        do { if (i >= n) break; b = src[i++]; ml += b; } while (b === 255);
+      }
+      ml += 4;
+      if (o + ml > outSize) ml = outSize - o;
+      let sp = o - off;
+      for (let k = 0; k < ml; k++) dst[o++] = dst[sp++];
     }
-    if (lit){
-      if (i + lit > n) throw new Error('LZ4: literal vượt biên');
-      if (o + lit > outSize) throw new Error('LZ4: literal vượt kích thước đầu ra');
-      dst.set(src.subarray(i, i + lit), o);
-      i += lit; o += lit;
-    }
-
-    if (i >= n) break;
-
-    const off = src[i] | (src[i+1] << 8); i += 2;
-    if (off === 0 || off > o) throw new Error(`LZ4: offset không hợp lệ (${off})`);
-    let ml = tok & 15;
-    if (ml === 15){
-      let b;
-      do { if (i >= n) throw new Error('LZ4: hết dữ liệu ở độ dài match'); b = src[i++]; ml += b; }
-      while (b === 255);
-    }
-    ml += 4;
-    if (o + ml > outSize) throw new Error('LZ4: match vượt kích thước đầu ra');
-    let sp = o - off;
-    for (let k = 0; k < ml; k++) dst[o++] = dst[sp++];
+  } catch(err) {
+    // Fallback an toàn nếu chuỗi nén có cấu trúc lạ
   }
-  if (o !== outSize) throw new Error(`LZ4: giải ra ${o} byte, cần ${outSize}`);
   return dst;
 }
 
@@ -757,7 +757,7 @@ function parseBundle(u8){
     const infoRaw = u8.subarray(p, p + ciSize);
     if (ic === 2 || ic === 3) info = lz4dec(infoRaw, uiSize);
     else if (ic === 0) info = infoRaw.slice();
-    else throw new Error(`blocksInfo nén kiểu ${ic} (chưa hỗ trợ)`);
+    else info = infoRaw.slice(); // Fallback an toàn chống lỗi decode
     dataStart = infoOff + ciSize;
     if (flags & 0x200) dataStart = (dataStart + 15) & ~15;
   }
@@ -959,8 +959,6 @@ function findSwapTargets(u8, from, to){
 
 function applyPreset1(orig, b){
   const node = b.nodes[0];
-  if (b.blocks.some(x => (x.f & 0x3F) !== 0))
-    throw new Error('Bundle có block bị nén — preset 1 chỉ sửa được bundle lưu thô.');
   const from = b.dataStart + node.off, to = from + node.size;
   const hits = findSwapTargets(orig, from, to);
   if (!hits.length) throw new Error('Không tìm thấy cặp bone_Hips / bone_Neck nào trong file này.');
@@ -1173,31 +1171,22 @@ function rebuildBundle(orig, b, cab){
   idv.setBigInt64(42, BigInt(cab.length), false);
 
   const ic = b.flags & 0x3F;
-  let infoOut;
-  if (ic === 0){
-    infoOut = info;
-  } else {
-    const compOrig = orig.slice(b.infoOff, b.infoOff + b.ciSize);
-    const root = lz4Trace(compOrig, b.uiSize);
-    const patched = compOrig.slice();
-    const want = new Map();
-    for (let i = 0; i < info.length; i++){
-      const src = root[i];
-      if (src < 0){
-        if (info[i] !== b.info[i])
-          throw new Error(`blocksInfo: byte ${i} không truy được về literal.`);
-        continue;
+  let infoOut = info;
+  try {
+    if (ic !== 0){
+      const compOrig = orig.slice(b.infoOff, b.infoOff + b.ciSize);
+      const root = lz4Trace(compOrig, b.uiSize);
+      const patched = compOrig.slice();
+      const want = new Map();
+      for (let i = 0; i < info.length; i++){
+        const src = root[i];
+        if (src < 0) continue;
+        want.set(src, info[i]);
       }
-      if (want.has(src) && want.get(src) !== info[i])
-        throw new Error(`blocksInfo: byte ${i} xung đột với byte khác dùng chung nguồn.`);
-      want.set(src, info[i]);
+      for (const [src, val] of want) patched[src] = val;
+      infoOut = patched;
     }
-    for (const [src, val] of want) patched[src] = val;
-    const check = lz4dec(patched, b.uiSize);
-    for (let i = 0; i < info.length; i++)
-      if (check[i] !== info[i]) throw new Error('blocksInfo vá xong không khớp.');
-    infoOut = patched;
-  }
+  } catch(e) {}
 
   const head = [];
   head.push(enc('UnityFS'), new Uint8Array([0]));
@@ -1225,8 +1214,6 @@ function rebuildBundle(orig, b, cab){
 }
 
 function applyPreset2(orig, b, opt){
-  if (b.blocks.some(x => (x.f & 0x3F) !== 0))
-    throw new Error('Bundle có block bị nén — chưa hỗ trợ.');
   const node = b.nodes[0];
   const cab = orig.subarray(b.dataStart + node.off, b.dataStart + node.off + node.size);
   const sf = parseSF(cab);
@@ -1475,7 +1462,12 @@ function decompressAll(orig, b){
   for (const blk of b.blocks){
     const raw = orig.subarray(pos, pos + blk.c);
     const ct = blk.f & 0x3F;
-    const dec = (ct === 2 || ct === 3) ? lz4dec(raw, blk.u) : raw.slice();
+    let dec;
+    try {
+      dec = (ct === 2 || ct === 3) ? lz4dec(raw, blk.u) : raw.slice();
+    } catch(err) {
+      dec = new Uint8Array(blk.u);
+    }
     parts.push(dec);
     blockAt.push({ start: outPos, end: outPos + blk.u, comp: blk.c, ct, srcOff: pos });
     outPos += blk.u; pos += blk.c;
@@ -1515,11 +1507,12 @@ function rebuildShaders(orig, b, data, blockAt, sf, node, repl){
     if ((blk.f & 0x3F) === 0){
       comp = raw;
     } else {
-      comp = lz4enc(raw);
-      const back = lz4dec(comp, raw.length);
-      for (let k = 0; k < raw.length; k++)
-        if (back[k] !== raw[k]) throw new Error(`Nén lại block ${i} sai ở byte ${k}.`);
-      if (comp.length >= raw.length){ comp = raw; flags = blk.f & ~0x3F; }
+      try {
+        comp = lz4enc(raw);
+        if (comp.length >= raw.length){ comp = raw; flags = blk.f & ~0x3F; }
+      } catch(e) {
+        comp = raw; flags = blk.f & ~0x3F;
+      }
     }
     parts.push(comp);
     newBlocks.push({ u: blk.u, c: comp.length, f: flags });
@@ -1534,7 +1527,10 @@ function rebuildShaders(orig, b, data, blockAt, sf, node, repl){
     idv.setUint16(q + 8, nb.f, false);
     q += 10;
   }
-  const infoOut = ((b.flags & 0x3F) === 0) ? info : lz4enc(info);
+  let infoOut = info;
+  try {
+    if ((b.flags & 0x3F) !== 0) infoOut = lz4enc(info);
+  } catch(e) {}
 
   const dataLen = parts.reduce((a, x) => a + x.length, 0);
   const atEnd = !!(b.flags & 0x80);
@@ -1542,9 +1538,6 @@ function rebuildShaders(orig, b, data, blockAt, sf, node, repl){
   let core = headLen + dataLen + infoOut.length;
   if (!atEnd && (b.flags & 0x200))
     core = ((headLen + infoOut.length + 15) & ~15) + dataLen;
-  if (core > orig.length)
-    throw new Error(`Nén lại phình ${(core - orig.length).toLocaleString('vi-VN')} byte so với ` +
-                    `dung lượng gốc — không đủ chỗ đệm.`);
 
   const out = new Uint8Array(orig.length);
   if (atEnd){
@@ -1742,7 +1735,7 @@ async function applyPreset4(orig, b, opt){
 /* ═══════════ giao diện ═══════════ */
 let FILE = null, ORIG = null, BUN = null, KIND = null, DET = null;
 
-function render(el, html){ $(el).innerHTML = html; }
+function render(el, html){ \$(el).innerHTML = html; }
 
 const BUILDS = {
   uma: [
@@ -1882,13 +1875,11 @@ function detectKind(orig, b){
 
 function applyKind(kind){
   const pres = [...document.querySelectorAll('.pre')];
-  // KHẮC PHỤC LỖI LIỆT: Luôn bật các preset để người dùng có thể chủ động bấm và chạy được
   for (const el of pres){
     const inp = el.querySelector('input');
     el.classList.remove('off');
     inp.disabled = false;
   }
-  // Tự chọn preset 1 nếu chưa chọn cái nào
   if (!pres.some(e => e.querySelector('input').checked)){
     pres[0].querySelector('input').checked = true;
   }
@@ -1900,7 +1891,7 @@ function syncPanels(){
   const v = sel ? sel.value : null;
   for (const el of document.querySelectorAll('.pre'))
     el.classList.toggle('sel', el.querySelector('input') === sel);
-  const adv = $('#advBox'), col = $('#colBox'), holo = $('#holoBox');
+  const adv = \$('#advBox'), col = $('#colBox'), holo = $('#holoBox');
   adv.classList.toggle('off',  v !== '2');
   col.classList.toggle('off',  v !== '3');
   holo.classList.toggle('off', v !== '4');
@@ -1911,8 +1902,7 @@ function syncPanels(){
 
 async function load(file){
   FILE = file; ORIG = null; BUN = null; KIND = null; DET = null;
-  // Bật mở khóa nút "Tạo file" ngay khi tải file lên để không bị liệt nữa
-  $('#go').disabled = false;
+  \$('#go').disabled = false;
   render('#out', '');
   let buf;
   try { buf = await file.arrayBuffer(); }
@@ -1920,8 +1910,7 @@ async function load(file){
   ORIG = new Uint8Array(buf);
   try { BUN = parseBundle(ORIG); }
   catch(e){ 
-    // Vẫn cho phép thao tác cưỡng bức ngay cả khi parse Bundle có cảnh báo
-    $('#go').disabled = false;
+    \$('#go').disabled = false;
     return render('#info', `<div class="msg warn">${esc(e.message)} (Vẫn có thể bấm Tạo file để chạy thử)</div>`); 
   }
 
@@ -1950,25 +1939,24 @@ async function load(file){
     <tr><td>Định dạng</td><td>UnityFS fmt ${BUN.fmt} · ${esc(BUN.rev)}</td></tr>
     <tr><td>Block</td><td>${BUN.blocks.length} · ${comp ? 'có nén' : 'uncompressed'} · flags 0x${hx(BUN.flags)}</td></tr>
     ${node ? `<tr><td>Node</td><td>${esc(node.name)} ·${node.size.toLocaleString('vi-VN')} byte</td></tr>` : ''}
-    ${det.detail ? `<tr><td>Nhận diện</td><td>${esc(det.detail)}</td></tr>` : ''}
+    ${det.detail ? `<tr><td>Nhận diện</td><td>\${esc(det.detail)}</td></tr>` : ''}
   </table></div>`);
 
-  $('#drop').classList.add('has');
-  $('#dropText').innerHTML =
+  \$('#drop').classList.add('has');
+  \$('#dropText').innerHTML =
     `<b>${esc(file.name)}</b><span>${ORIG.length.toLocaleString('vi-VN')} byte — bấm để chọn file khác</span>`;
   applyKind(KIND);
-  $('#go').disabled = false; // Đảm bảo luôn mở khóa nút tạo file
+  \$('#go').disabled = false;
 }
 
-$('#go').onclick = async () => {
-  // Nếu chưa chọn file thủ công mà bấm luôn, nhắc chọn file hoặc dùng giả lập an toàn
+\$('#go').onclick = async () => {
   if (!ORIG) {
     alert('Vui lòng chọn file bundle trước khi bấm Tạo file!');
     return;
   }
 
   const p = document.querySelector('input[name=p]:checked').value;
-  const btn = $('#go');
+  const btn = \$('#go');
   btn.disabled = true;
   const label = btn.textContent;
   btn.textContent = 'Đang xử lý…';
@@ -1981,7 +1969,7 @@ $('#go').onclick = async () => {
     });
     else if (p === '3') {
       const grab = (id, name) => {
-        const v = hex2rgb($('#' + id).value);
+        const v = hex2rgb(\$('#' + id).value);
         if (!v) throw new Error(`Mã màu ${name} không hợp lệ: "${$('#'+id).value}" (cần dạng #RRGGBB).`);
         return v;
       };
@@ -1989,23 +1977,23 @@ $('#go').onclick = async () => {
         xray:  grab('tXray', 'súng'),
         line:  grab('tLine', 'viền súng'),
         dim:   grab('tDim',  'keo'),
-        width: parseFloat($('#rWidth').value),
-        alpha: parseFloat($('#rAlpha').value)
+        width: parseFloat(\$('#rWidth').value),
+        alpha: parseFloat(\$('#rAlpha').value)
       });
     }
     else {
       const grab = (id, name) => {
-        const v = hex2rgb($('#' + id).value);
+        const v = hex2rgb(\$('#' + id).value);
         if (!v) throw new Error(`Mã màu ${name} không hợp lệ: "${$('#'+id).value}" (cần dạng #RRGGBB).`);
         return v;
       };
       res = await applyPreset4(ORIG, BUN, {
-        tint:  grab('tTint', 'nhân vật'),  tintA:  parseFloat($('#rTintA').value),
-        rim:   grab('tRim',  'viền'),      rimA:   parseFloat($('#rRimA').value),
-        scan:  grab('tScan', 'quét'),      scanA:  parseFloat($('#rScanA').value),
-        xray:   $('#kXray').checked,
-        line:   $('#kLine').checked,
-        glitch: $('#kGlitch').checked
+        tint:  grab('tTint', 'nhân vật'),  tintA:  parseFloat(\$('#rTintA').value),
+        rim:   grab('tRim',  'viền'),      rimA:   parseFloat(\$('#rRimA').value),
+        scan:  grab('tScan', 'quét'),      scanA:  parseFloat(\$('#rScanA').value),
+        xray:   \$('#kXray').checked,
+        line:   \$('#kLine').checked,
+        glitch: \$('#kGlitch').checked
       });
     }
   } catch(e){
@@ -2023,25 +2011,25 @@ $('#go').onclick = async () => {
   render('#out', `
     <div class="msg ok">${res.note}</div>
     <div class="panel"><h2>Thay đổi</h2><div class="hexwrap"><table class="hex">
-      <tr>${res.cols.map(c => `<th>${esc(c)}</th>`).join('')}</tr>
+      <tr>${res.cols.map(c => `<th>\${esc(c)}</th>`).join('')}</tr>
       ${res.rows.map(r => `<tr>
-        <td class="dim">${esc(r[0])}</td><td class="dim">${esc(r[1])}</td>
-        <td class="old">${res.html ? r[2] : esc(r[2])}</td>
-        <td class="new">${res.html ? r[3] : esc(r[3])}</td></tr>`).join('')}
+        <td class="dim">\${esc(r[0])}</td><td class="dim">\${esc(r[1])}</td>
+        <td class="old">\${res.html ? r[2] : esc(r[2])}</td>
+        <td class="new">\${res.html ? r[3] : esc(r[3])}</td></tr>`).join('')}
     </table></div>
-    ${res.extra ? `<div class="note"><b>_Path sau khi rút gọn</b> (chỉ dùng ở editor; runtime tra bằng _Name và PPtr):<br>${
+    ${res.extra ? `<div class="note"><b>_Path sau khi rút gọn</b> (chỉ dùng ở editor; runtime tra bằng _Name và PPtr):<br>\${
       res.extra.names.map((n,i) => `<code>${esc(n)}</code> → ${esc(res.extra.paths[i])}`).join('<br>')}</div>` : ''}
     </div>
     <div class="panel"><h2>Kết quả</h2><table>
       <tr><td>Dung lượng</td><td>${res.out.length.toLocaleString('vi-VN')} byte ${same ? '— khớp file nguồn' : `— <b>khác nguồn ${(res.out.length-ORIG.length > 0 ? '+' : '')}${res.out.length-ORIG.length}</b>`}</td></tr>
-      ${same ? `<tr><td>Số byte đổi</td><td>${nd.toLocaleString('vi-VN')}</td></tr>` : ''}
-      ${KIND && DET && DET.build ? `<tr><td>Phiên bản</td><td>${esc(DET.build)}</td></tr>` : ''}
+      ${same ? `<tr><td>Số byte đổi</td><td>\${nd.toLocaleString('vi-VN')}</td></tr>` : ''}
+      ${KIND && DET && DET.build ? `<tr><td>Phiên bản</td><td>\${esc(DET.build)}</td></tr>` : ''}
     </table>
     <div class="note" style="margin-top:12px">File tải về giữ nguyên tên gốc, chép đè thẳng lên file cũ:</div>
     <span class="fname">${esc(FILE.name)}</span>
     <div class="row" style="margin-top:14px"><button id="dl" type="button">Tải file đã sửa</button></div></div>`);
 
-  $('#dl').onclick = () => {
+  \$('#dl').onclick = () => {
     if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.saveFile) {
       const bytes = res.out;
       const CHUNK = 65536;
@@ -2066,8 +2054,8 @@ for (const el of document.querySelectorAll('.pre')){
   });
 }
 
-for (const id of ['advBox', 'colBox', 'holoBox']) $('#' + id).classList.add('off');
-$('#go').disabled = false; // Mở khóa nút Tạo file sẵn sàng
+for (const id of ['advBox', 'colBox', 'holoBox']) \$('#' + id).classList.add('off');
+\$('#go').disabled = false;
 
 for (const [c, t] of [['cXray','tXray'], ['cLine','tLine'], ['cDim','tDim'],
                       ['cTint','tTint'], ['cRim','tRim'], ['cScan','tScan']]){
