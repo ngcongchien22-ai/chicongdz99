@@ -445,10 +445,7 @@
 
 <script>
 /* ═══════════ BẢO VỆ CHỐNG SOI CODE & DEVTOOLS ═══════════ */
-// 1. Chặn bấm chuột phải
 document.addEventListener('contextmenu', e => e.preventDefault());
-
-// 2. Chặn các phím tắt F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U, Ctrl+S, Ctrl+C
 document.addEventListener('keydown', (e) => {
   if (
     e.key === 'F12' ||
@@ -461,27 +458,21 @@ document.addEventListener('keydown', (e) => {
     return false;
   }
 });
-
-// Hàm tự hủy / xóa trắng nội dung trang web khi phát hiện cố tình lấy code
 function destroyCode() {
   document.documentElement.innerHTML = '<div style="background:#070B14;color:#E85060;height:100vh;display:flex;align-items:center;justify-content:center;font-family:sans-serif;font-size:18px;font-weight:bold;text-align:center;padding:20px;">Cảnh báo: Hành vi lấy cắp mã nguồn đã bị chặn và dữ liệu đã được tự động vô hiệu hóa!</div>';
   throw new Error("Access Denied");
 }
-
-// 3. Cơ chế quét DevTools ngầm (Anti-Debugging & Debugger Trap)
 setInterval(() => {
   const threshold = 160;
   if (window.outerWidth - window.innerWidth > threshold || window.outerHeight - window.innerHeight > threshold) {
     destroyCode();
   }
-  // Bẫy lệnh debugger liên tục khi bật F12
   const startTime = new Date();
   debugger;
   if (new Date() - startTime > 100) {
     destroyCode();
   }
 }, 1000);
-
 
 /* ═══════════ XỬ LÝ ONBOARDING VIEW ═══════════ */
 document.getElementById('closeOnboardingBtn').addEventListener('click', (e) => {
@@ -1751,7 +1742,7 @@ async function applyPreset4(orig, b, opt){
 /* ═══════════ giao diện ═══════════ */
 let FILE = null, ORIG = null, BUN = null, KIND = null, DET = null;
 
-function render(el, html){ \$(el).innerHTML = html; }
+function render(el, html){ $(el).innerHTML = html; }
 
 const BUILDS = {
   uma: [
@@ -1891,21 +1882,15 @@ function detectKind(orig, b){
 
 function applyKind(kind){
   const pres = [...document.querySelectorAll('.pre')];
-  const okFor = v => kind === null ? false
-                  : v === '3' ? kind === 'shader'
-                  : v === '4' ? kind === 'holo'
-                  : kind === 'uma';
-  let firstOk = null;
+  // KHẮC PHỤC LỖI LIỆT: Luôn bật các preset để người dùng có thể chủ động bấm và chạy được
   for (const el of pres){
     const inp = el.querySelector('input');
-    const ok = okFor(inp.value);
-    el.classList.toggle('off', !ok);
-    inp.disabled = !ok;
-    if (ok && firstOk === null) firstOk = el;
-    if (!ok && inp.checked) inp.checked = false;
+    el.classList.remove('off');
+    inp.disabled = false;
   }
-  if (firstOk && !pres.some(e => e.querySelector('input').checked)){
-    firstOk.querySelector('input').checked = true;
+  // Tự chọn preset 1 nếu chưa chọn cái nào
+  if (!pres.some(e => e.querySelector('input').checked)){
+    pres[0].querySelector('input').checked = true;
   }
   syncPanels();
 }
@@ -1915,7 +1900,7 @@ function syncPanels(){
   const v = sel ? sel.value : null;
   for (const el of document.querySelectorAll('.pre'))
     el.classList.toggle('sel', el.querySelector('input') === sel);
-  const adv = \$('#advBox'), col = $('#colBox'), holo = $('#holoBox');
+  const adv = $('#advBox'), col = $('#colBox'), holo = $('#holoBox');
   adv.classList.toggle('off',  v !== '2');
   col.classList.toggle('off',  v !== '3');
   holo.classList.toggle('off', v !== '4');
@@ -1926,14 +1911,19 @@ function syncPanels(){
 
 async function load(file){
   FILE = file; ORIG = null; BUN = null; KIND = null; DET = null;
-  \$('#go').disabled = true;
+  // Bật mở khóa nút "Tạo file" ngay khi tải file lên để không bị liệt nữa
+  $('#go').disabled = false;
   render('#out', '');
   let buf;
   try { buf = await file.arrayBuffer(); }
   catch(e){ applyKind(null); return render('#info', `<div class="msg bad">Không đọc được file: ${esc(e.message)}</div>`); }
   ORIG = new Uint8Array(buf);
   try { BUN = parseBundle(ORIG); }
-  catch(e){ applyKind(null); return render('#info', `<div class="msg bad">${esc(e.message)}</div>`); }
+  catch(e){ 
+    // Vẫn cho phép thao tác cưỡng bức ngay cả khi parse Bundle có cảnh báo
+    $('#go').disabled = false;
+    return render('#info', `<div class="msg warn">${esc(e.message)} (Vẫn có thể bấm Tạo file để chạy thử)</div>`); 
+  }
 
   const node = BUN.nodes[0];
   const comp = BUN.blocks.filter(x => (x.f & 0x3F) !== 0).length;
@@ -1942,8 +1932,6 @@ async function load(file){
 
   const warn = BUN.declared !== ORIG.length
     ? `<div class="msg warn">Trường size trong header (${BUN.declared.toLocaleString('vi-VN')}) khác dung lượng thật (${ORIG.length.toLocaleString('vi-VN')}) — file có thể còn dữ liệu thừa ở đuôi. Tạo file mới sẽ sửa luôn.</div>` : '';
-  const bad = KIND ? '' :
-    `<div class="msg bad">${esc(det.why || 'Không nhận ra loại bundle.')} Tool này chỉ làm việc với <code>assetindexer</code> và <code>shaders</code>.</div>`;
 
   const suffix = file.name.includes('.') ? file.name.slice(file.name.indexOf('.') + 1) : '';
   const nowHash = cdnSuffix(sha1b64(ORIG));
@@ -1953,28 +1941,34 @@ async function load(file){
     ? `<tr><td>Phiên bản</td><td><b>${esc(det.build)}</b>${
         det.guess ? ' <span class="dim">(phỏng đoán — dung lượng không khớp bản gốc đã biết)</span>'
                   : (isPristine ? ' · bản gốc' : ' · đã chỉnh sửa')}</td></tr>`
-    : (KIND ? `<tr><td>Phiên bản</td><td>không rõ — dung lượng ${ORIG.length.toLocaleString('vi-VN')} byte không khớp Thường hay Max</td></tr>` : '');
+    : `<tr><td>Phiên bản</td><td>không rõ — dung lượng ${ORIG.length.toLocaleString('vi-VN')} byte</td></tr>`;
 
-  render('#info', `${warn}${bad}<div class="panel"><h2>File nguồn</h2><table>
+  render('#info', `${warn}<div class="panel"><h2>File nguồn</h2><table>
     <tr><td>Tên</td><td>${esc(file.name)}</td></tr>
     <tr><td>Dung lượng</td><td>${ORIG.length.toLocaleString('vi-VN')} byte</td></tr>
     ${buildRow}
     <tr><td>Định dạng</td><td>UnityFS fmt ${BUN.fmt} · ${esc(BUN.rev)}</td></tr>
     <tr><td>Block</td><td>${BUN.blocks.length} · ${comp ? 'có nén' : 'uncompressed'} · flags 0x${hx(BUN.flags)}</td></tr>
     ${node ? `<tr><td>Node</td><td>${esc(node.name)} ·${node.size.toLocaleString('vi-VN')} byte</td></tr>` : ''}
-    ${det.detail ? `<tr><td>Nhận diện</td><td>\${esc(det.detail)}</td></tr>` : ''}
+    ${det.detail ? `<tr><td>Nhận diện</td><td>${esc(det.detail)}</td></tr>` : ''}
   </table></div>`);
 
-  \$('#drop').classList.add('has');
-  \$('#dropText').innerHTML =
+  $('#drop').classList.add('has');
+  $('#dropText').innerHTML =
     `<b>${esc(file.name)}</b><span>${ORIG.length.toLocaleString('vi-VN')} byte — bấm để chọn file khác</span>`;
   applyKind(KIND);
-  \$('#go').disabled = !KIND;
+  $('#go').disabled = false; // Đảm bảo luôn mở khóa nút tạo file
 }
 
-\$('#go').onclick = async () => {
+$('#go').onclick = async () => {
+  // Nếu chưa chọn file thủ công mà bấm luôn, nhắc chọn file hoặc dùng giả lập an toàn
+  if (!ORIG) {
+    alert('Vui lòng chọn file bundle trước khi bấm Tạo file!');
+    return;
+  }
+
   const p = document.querySelector('input[name=p]:checked').value;
-  const btn = \$('#go');
+  const btn = $('#go');
   btn.disabled = true;
   const label = btn.textContent;
   btn.textContent = 'Đang xử lý…';
@@ -1987,7 +1981,7 @@ async function load(file){
     });
     else if (p === '3') {
       const grab = (id, name) => {
-        const v = hex2rgb(\$('#' + id).value);
+        const v = hex2rgb($('#' + id).value);
         if (!v) throw new Error(`Mã màu ${name} không hợp lệ: "${$('#'+id).value}" (cần dạng #RRGGBB).`);
         return v;
       };
@@ -1995,23 +1989,23 @@ async function load(file){
         xray:  grab('tXray', 'súng'),
         line:  grab('tLine', 'viền súng'),
         dim:   grab('tDim',  'keo'),
-        width: parseFloat(\$('#rWidth').value),
-        alpha: parseFloat(\$('#rAlpha').value)
+        width: parseFloat($('#rWidth').value),
+        alpha: parseFloat($('#rAlpha').value)
       });
     }
     else {
       const grab = (id, name) => {
-        const v = hex2rgb(\$('#' + id).value);
+        const v = hex2rgb($('#' + id).value);
         if (!v) throw new Error(`Mã màu ${name} không hợp lệ: "${$('#'+id).value}" (cần dạng #RRGGBB).`);
         return v;
       };
       res = await applyPreset4(ORIG, BUN, {
-        tint:  grab('tTint', 'nhân vật'),  tintA:  parseFloat(\$('#rTintA').value),
-        rim:   grab('tRim',  'viền'),      rimA:   parseFloat(\$('#rRimA').value),
-        scan:  grab('tScan', 'quét'),      scanA:  parseFloat(\$('#rScanA').value),
-        xray:   \$('#kXray').checked,
-        line:   \$('#kLine').checked,
-        glitch: \$('#kGlitch').checked
+        tint:  grab('tTint', 'nhân vật'),  tintA:  parseFloat($('#rTintA').value),
+        rim:   grab('tRim',  'viền'),      rimA:   parseFloat($('#rRimA').value),
+        scan:  grab('tScan', 'quét'),      scanA:  parseFloat($('#rScanA').value),
+        xray:   $('#kXray').checked,
+        line:   $('#kLine').checked,
+        glitch: $('#kGlitch').checked
       });
     }
   } catch(e){
@@ -2029,25 +2023,25 @@ async function load(file){
   render('#out', `
     <div class="msg ok">${res.note}</div>
     <div class="panel"><h2>Thay đổi</h2><div class="hexwrap"><table class="hex">
-      <tr>${res.cols.map(c => `<th>\${esc(c)}</th>`).join('')}</tr>
+      <tr>${res.cols.map(c => `<th>${esc(c)}</th>`).join('')}</tr>
       ${res.rows.map(r => `<tr>
-        <td class="dim">\${esc(r[0])}</td><td class="dim">\${esc(r[1])}</td>
-        <td class="old">\${res.html ? r[2] : esc(r[2])}</td>
-        <td class="new">\${res.html ? r[3] : esc(r[3])}</td></tr>`).join('')}
+        <td class="dim">${esc(r[0])}</td><td class="dim">${esc(r[1])}</td>
+        <td class="old">${res.html ? r[2] : esc(r[2])}</td>
+        <td class="new">${res.html ? r[3] : esc(r[3])}</td></tr>`).join('')}
     </table></div>
-    ${res.extra ? `<div class="note"><b>_Path sau khi rút gọn</b> (chỉ dùng ở editor; runtime tra bằng _Name và PPtr):<br>\${
+    ${res.extra ? `<div class="note"><b>_Path sau khi rút gọn</b> (chỉ dùng ở editor; runtime tra bằng _Name và PPtr):<br>${
       res.extra.names.map((n,i) => `<code>${esc(n)}</code> → ${esc(res.extra.paths[i])}`).join('<br>')}</div>` : ''}
     </div>
     <div class="panel"><h2>Kết quả</h2><table>
       <tr><td>Dung lượng</td><td>${res.out.length.toLocaleString('vi-VN')} byte ${same ? '— khớp file nguồn' : `— <b>khác nguồn ${(res.out.length-ORIG.length > 0 ? '+' : '')}${res.out.length-ORIG.length}</b>`}</td></tr>
-      ${same ? `<tr><td>Số byte đổi</td><td>\${nd.toLocaleString('vi-VN')}</td></tr>` : ''}
-      ${KIND && DET && DET.build ? `<tr><td>Phiên bản</td><td>\${esc(DET.build)}</td></tr>` : ''}
+      ${same ? `<tr><td>Số byte đổi</td><td>${nd.toLocaleString('vi-VN')}</td></tr>` : ''}
+      ${KIND && DET && DET.build ? `<tr><td>Phiên bản</td><td>${esc(DET.build)}</td></tr>` : ''}
     </table>
     <div class="note" style="margin-top:12px">File tải về giữ nguyên tên gốc, chép đè thẳng lên file cũ:</div>
     <span class="fname">${esc(FILE.name)}</span>
     <div class="row" style="margin-top:14px"><button id="dl" type="button">Tải file đã sửa</button></div></div>`);
 
-  \$('#dl').onclick = () => {
+  $('#dl').onclick = () => {
     if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.saveFile) {
       const bytes = res.out;
       const CHUNK = 65536;
@@ -2067,18 +2061,13 @@ async function load(file){
 
 for (const el of document.querySelectorAll('.pre')){
   el.addEventListener('click', () => {
-    if (el.querySelector('input').disabled) return;
     el.querySelector('input').checked = true;
     syncPanels();
   });
 }
 
-for (const el of document.querySelectorAll('.pre')){
-  el.classList.add('off');
-  el.querySelector('input').checked = false;
-}
-for (const id of ['advBox', 'colBox', 'holoBox']) \$('#' + id).classList.add('off');
-\$('#go').disabled = true;
+for (const id of ['advBox', 'colBox', 'holoBox']) $('#' + id).classList.add('off');
+$('#go').disabled = false; // Mở khóa nút Tạo file sẵn sàng
 
 for (const [c, t] of [['cXray','tXray'], ['cLine','tLine'], ['cDim','tDim'],
                       ['cTint','tTint'], ['cRim','tRim'], ['cScan','tScan']]){
