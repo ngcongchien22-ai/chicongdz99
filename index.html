@@ -15,7 +15,7 @@
   /* ── Hiệu ứng Nền Vũ Trụ ── */
     body {
     margin: 0;
-    background-color: #070B14; /* Thêm dòng này để lót nền tối */
+    background-color: #070B14;
     background: #070B14 url('Https://www.image2url.com/r2/default/gifs/1790222811378-a9a85d25-8ee8-4ebb-ab27-dd829df0b1d4.gif') no-repeat center center fixed;
     background-size: cover;
     color: var(--ink);
@@ -236,6 +236,18 @@
 
   <div id="info"></div>
 
+  <!-- TRÌNH PHÁT NHẠC KẾT NỐI GOOGLE SHEETS -->
+  <div class="panel" id="musicPanel">
+    <h2>Trình phát nhạc nền</h2>
+    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+      <select id="songSelect" style="flex: 1; min-width: 200px; padding: 10px; border-radius: 8px; background: rgba(7,11,20,0.6); color: var(--ink); border: 1px solid rgba(74,125,255,0.22); font: inherit; font-size: 13.5px;">
+        <option value="">-- Đang tải danh sách từ Google Sheets... --</option>
+      </select>
+      <button id="togglePlayBtn" type="button">Bật nhạc</button>
+    </div>
+    <audio id="bgAudio" loop></audio>
+  </div>
+
   <div class="presets" id="presets">
     <label class="pre sel">
       <input type="radio" name="p" value="1" checked>
@@ -438,6 +450,83 @@ document.getElementById('closeOnboardingBtn').addEventListener('click', () => {
   document.getElementById('onboardingView').classList.add('hidden');
 });
 
+/* ═══════════ KẾT NỐI GOOGLE SHEETS & TRÌNH PHÁT NHẠC ═══════════ */
+const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1WJq4EWe-hlahMC0GPcLkjYkKXcDJnA6FX4f-pVgCTpY/export?format=csv';
+
+const audioEl = document.getElementById('bgAudio');
+const songSelect = document.getElementById('songSelect');
+const togglePlayBtn = document.getElementById('togglePlayBtn');
+let isPlaying = false;
+
+async function loadPlaylistFromGoogleSheets() {
+  try {
+    const response = await fetch(SHEET_CSV_URL);
+    const csvText = await response.text();
+    const rows = csvText.split('\n').map(r => r.split(','));
+    let playlist = [];
+    for (let i = 1; i < rows.length; i++) {
+      const row = rows[i];
+      if (row.length >= 2) {
+        let name = row[0].replace(/^"|"$/g, '').trim();
+        let link = row.slice(1).join(',').replace(/^"|"$/g, '').trim();
+        if (name && link) {
+          playlist.push({ name, link });
+        }
+      }
+    }
+
+    if (playlist.length > 0) {
+      songSelect.innerHTML = '<option value="">-- Chọn bài hát --</option>';
+      playlist.forEach((song, index) => {
+        const opt = document.createElement('option');
+        opt.value = song.link;
+        opt.textContent = `${index + 1}. ${song.name}`;
+        songSelect.appendChild(opt);
+      });
+      audioEl.src = playlist[0].link;
+      songSelect.value = playlist[0].link;
+    } else {
+      songSelect.innerHTML = '<option value="">Không có bài hát nào trong Sheets</option>';
+    }
+  } catch (err) {
+    console.error('Lỗi tải danh sách nhạc:', err);
+    songSelect.innerHTML = '<option value="">Lỗi kết nối Google Sheets</option>';
+  }
+}
+
+songSelect.addEventListener('change', () => {
+  const selectedUrl = songSelect.value;
+  if (!selectedUrl) return;
+  audioEl.src = selectedUrl;
+  if (isPlaying) {
+    audioEl.play().catch(e => console.log('Không thể phát:', e));
+  }
+});
+
+togglePlayBtn.addEventListener('click', () => {
+  if (!audioEl.src) {
+    alert('Vui lòng chọn bài hát trước!');
+    return;
+  }
+  
+  if (isPlaying) {
+    audioEl.pause();
+    isPlaying = false;
+    togglePlayBtn.textContent = 'Bật nhạc';
+    togglePlayBtn.style.background = 'linear-gradient(135deg,#2E63DB,#6040C8)';
+  } else {
+    audioEl.play().then(() => {
+      isPlaying = true;
+      togglePlayBtn.textContent = 'Tắt nhạc';
+      togglePlayBtn.style.background = 'linear-gradient(135deg,#E85060,#E8A030)';
+    }).catch(e => {
+      alert('Trình duyệt chặn phát tự động, hãy bấm chọn bài trước.');
+    });
+  }
+});
+
+loadPlaylistFromGoogleSheets();
+
 /* ═══════════ tiện ích ═══════════ */
 const $ = s => document.querySelector(s);
 const hx = n => n.toString(16);
@@ -481,7 +570,6 @@ function lz4dec(src, outSize){
       i += lit; o += lit;
     }
 
-    /* token cuối chỉ có literal, không kèm match */
     if (i >= n) break;
 
     const off = src[i] | (src[i+1] << 8); i += 2;
@@ -494,7 +582,6 @@ function lz4dec(src, outSize){
     }
     ml += 4;
     if (o + ml > outSize) throw new Error('LZ4: match vượt kích thước đầu ra');
-    /* copy từng byte — vùng match có thể chồng lấn khi off < ml */
     let sp = o - off;
     for (let k = 0; k < ml; k++) dst[o++] = dst[sp++];
   }
@@ -1621,7 +1708,7 @@ async function applyPreset4(orig, b, opt){
 /* ═══════════ giao diện ═══════════ */
 let FILE = null, ORIG = null, BUN = null, KIND = null, DET = null;
 
-function render(el, html){ $(el).innerHTML = html; }
+function render(el, html){ \$(el).innerHTML = html; }
 
 const BUILDS = {
   uma: [
@@ -1785,7 +1872,7 @@ function syncPanels(){
   const v = sel ? sel.value : null;
   for (const el of document.querySelectorAll('.pre'))
     el.classList.toggle('sel', el.querySelector('input') === sel);
-  const adv = $('#advBox'), col = $('#colBox'), holo = $('#holoBox');
+  const adv = \$('#advBox'), col = $('#colBox'), holo = $('#holoBox');
   adv.classList.toggle('off',  v !== '2');
   col.classList.toggle('off',  v !== '3');
   holo.classList.toggle('off', v !== '4');
@@ -1796,7 +1883,7 @@ function syncPanels(){
 
 async function load(file){
   FILE = file; ORIG = null; BUN = null; KIND = null; DET = null;
-  $('#go').disabled = true;
+  \$('#go').disabled = true;
   render('#out', '');
   let buf;
   try { buf = await file.arrayBuffer(); }
@@ -1832,19 +1919,19 @@ async function load(file){
     <tr><td>Định dạng</td><td>UnityFS fmt ${BUN.fmt} · ${esc(BUN.rev)}</td></tr>
     <tr><td>Block</td><td>${BUN.blocks.length} · ${comp ? 'có nén' : 'uncompressed'} · flags 0x${hx(BUN.flags)}</td></tr>
     ${node ? `<tr><td>Node</td><td>${esc(node.name)} ·${node.size.toLocaleString('vi-VN')} byte</td></tr>` : ''}
-    ${det.detail ? `<tr><td>Nhận diện</td><td>${esc(det.detail)}</td></tr>` : ''}
+    ${det.detail ? `<tr><td>Nhận diện</td><td>\${esc(det.detail)}</td></tr>` : ''}
   </table></div>`);
 
-  $('#drop').classList.add('has');
-  $('#dropText').innerHTML =
+  \$('#drop').classList.add('has');
+  \$('#dropText').innerHTML =
     `<b>${esc(file.name)}</b><span>${ORIG.length.toLocaleString('vi-VN')} byte — bấm để chọn file khác</span>`;
   applyKind(KIND);
-  $('#go').disabled = !KIND;
+  \$('#go').disabled = !KIND;
 }
 
-$('#go').onclick = async () => {
+\$('#go').onclick = async () => {
   const p = document.querySelector('input[name=p]:checked').value;
-  const btn = $('#go');
+  const btn = \$('#go');
   btn.disabled = true;
   const label = btn.textContent;
   btn.textContent = 'Đang xử lý…';
@@ -1857,7 +1944,7 @@ $('#go').onclick = async () => {
     });
     else if (p === '3') {
       const grab = (id, name) => {
-        const v = hex2rgb($('#' + id).value);
+        const v = hex2rgb(\$('#' + id).value);
         if (!v) throw new Error(`Mã màu ${name} không hợp lệ: "${$('#'+id).value}" (cần dạng #RRGGBB).`);
         return v;
       };
@@ -1865,23 +1952,23 @@ $('#go').onclick = async () => {
         xray:  grab('tXray', 'súng'),
         line:  grab('tLine', 'viền súng'),
         dim:   grab('tDim',  'keo'),
-        width: parseFloat($('#rWidth').value),
-        alpha: parseFloat($('#rAlpha').value)
+        width: parseFloat(\$('#rWidth').value),
+        alpha: parseFloat(\$('#rAlpha').value)
       });
     }
     else {
       const grab = (id, name) => {
-        const v = hex2rgb($('#' + id).value);
+        const v = hex2rgb(\$('#' + id).value);
         if (!v) throw new Error(`Mã màu ${name} không hợp lệ: "${$('#'+id).value}" (cần dạng #RRGGBB).`);
         return v;
       };
       res = await applyPreset4(ORIG, BUN, {
-        tint:  grab('tTint', 'nhân vật'),  tintA:  parseFloat($('#rTintA').value),
-        rim:   grab('tRim',  'viền'),      rimA:   parseFloat($('#rRimA').value),
-        scan:  grab('tScan', 'quét'),      scanA:  parseFloat($('#rScanA').value),
-        xray:   $('#kXray').checked,
-        line:   $('#kLine').checked,
-        glitch: $('#kGlitch').checked
+        tint:  grab('tTint', 'nhân vật'),  tintA:  parseFloat(\$('#rTintA').value),
+        rim:   grab('tRim',  'viền'),      rimA:   parseFloat(\$('#rRimA').value),
+        scan:  grab('tScan', 'quét'),      scanA:  parseFloat(\$('#rScanA').value),
+        xray:   \$('#kXray').checked,
+        line:   \$('#kLine').checked,
+        glitch: \$('#kGlitch').checked
       });
     }
   } catch(e){
@@ -1899,25 +1986,25 @@ $('#go').onclick = async () => {
   render('#out', `
     <div class="msg ok">${res.note}</div>
     <div class="panel"><h2>Thay đổi</h2><div class="hexwrap"><table class="hex">
-      <tr>${res.cols.map(c => `<th>${esc(c)}</th>`).join('')}</tr>
+      <tr>${res.cols.map(c => `<th>\${esc(c)}</th>`).join('')}</tr>
       ${res.rows.map(r => `<tr>
-        <td class="dim">${esc(r[0])}</td><td class="dim">${esc(r[1])}</td>
-        <td class="old">${res.html ? r[2] : esc(r[2])}</td>
-        <td class="new">${res.html ? r[3] : esc(r[3])}</td></tr>`).join('')}
+        <td class="dim">\${esc(r[0])}</td><td class="dim">\${esc(r[1])}</td>
+        <td class="old">\${res.html ? r[2] : esc(r[2])}</td>
+        <td class="new">\${res.html ? r[3] : esc(r[3])}</td></tr>`).join('')}
     </table></div>
-    ${res.extra ? `<div class="note"><b>_Path sau khi rút gọn</b> (chỉ dùng ở editor; runtime tra bằng _Name và PPtr):<br>${
+    ${res.extra ? `<div class="note"><b>_Path sau khi rút gọn</b> (chỉ dùng ở editor; runtime tra bằng _Name và PPtr):<br>\${
       res.extra.names.map((n,i) => `<code>${esc(n)}</code> → ${esc(res.extra.paths[i])}`).join('<br>')}</div>` : ''}
     </div>
     <div class="panel"><h2>Kết quả</h2><table>
       <tr><td>Dung lượng</td><td>${res.out.length.toLocaleString('vi-VN')} byte ${same ? '— khớp file nguồn' : `— <b>khác nguồn ${(res.out.length-ORIG.length > 0 ? '+' : '')}${res.out.length-ORIG.length}</b>`}</td></tr>
-      ${same ? `<tr><td>Số byte đổi</td><td>${nd.toLocaleString('vi-VN')}</td></tr>` : ''}
-      ${KIND && DET && DET.build ? `<tr><td>Phiên bản</td><td>${esc(DET.build)}</td></tr>` : ''}
+      ${same ? `<tr><td>Số byte đổi</td><td>\${nd.toLocaleString('vi-VN')}</td></tr>` : ''}
+      ${KIND && DET && DET.build ? `<tr><td>Phiên bản</td><td>\${esc(DET.build)}</td></tr>` : ''}
     </table>
     <div class="note" style="margin-top:12px">File tải về giữ nguyên tên gốc, chép đè thẳng lên file cũ:</div>
     <span class="fname">${esc(FILE.name)}</span>
     <div class="row" style="margin-top:14px"><button id="dl">Tải file đã sửa</button></div></div>`);
 
-  $('#dl').onclick = () => {
+  \$('#dl').onclick = () => {
     if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.saveFile) {
       const bytes = res.out;
       const CHUNK = 65536;
@@ -1947,8 +2034,8 @@ for (const el of document.querySelectorAll('.pre')){
   el.classList.add('off');
   el.querySelector('input').checked = false;
 }
-for (const id of ['advBox', 'colBox', 'holoBox']) $('#' + id).classList.add('off');
-$('#go').disabled = true;
+for (const id of ['advBox', 'colBox', 'holoBox']) \$('#' + id).classList.add('off');
+\$('#go').disabled = true;
 
 for (const [c, t] of [['cXray','tXray'], ['cLine','tLine'], ['cDim','tDim'],
                       ['cTint','tTint'], ['cRim','tRim'], ['cScan','tScan']]){
