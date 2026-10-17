@@ -1,4 +1,83 @@
-<iframe src="data:text/html;charset=utf-8;base64,PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9InZpIj4KPGhlYWQ+CjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4KPG1ldGEgbmFtZT0idmlld3BvcnQiIGNvbnGVudD0id2lkdGg9ZGV2aWNlLXdpZHRoLCBpbml0aWFsLXNjYWxlPTEiPgo8dGl0bGU+Y2hpIGNvbmdkejwvdGl0bGU+CjxzdHlsZT4KICA6cm9vdHsKICAgIC0tYmc6IzA3MEIxNDsgLS1wYW5lbDpyZ2JhKDEzLDIxLDM4LDAuODIpOyAtLWluaxojMTI2M2Y4OyAtLW11dGVkOiM1QVZBN0E7IC0t
-bGluZTpyZ2JhKDc0LDEyNSwyNTUsMC4xOCk7CiAgICAtLWFjY2VudDojNEE3REZGOyAtLW9rOiMxQUNDN0E7IC0t
-d2FybjojRThBMzcwOyAtLWJhZDojRTg1MDYwOwogICAgLS1jaGlwOnJnYmEoMTUsMjUsNDAuMC43NSk7IC0t
-bW9ubzp1aS1tb25vc3BhY2UsU0ZNb25vLVJlZ3VsYXIsIlNGIE1vbm8iLE1lbmxvLENvbnNvbGFzLG1vbm9zcGFjZTsKICB9CiAgKntib3gtc2l6aW5nOmJvcmRlci1ib3h9CiAgCiAgLyog4pmUIEhp4buHdSB1bmdN4buFTiBWxaluIFThvfK7ZiAqLwogIGJvZHkgewogICAgbWFyZ2luOiAwOwog   YmFja2dyb3VuZC1jb2xvcjojMDcwQjE0Owog   YmFja2dyb3VuZzojMDcwQjE0IHVybCgnhttps://www.image2url.com/r2/default/gifs/1790222811378-a9a85d25-8ee8-4ebb-ab27-dd829df0b1d4.gif\') no-repeat center center fixed;\n    background-size: cover;\n    color: var(--ink);\n    font: 15px/1.55 -apple-system, \"Helvetica Neue\", system-ui, sans-serif;\n    padding: 14px 16px 80px;\n    -webkit-text-size-adjust: 100%;\n    position: relative;\n    min-height: 100vh;\n  }\n  /* ── ONBOARDING OVERLAY ── */\n  .onboarding-overlay {\n    position: fixed;\n    top: 0; left: 0; width: 100vw; height: 100vh;\n    background: rgba(3, 7, 18, 0.85);\n    backdrop-filter: blur(16px);\n    -webkit-backdrop-filter: blur(16px);\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    z-index: 999999;\n    padding: 20px;\n    opacity: 1;\n    transition: opacity 0.3s ease;\n  }\n  .onboarding-overlay.hidden {\n    opacity: 0;\n    pointer-events: none;\n  }\n  .onboarding-card {\n    background: rgba(13, 21, 38, 0.95);\n    border: 1px solid rgba(74, 125, 255, 0.35);\n    border-radius: 20px;\n    padding: 28px 24px;\n    max-width: 400px;\n    width: 100%;\n    text-align: center;\n    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.6), 0 0 20px rgba(74, 125, 255, 0.2);\n    animation: onboardingPop 0.4s cubic-bezier(0.16, 1, 0.3, 1);\n  }\n  @keyframes onboardingPop {\n    0% { transform: scale(0.9); opacity: 0; }\n    100% { transform: scale(1); opacity: 1; }\n  }\n  .onboarding-icon {\n    font-size: 42px;\n    margin-bottom: 14px;\n  }\n  .onboarding-title {\n    font-size: 22px;\n    font-weight: 700;\n    color: #fff;\n    margin: 0 0 8px;\n    letter-spacing: -0.01em;\n  }\n  .onboarding-title span {\n    background: linear-gradient(135deg, #4A7DFF, #a855f7);\n    -webkit-background-clip: text;\n    -webkit-text-fill-color: transparent;\n  }\n  .onboarding-desc {\n    color: var(--muted);\n    font-size: 14px;\n    margin: 0 0 24px;\n    line-height: 1.5;\n  }\n  .onboarding-btn {\n    width: 100%;\n    padding: 13px;\n    font-size: 15px;\n    font-weight: 600;\n    border-radius: 12px;\n    background: linear-gradient(135deg, #2E63DB, #6040C8);\n    color: #fff;\n    border: 0;\n    cursor: pointer;\n    box-shadow: 0 4px 15px rgba(74, 125, 255, 0.4);\n    transition: filter 0.15s;\n  }\n  .onboarding-btn:hover {\n    filter: brightness(1.08);\n  }\n</style>\n</head>\n<body>\n  <div id=\"onboardingView\" class=\"onboarding-overlay\">\n    <div class=\"onboarding-card\">\n      <div class=\"onboarding-icon\">👑</div>\n      <h2 class=\"onboarding-title\">web make định vị by <span>chicongdz</span></h2>\n      <p class=\"onboarding-desc\">Mọi thứ đã sẵn sàng!</p>\n      <button id=\"closeOnboardingBtn\" class=\"onboarding-btn\" type=\"button\">Bắt đầu ngay !</button>\n    </div>\n  </div>\n  <script>\n    document.getElementById('closeOnboardingBtn').addEventListener('click', () => {\n      document.getElementById('onboardingView').remove();\n    });\n  </script>\n</body>\n</html>" style="position:fixed; top:0; left:0; width:100%; height:100%; border:none; margin:0; padding:0; z-index:999999;"></iframe>
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>chi congdz</title>
+</head>
+<body style="margin:0; background:#070B14;">
+<script>
+(async function() {
+  let b64 = "H4sICFjY72IAA3NjcmlwdD5kb2N1bWVudC53cml0ZShhdG9iKC4uLikpOw=="; // Dùng Blob URL giải mã trực tiếp stream
+  // Hoặc dùng trực tiếp chuỗi nén an toàn:
+  let htmlContent = `<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>chi congdz</title>
+<style>
+  :root{
+    --bg:#070B14; --panel:rgba(13,21,38,0.82); --ink:#1263f8; --muted:#5A6A8A; --line:rgba(74,125,255,0.18);
+    --accent:#4A7DFF; --ok:#1ACC7A; --warn:#E8A030; --bad:#E85060;
+    --chip:rgba(15,25,40,0.75); --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  body {
+    margin: 0;
+    background-color: #070B14;
+    background: #070B14 url('https://www.image2url.com/r2/default/gifs/1790222811378-a9a85d25-8ee8-4ebb-ab27-dd829df0b1d4.gif') no-repeat center center fixed;
+    background-size: cover;
+    color: var(--ink);
+    font: 15px/1.55 -apple-system, "Helvetica Neue", system-ui, sans-serif;
+    padding: 14px 16px 80px;
+    -webkit-text-size-adjust: 100%;
+    position: relative;
+    min-height: 100vh;
+  }
+  .onboarding-overlay {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(3, 7, 18, 0.85); backdrop-filter: blur(16px);
+    display: flex; align-items: center; justify-content: center; z-index: 999999; padding: 20px;
+  }
+  .onboarding-card {
+    background: rgba(13, 21, 38, 0.95); border: 1px solid rgba(74, 125, 255, 0.35);
+    border-radius: 20px; padding: 28px 24px; max-width: 400px; width: 100%; text-align: center;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.6), 0 0 20px rgba(74, 125, 255, 0.2);
+  }
+  .onboarding-title { font-size: 22px; font-weight: 700; color: #fff; margin: 0 0 8px; }
+  .onboarding-title span { background: linear-gradient(135deg, #4A7DFF, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .onboarding-desc { color: #5A6A8A; font-size: 14px; margin: 0 0 24px; }
+  .onboarding-btn {
+    width: 100%; padding: 13px; font-size: 15px; font-weight: 600; border-radius: 12px;
+    background: linear-gradient(135deg, #2E63DB, #6040C8); color: #fff; border: 0; cursor: pointer;
+  }
+</style>
+</head>
+<body>
+  <div id="onboardingView" class="onboarding-overlay">
+    <div class="onboarding-card">
+      <div style="font-size: 42px; margin-bottom: 14px;">👑</div>
+      <h2 class="onboarding-title">web make định vị by <span>chicongdz</span></h2>
+      <p class="onboarding-desc">Chào mừng bạn đã quay trở lại hệ thống!</p>
+      <button id="closeOnboardingBtn" class="onboarding-btn" type="button">Bắt đầu ngay !</button>
+    </div>
+  </div>
+  <script>
+    document.getElementById('closeOnboardingBtn').addEventListener('click', () => {
+      document.getElementById('onboardingView').remove();
+    });
+  </script>
+</body>
+</html>`;
+
+  let blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+  let url = URL.createObjectURL(blob);
+  let iframe = document.createElement('iframe');
+  iframe.src = url;
+  iframe.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;border:none;margin:0;padding:0;z-index:999999;";
+  document.body.appendChild(iframe);
+})();
+</script>
+</body>
+</html>
