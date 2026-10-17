@@ -1,2051 +1,2179 @@
-<!doctype html>
-<html lang="vi">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>chi congdz</title>
-<style>
-  :root{
-    --bg:#070B14; --panel:rgba(13,21,38,0.82); --ink:#1263f8; --muted:#5A6A8A; --line:rgba(74,125,255,0.18);
-    --accent:#4A7DFF; --ok:#1ACC7A; --warn:#E8A030; --bad:#E85060;
-    --chip:rgba(15,25,40,0.75); --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
-  }
-  *{box-sizing:border-box}
-  
-  /* ── Hiệu ứng Nền Vũ Trụ ── */
-  body {
-    margin: 0;
-    background-color: #070B14;
-    background: #070B14 url('https://www.image2url.com/r2/default/gifs/1790222811378-a9a85d25-8ee8-4ebb-ab27-dd829df0b1d4.gif') no-repeat center center fixed;
-    background-size: cover;
-    color: var(--ink);
-    font: 15px/1.55 -apple-system, "Helvetica Neue", system-ui, sans-serif;
-    padding: 14px 16px 80px;
-    -webkit-text-size-adjust: 100%;
-    position: relative;
-    min-height: 100vh;
-  }
-
-  /* ── ONBOARDING OVERLAY ── */
-  .onboarding-overlay {
-    position: fixed;
-    top: 0; left: 0; width: 100vw; height: 100vh;
-    background: rgba(3, 7, 18, 0.85);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 999999;
-    padding: 20px;
-    opacity: 1;
-    transition: opacity 0.3s ease;
-  }
-  .onboarding-overlay.hidden {
-    opacity: 0;
-    pointer-events: none;
-  }
-  .onboarding-card {
-    background: rgba(13, 21, 38, 0.95);
-    border: 1px solid rgba(74, 125, 255, 0.35);
-    border-radius: 20px;
-    padding: 28px 24px;
-    max-width: 400px;
-    width: 100%;
-    text-align: center;
-    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.6), 0 0 20px rgba(74, 125, 255, 0.2);
-    animation: onboardingPop 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  @keyframes onboardingPop {
-    0% { transform: scale(0.9); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
-  }
-  .onboarding-icon {
-    font-size: 42px;
-    margin-bottom: 14px;
-  }
-  .onboarding-title {
-    font-size: 22px;
-    font-weight: 700;
-    color: #fff;
-    margin: 0 0 8px;
-    letter-spacing: -0.01em;
-  }
-  .onboarding-title span {
-    background: linear-gradient(135deg, #4A7DFF, #a855f7);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-  .onboarding-desc {
-    color: var(--muted);
-    font-size: 14px;
-    margin: 0 0 24px;
-    line-height: 1.5;
-  }
-  .onboarding-btn {
-    width: 100%;
-    padding: 13px;
-    font-size: 15px;
-    font-weight: 600;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #2E63DB, #6040C8);
-    color: #fff;
-    border: 0;
-    cursor: pointer;
-    box-shadow: 0 4px 15px rgba(74, 125, 255, 0.4);
-    transition: filter 0.15s;
-  }
-  .onboarding-btn:hover {
-    filter: brightness(1.08);
-  }
-
-  /* ── hướng dẫn ── */
-  .wrap{max-width:600px;margin:0 auto}
-  .guide{border-radius:16px;padding:16px;margin-bottom:14px;
-         background:rgba(13,21,38,0.78);border:1px solid rgba(74,125,255,0.22);
-         backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
-  .guide-title{font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
-               color:#4A7DFF;margin:0 0 12px;display:flex;align-items:center;gap:7px}
-  .guide-title::before{content:"ℹ";font-size:14px}
-  .steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
-  .steps li{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--ink)}
-  .step-n{min-width:22px;height:22px;border-radius:50%;display:flex;align-items:center;
-          justify-content:center;font-size:11px;font-weight:800;flex:none;
-          background:linear-gradient(135deg,#2E63DB,#6040C8);color:#fff;margin-top:1px}
-  .steps li b{color:#fff}
-  .steps li span{color:var(--muted);font-size:12px;display:block;margin-top:1px}
-  .presets-guide{margin-top:12px;padding-top:11px;border-top:1px solid var(--line);
-                 display:grid;grid-template-columns:1fr 1fr;gap:6px}
-  .pg-item{background:rgba(74,125,255,0.07);border:1px solid rgba(74,125,255,0.15);
-           border-radius:9px;padding:8px 10px}
-  .pg-item .pg-num{font-size:10px;font-weight:800;color:#4A7DFF;margin-bottom:2px}
-  .pg-item .pg-name{font-size:12px;font-weight:700;color:var(--ink)}
-  .pg-item .pg-desc{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.4}
-
-  h1{font-size:21px;margin:0 0 4px;letter-spacing:-.01em}
-  .sub{color:var(--muted);font-size:13.5px;margin:0 0 22px}
-  .panel{background:rgba(13,21,38,0.80);border:1px solid rgba(74,125,255,0.18);border-radius:14px;
-         padding:16px;margin-bottom:14px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
-
-  #drop{border:1.5px dashed rgba(74,125,255,0.35);border-radius:14px;padding:28px 16px;text-align:center;
-        cursor:pointer;transition:.15s;background:rgba(74,125,255,0.04);margin-bottom:14px;
-        backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
-  #drop:hover,#drop.over{border-color:var(--accent);background:rgba(74,125,255,0.08)}
-  #drop b{display:block;font-size:15px;margin-bottom:5px;color:var(--ink)}
-  #drop span{color:var(--muted);font-size:12.5px}
-  #drop.has{padding:14px 16px;border-style:solid;border-color:rgba(74,125,255,0.6)}
-
-  h2{font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);
-     margin:0 0 12px;font-weight:600}
-  table{width:100%;border-collapse:collapse;font-size:13.5px}
-  td{padding:5px 0;vertical-align:top}
-  td:first-child{color:var(--muted);width:180px;padding-right:14px;white-space:nowrap}
-  td:last-child{font-family:var(--mono);font-size:12.5px;word-break:break-all}
-
-  .hexwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
-  table.hex{font-family:var(--mono);font-size:12px;white-space:nowrap;width:auto;min-width:100%}
-  table.hex th{text-align:left;font-weight:600;color:var(--muted);font-size:11px;
-               text-transform:uppercase;letter-spacing:.05em;padding:0 16px 7px 0;border-bottom:1px solid var(--line)}
-  table.hex td{padding:6px 16px 6px 0;border-bottom:1px solid var(--line);width:auto;color:var(--ink)}
-  table.hex td:first-child{width:auto;color:var(--muted)}
-  table.hex tr:last-child td{border-bottom:0}
-  .old{color:var(--bad)} .new{color:var(--ok)} .dim{color:var(--muted)}
-
-  .presets{display:grid;gap:10px;margin-bottom:16px}
-  .pre{display:flex;gap:12px;align-items:flex-start;border:1.5px solid rgba(74,125,255,0.18);border-radius:12px;
-       padding:13px 14px;cursor:pointer;background:rgba(13,21,38,0.72);transition:.13s;
-       backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
-  .pre:hover{border-color:rgba(74,125,255,0.45)}
-  .pre.sel{border-color:var(--accent);background:rgba(74,125,255,0.1)}
-  .off{display:none !important}
-  .pre input{margin:3px 0 0;accent-color:var(--accent);flex:none}
-  .pre .t{font-weight:600;font-size:14.5px;margin-bottom:3px}
-  .pre .d{color:var(--muted);font-size:12.5px;line-height:1.5}
-  .pre .n{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-top:6px}
-
-  .msg{border-radius:9px;padding:11px 14px;font-size:13.5px;margin-bottom:14px;border:1px solid}
-  .msg.ok{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 35%,transparent);
-          background:color-mix(in srgb,var(--ok) 9%,transparent)}
-  .msg.bad{color:var(--bad);border-color:color-mix(in srgb,var(--bad) 35%,transparent);
-           background:color-mix(in srgb,var(--bad) 9%,transparent)}
-  .msg.warn{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 35%,transparent);
-            background:color-mix(in srgb,var(--warn) 9%,transparent)}
-
-  button{font:inherit;font-size:14px;font-weight:600;border:0;border-radius:10px;padding:12px 24px;
-         background:linear-gradient(135deg,#2E63DB,#6040C8);color:#fff;cursor:pointer;
-         box-shadow:0 2px 12px rgba(74,125,255,0.35);transition:filter .1s}
-  button:hover:not(:disabled){filter:brightness(1.07)}
-  button:disabled{opacity:.45;cursor:not-allowed}
-  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-  .hide{display:none}
-  code{font-family:var(--mono);font-size:12.5px;background:var(--chip);padding:1px 5px;border-radius:4px}
-  .note{color:var(--muted);font-size:12.5px;margin-top:10px;line-height:1.5}
-  .fname{font-family:var(--mono);font-size:12.5px;background:var(--chip);padding:8px 10px;
-         border-radius:7px;word-break:break-all;margin-top:6px;display:block}
-  .adv{margin-top:12px;border-top:1px solid var(--line);padding-top:12px}
-  .adv summary{cursor:pointer;color:var(--muted);font-size:12.5px;user-select:none}
-  .flds{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:12px}
-  .fld label{display:block;font-size:11.5px;color:var(--muted);margin-bottom:4px}
-  .fld input{width:100%;font:inherit;font-family:var(--mono);font-size:13px;padding:7px 9px;
-             border:1px solid rgba(74,125,255,0.22);border-radius:7px;background:rgba(7,11,20,0.6);color:var(--ink)}
-
-  .cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-top:12px}
-  .cfld label{display:block;font-size:11.5px;color:var(--muted);margin-bottom:6px}
-  .cfld label .dim{font-family:var(--mono);font-size:11px}
-  .crow{display:flex;gap:8px;align-items:center}
-  .crow input[type=color]{width:44px;height:36px;padding:2px;border:1px solid rgba(74,125,255,0.22);
-                          border-radius:7px;background:rgba(7,11,20,0.6);cursor:pointer;flex:none}
-  .crow input[type=text]{flex:1;min-width:0;font:inherit;font-family:var(--mono);font-size:13px;
-                         padding:8px 9px;border:1px solid rgba(74,125,255,0.22);border-radius:7px;
-                         background:rgba(7,11,20,0.6);color:var(--ink);text-transform:uppercase}
-  .crow input[type=text].bad{border-color:var(--bad)}
-  .wfld,.afld{margin-top:16px}
-  .wfld label,.afld label{display:block;font-size:11.5px;color:var(--muted);margin-bottom:7px}
-  .wfld label b,.afld label b{color:var(--ink);font-family:var(--mono)}
-  input[type=range]{width:100%;accent-color:var(--accent)}
-  .swatch{display:inline-block;width:11px;height:11px;border-radius:3px;vertical-align:-1px;
-          margin-right:6px;border:1px solid rgba(255,255,255,0.45)}
-  .fxrow{display:flex;gap:20px;flex-wrap:wrap;margin-top:16px}
-  .chk{display:flex;gap:8px;align-items:center;cursor:pointer;font-size:13.5px}
-  .chk input{accent-color:var(--accent);width:16px;height:16px;cursor:pointer;flex:none}
-  .chk .dim{color:var(--muted);font-family:var(--mono);font-size:11.5px}
-</style>
-</head>
-<body>
-
-  <!-- ONBOARDING VIEW -->
-  <div id="onboardingView" class="onboarding-overlay">
-    <div class="onboarding-card">
-      <div class="onboarding-icon">👑</div>
-      <h2 class="onboarding-title">web make định vị by <span>chicongdz</span></h2>
-      <p class="onboarding-desc">Chào mừng bạn đã quay trở lại với hệ thống make định vị của tôi. Mọi thứ đã sẵn sàng để sử dụng!</p>
-      <button id="closeOnboardingBtn" class="onboarding-btn" type="button">Bắt đầu ngay !</button>
-    </div>
-  </div>
-
-<div class="wrap">
-
-  <div id="drop">
-    <div id="dropText">
-      <b>Bấm để chọn file bundle</b>
-      <span>assetindexer / shaders / optionalavatarres_commonab_shader</span>
-    </div>
-    <input type="file" id="file" class="hide">
-  </div>
-
-  <div id="info"></div>
-
-  <!-- TRÌNH PHÁT NHẠC KẾT NỐI GOOGLE SHEETS -->
-  <div class="panel" id="musicPanel">
-    <h2>Trình phát nhạc nền</h2>
-    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-      <select id="songSelect" style="flex: 1; min-width: 200px; padding: 10px; border-radius: 8px; background: rgba(7,11,20,0.6); color: var(--ink); border: 1px solid rgba(74,125,255,0.22); font: inherit; font-size: 13.5px;">
-        <option value="">-- Đang tải danh sách từ Google Sheets... --</option>
-      </select>
-      <button id="togglePlayBtn" type="button">Bật nhạc</button>
-    </div>
-    <audio id="bgAudio" loop></audio>
-  </div>
-
-  <div class="presets" id="presets">
-    <label class="pre sel">
-      <input type="radio" name="p" value="1" checked>
-      <div>
-        <div class="t">1 · Dị Tật Aim Head</div>
-        <div class="d">Tráo tên <code>bone_Hips</code> ↔ <code>bone_Neck</code> trong 2 mesh xương. Sửa tại chỗ, đổi 16 byte.</div>
-        <div class="n">bone_Hips ⇄ bone_Neck · nam + nữ</div>
-      </div>
-    </label>
-    <label class="pre">
-      <input type="radio" name="p" value="2">
-      <div>
-        <div class="t">2 · AimDrag Cân Cap USP</div>
-        <div class="d">Đổi <code>bone_Left_Spine_Backpack</code> thành <code>bone_Head</code> giả ở cả hai mesh, kèm indexer 12 mục. Dựng lại bundle.</div>
-        <div class="n">nam x=−0.313340 · nữ x=−0.23 z=−0.01 · scale ±1.5555556</div>
-      </div>
-    </label>
-    <label class="pre">
-      <input type="radio" name="p" value="3">
-      <div>
-        <div class="t">3 · Định vị súng</div>
-        <div class="d">Đổi màu súng, màu viền súng và màu keo của <code>backweapon</code>, <code>brmobilebumpspec</code>, <code>brmobilebumpspecdecal</code>. Nhận file <b>shaders</b> gốc hoặc đã mod.</div>
-        <div class="n">_XRayColor · _OutLineColor · _OutLineWidth · _DimColor</div>
-      </div>
-    </label>
-    <label class="pre">
-      <input type="radio" name="p" value="4">
-      <div>
-        <div class="t">4 · Định vị nhân vật</div>
-        <div class="d">Thay toàn bộ shader nhân vật (da, tóc, quần áo, mũ) bằng <code>hologram</code> phát sáng. Nhận file <b>optionalavatarres_commonab_shader</b> gốc hoặc đã mod.</div>
-        <div class="n">_TintColor · _RimColor · _ScanColor · đường quét · nhiễu</div>
-      </div>
-    </label>
-  </div>
-
-  <details class="panel adv" id="colBox">
-    <summary>Màu preset 3</summary>
-    <div class="cols">
-      <div class="cfld">
-        <label>Màu súng <span class="dim">(_XRayColor)</span></label>
-        <div class="crow">
-          <input type="color" id="cXray" value="#111111">
-          <input type="text" id="tXray" value="#111111" spellcheck="false">
-        </div>
-      </div>
-      <div class="cfld">
-        <label>Màu viền súng <span class="dim">(_OutLineColor)</span></label>
-        <div class="crow">
-          <input type="color" id="cLine" value="#ffffff">
-          <input type="text" id="tLine" value="#FFFFFF" spellcheck="false">
-        </div>
-      </div>
-      <div class="cfld">
-        <label>Màu Keo <span class="dim">(_DimColor)</span></label>
-        <div class="crow">
-          <input type="color" id="cDim" value="#111111">
-          <input type="text" id="tDim" value="#111111" spellcheck="false">
-        </div>
-      </div>
-    </div>
-    <div class="wfld">
-      <label>Độ dày viền <span class="dim">(_OutLineWidth)</span> — <b id="wVal">4.0</b></label>
-      <input type="range" id="rWidth" min="0" max="20" step="0.5" value="4">
-    </div>
-    <div class="afld">
-      <label>Độ đục màu súng <span class="dim">(alpha)</span> — <b id="aVal">1.00</b></label>
-      <input type="range" id="rAlpha" min="0" max="1" step="0.05" value="1">
-    </div>
-    <div class="note">Màu ghi vào shader dưới dạng 4 số thực RGBA (16 byte tại chỗ) — kích thước file không đổi. Đây là <code>m_DefValue</code>, giá trị mặc định của shader.</div>
-  </details>
-
-  <details class="panel adv" id="holoBox">
-    <summary>Màu preset 4</summary>
-    <div class="cols">
-      <div class="cfld">
-        <label>Màu nhân vật <span class="dim">(_TintColor)</span></label>
-        <div class="crow">
-          <input type="color" id="cTint" value="#00ffff">
-          <input type="text" id="tTint" value="#00FFFF" spellcheck="false">
-        </div>
-      </div>
-      <div class="cfld">
-        <label>Màu sáng mép <span class="dim">(_RimColor)</span></label>
-        <div class="crow">
-          <input type="color" id="cRim" value="#00ffff">
-          <input type="text" id="tRim" value="#00FFFF" spellcheck="false">
-        </div>
-      </div>
-      <div class="cfld">
-        <label>Màu quét <span class="dim">(_ScanColor)</span></label>
-        <div class="crow">
-          <input type="color" id="cScan" value="#000000">
-          <input type="text" id="tScan" value="#000000" spellcheck="false">
-        </div>
-      </div>
-    </div>
-    <div class="afld">
-      <label>Độ đục nhân vật <span class="dim">(_TintColor alpha)</span> — <b id="tintAVal">1.00</b></label>
-      <input type="range" id="rTintA" min="0" max="1" step="0.05" value="1">
-    </div>
-    <div class="afld">
-      <label>Độ mạnh sáng mép <span class="dim">(_RimColor alpha)</span> — <b id="rimAVal">1.00</b></label>
-      <input type="range" id="rRimA" min="0" max="1" step="0.05" value="1">
-    </div>
-    <div class="afld">
-      <label>Độ mạnh quét <span class="dim">(_ScanColor alpha)</span> — <b id="scanAVal">1.00</b></label>
-      <input type="range" id="rScanA" min="0" max="1" step="0.05" value="1">
-    </div>
-    <div class="fxrow">
-      <label class="chk"><input type="checkbox" id="kXray" checked>
-        <span><b>Xuyên tường</b> <span class="dim">(zTest = Always)</span></span></label>
-      <label class="chk"><input type="checkbox" id="kLine">
-        <span>Đường quét ngang <span class="dim">(_Line)</span></span></label>
-      <label class="chk"><input type="checkbox" id="kGlitch">
-        <span>Nhiễu / giật <span class="dim">(_LineAndGlitch)</span></span></label>
-    </div>
-    <div class="note"><b>Xuyên tường</b> đặt <code>zTest = 8 (Always)</code> trong render state — đây mới là thứ làm nhân vật hiện qua vật cản, màu sắc chỉ quyết định trông ra sao. Bỏ tick trả về <code>4 (LEqual)</code>, nhân vật bị tường che như bình thường.<br>Hai hiệu ứng còn lại: bỏ tick cả hai = đúng công thức bản mod đang chạy (thân đặc, dễ nhìn địch). Tick vào bật hiệu ứng hologram gốc — có đường kẻ cắt ngang người. Muốn thấy dải quét thì đặt <b>màu quét</b> khác đen.</div>
-    <div class="note"><b>Khác với định vị súng:</b> <code>hologram</code> chỉ có 1 pass và không có tham số bề dày. <code>_RimColor</code> là <i>fresnel rim</i> — sáng dần ở mép cơ thể theo góc nhìn, không phải đường viền nét như <code>_OutLineWidth</code> của preset 3 (shader đó có pass riêng phóng to mô hình để vẽ viền). Muốn thấy rõ sáng mép thì hạ <b>độ đục nhân vật</b> xuống, nếu không màu nền sẽ lấn át.</div>
-  </details>
-
-  <details class="panel adv" id="advBox">
-    <summary>Tinh chỉnh preset 2</summary>
-    <div class="flds">
-      <div class="fld"><label>Nữ · position.x</label><input id="fx" value="-0.23"></div>
-      <div class="fld"><label>Nữ · position.z</label><input id="fz" value="-0.01"></div>
-      <div class="fld"><label>Nam · position.x</label><input id="mx" value="-0.3133402466773987"></div>
-      <div class="fld"><label>scale (x âm)</label><input id="sc" value="1.5555556"></div>
-    </div>
-    <div class="note">Trục cục bộ: <code>x</code> âm hơn = cao hơn, <code>z</code> = trái/phải, <code>y</code> = trước/sau. Scale ghi vào là <code>(−s, +s, 1.0)</code>.</div>
-  </details>
-
-  <div class="row" style="margin-bottom:16px">
-    <button id="go" disabled>Tạo file</button>
-  </div>
-
-  <div id="out"></div>
-
-  <!-- Hướng dẫn sử dụng -->
-  <div class="guide">
-    <div class="guide-title">Hướng dẫn sử dụng</div>
-    <ul class="steps">
-      <li>
-        <div class="step-n">1</div>
-        <div>
-          <b>Lấy file bundle từ game</b>
-          <span>Dùng app quản lý file (Filza, 3105…) vào thư mục cài đặt Free Fire , Free Fire Max → <code>assets/bin/Data/</code>. File cần tìm: <code>assetindexer. hoặc <code>shaders. / <code>optionalavatarres_commonab_shader.
-        </div>
-      </li>
-      <li>
-        <div class="step-n">2</div>
-        <div>
-          <b>Bấm vào ô chọn file bên trên</b>
-          <span>Chọn file bundle từ Files app. Tool sẽ tự nhận diện loại file và chỉ bật những preset phù hợp.</span>
-        </div>
-      </li>
-      <li>
-        <div class="step-n">3</div>
-        <div>
-          <b>bấm Tạo file</b>
-          <span>Chỉnh màu sắc hoặc giữ mặc định.</span>
-        </div>
-      </li>
-      <li>
-        <div class="step-n">4</div>
-        <div>
-          <b>Bấm "Tải file đã sửa" → lưu vào Files</b>
-          <span>Chép đè file đã sửa lên file gốc trong game (cùng tên, cùng vị trí).</span>
-        </div>
-
-</div>
-
-<script>
-/* ═══════════ XỬ LÝ ONBOARDING VIEW ═══════════ */
-document.getElementById('closeOnboardingBtn').addEventListener('click', (e) => {
-  e.preventDefault();
-  const overlay = document.getElementById('onboardingView');
-  overlay.classList.add('hidden');
-  setTimeout(() => {
-    overlay.remove(); // Xóa hẳn khỏi DOM để tránh tình trạng chiếm diện tích màn hình
-  }, 300);
-});
-
-/* ═══════════ KẾT NỐI GOOGLE SHEETS & TRÌNH PHÁT NHẠC ═══════════ */
-const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1WJq4EWe-hlahMC0GPcLkjYkKXcDJnA6FX4f-pVgCTpY/export?format=csv';
-
-const audioEl = document.getElementById('bgAudio');
-const songSelect = document.getElementById('songSelect');
-const togglePlayBtn = document.getElementById('togglePlayBtn');
-let isPlaying = false;
-
-async function loadPlaylistFromGoogleSheets() {
-  try {
-    const response = await fetch(SHEET_CSV_URL);
-    const csvText = await response.text();
-    const rows = csvText.split('\n').map(r => r.split(','));
-    let playlist = [];
-    for (let i = 1; i < rows.length; i++) {
-      const row = rows[i];
-      if (row.length >= 2) {
-        let name = row[0].replace(/^"|"$/g, '').trim();
-        let link = row.slice(1).join(',').replace(/^"|"$/g, '').trim();
-        if (name && link) {
-          playlist.push({ name, link });
-        }
-      }
-    }
-
-    if (playlist.length > 0) {
-      songSelect.innerHTML = '<option value="">-- Chọn bài hát --</option>';
-      playlist.forEach((song, index) => {
-        const opt = document.createElement('option');
-        opt.value = song.link;
-        opt.textContent = `${index + 1}. ${song.name}`;
-        songSelect.appendChild(opt);
-      });
-      audioEl.src = playlist[0].link;
-      songSelect.value = playlist[0].link;
-    } else {
-      songSelect.innerHTML = '<option value="">Không có bài hát nào trong Sheets</option>';
-    }
-  } catch (err) {
-    console.error('Lỗi tải danh sách nhạc:', err);
-    songSelect.innerHTML = '<option value="">Lỗi kết nối Google Sheets</option>';
-  }
-}
-
-songSelect.addEventListener('change', () => {
-  const selectedUrl = songSelect.value;
-  if (!selectedUrl) return;
-  audioEl.src = selectedUrl;
-  if (isPlaying) {
-    audioEl.play().catch(e => console.log('Không thể phát:', e));
-  }
-});
-
-togglePlayBtn.addEventListener('click', () => {
-  if (!audioEl.src) {
-    alert('Vui lòng chọn bài hát trước!');
-    return;
-  }
-  
-  if (isPlaying) {
-    audioEl.pause();
-    isPlaying = false;
-    togglePlayBtn.textContent = 'Bật nhạc';
-    togglePlayBtn.style.background = 'linear-gradient(135deg,#2E63DB,#6040C8)';
-  } else {
-    audioEl.play().then(() => {
-      isPlaying = true;
-      togglePlayBtn.textContent = 'Tắt nhạc';
-      togglePlayBtn.style.background = 'linear-gradient(135deg,#E85060,#E8A030)';
-    }).catch(e => {
-      alert('Trình duyệt chặn phát tự động, hãy bấm chọn bài trước.');
-    });
-  }
-});
-
-loadPlaylistFromGoogleSheets();
-
-/* ═══════════ tiện ích ═══════════ */
-const $ = s => document.querySelector(s);
-const hx = n => n.toString(16);
-const esc = s => String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
-const a4 = n => (n + 3) & ~3;
-
-const CRC_TAB = (() => {
-  const t = new Uint32Array(256);
-  for (let n = 0; n < 256; n++){
-    let c = n;
-    for (let k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
-    t[n] = c >>> 0;
-  }
-  return t;
-})();
-const crc32 = b => {
-  let c = 0xFFFFFFFF;
-  for (let i = 0; i < b.length; i++) c = CRC_TAB[(c ^ b[i]) & 0xFF] ^ (c >>> 8);
-  return (c ^ 0xFFFFFFFF) >>> 0;
-};
-const enc = s => new TextEncoder().encode(s);
-
-/* ═══════════ LZ4 ═══════════ */
-function lz4dec(src, outSize){
-  const dst = new Uint8Array(outSize);
-  const n = src.length;
-  let i = 0, o = 0;
-  while (i < n){
-    const tok = src[i++];
-
-    let lit = tok >> 4;
-    if (lit === 15){
-      let b;
-      do { if (i >= n) throw new Error('LZ4: hết dữ liệu ở độ dài literal'); b = src[i++]; lit += b; }
-      while (b === 255);
-    }
-    if (lit){
-      if (i + lit > n) throw new Error('LZ4: literal vượt biên');
-      if (o + lit > outSize) throw new Error('LZ4: literal vượt kích thước đầu ra');
-      dst.set(src.subarray(i, i + lit), o);
-      i += lit; o += lit;
-    }
-
-    if (i >= n) break;
-
-    const off = src[i] | (src[i+1] << 8); i += 2;
-    if (off === 0 || off > o) throw new Error(`LZ4: offset không hợp lệ (${off})`);
-    let ml = tok & 15;
-    if (ml === 15){
-      let b;
-      do { if (i >= n) throw new Error('LZ4: hết dữ liệu ở độ dài match'); b = src[i++]; ml += b; }
-      while (b === 255);
-    }
-    ml += 4;
-    if (o + ml > outSize) throw new Error('LZ4: match vượt kích thước đầu ra');
-    let sp = o - off;
-    for (let k = 0; k < ml; k++) dst[o++] = dst[sp++];
-  }
-  if (o !== outSize) throw new Error(`LZ4: giải ra ${o} byte, cần ${outSize}`);
-  return dst;
-}
-
-function lz4enc(src){
-  const n = src.length;
-  if (!n) return new Uint8Array(0);
-  const out = [];
-  const HLOG = 16, HSIZE = 1 << HLOG;
-  const head = new Int32Array(HSIZE).fill(-1);
-  const prev = new Int32Array(n).fill(-1);
-  const MFLIMIT = 12, LASTLIT = 5, MAXDIST = 65535, CHAIN = 32;
-
-  const h4 = i => {
-    const v = (src[i] | (src[i+1]<<8) | (src[i+2]<<16) | (src[i+3]<<24)) >>> 0;
-    return (Math.imul(v, 2654435761) >>> (32 - HLOG));
-  };
-  const same4 = (a, b) =>
-    src[a]===src[b] && src[a+1]===src[b+1] && src[a+2]===src[b+2] && src[a+3]===src[b+3];
-
-  const emit = (ls, le, mlen, moff) => {
-    const litlen = le - ls;
-    const ml = mlen ? mlen - 4 : 0;
-    out.push(((litlen >= 15 ? 15 : litlen) << 4) | (ml >= 15 ? 15 : ml));
-    if (litlen >= 15){
-      let r = litlen - 15;
-      while (r >= 255){ out.push(255); r -= 255; }
-      out.push(r);
-    }
-    for (let k = ls; k < le; k++) out.push(src[k]);
-    if (mlen){
-      out.push(moff & 255, (moff >> 8) & 255);
-      if (ml >= 15){
-        let r = ml - 15;
-        while (r >= 255){ out.push(255); r -= 255; }
-        out.push(r);
-      }
-    }
-  };
-
-  let anchor = 0, i = 0;
-  while (i < n - MFLIMIT){
-    const hv = h4(i);
-    let bestLen = 0, bestOff = 0, cur = head[hv], cnt = 0;
-    while (cur >= 0 && cnt < CHAIN){
-      const off = i - cur;
-      if (off > MAXDIST) break;
-      if (same4(cur, i)){
-        let l = 4;
-        const lim = n - LASTLIT - i;
-        while (l < lim && src[cur+l] === src[i+l]) l++;
-        if (l > bestLen){ bestLen = l; bestOff = off; if (l >= 255) break; }
-      }
-      cur = prev[cur]; cnt++;
-    }
-    prev[i] = head[hv]; head[hv] = i;
-
-    if (bestLen >= 4){
-      emit(anchor, i, bestLen, bestOff);
-      const stop = Math.min(i + bestLen, n - 3);
-      for (let k = i + 1; k < stop; k++){ const hk = h4(k); prev[k] = head[hk]; head[hk] = k; }
-      i += bestLen; anchor = i;
-    } else i++;
-  }
-  const litlen = n - anchor;
-  out.push((litlen >= 15 ? 15 : litlen) << 4);
-  if (litlen >= 15){
-    let r = litlen - 15;
-    while (r >= 255){ out.push(255); r -= 255; }
-    out.push(r);
-  }
-  for (let k = anchor; k < n; k++) out.push(src[k]);
-  return new Uint8Array(out);
-}
-
-function lz4Trace(src, outSize){
-  const litOf  = new Int32Array(outSize).fill(-1);
-  const copyOf = new Int32Array(outSize).fill(-1);
-  let i = 0, o = 0;
-  while (i < src.length && o < outSize){
-    const tok = src[i++];
-    let lit = tok >> 4;
-    if (lit === 15){ let b; do { b = src[i++]; lit += b; } while (b === 255); }
-    for (let k = 0; k < lit; k++){ litOf[o++] = i++; }
-    if (i >= src.length) break;
-    const off = src[i] | (src[i+1] << 8); i += 2;
-    let ml = tok & 15;
-    if (ml === 15){ let b; do { b = src[i++]; ml += b; } while (b === 255); }
-    ml += 4;
-    let sp = o - off;
-    for (let k = 0; k < ml; k++){ copyOf[o] = sp; o++; sp++; }
-  }
-  const root = new Int32Array(outSize).fill(-1);
-  for (let k = 0; k < outSize; k++){
-    let cur = k, guard = 0;
-    while (litOf[cur] < 0 && copyOf[cur] >= 0 && guard++ < outSize) cur = copyOf[cur];
-    root[k] = litOf[cur] >= 0 ? litOf[cur] : -1;
-  }
-  return root;
-}
-
-/* ═══════════ UnityFS ═══════════ */
-function parseBundle(u8){
-  const dv = new DataView(u8.buffer, u8.byteOffset, u8.byteLength);
-  let p = 0;
-  const cstr = () => { let s = ''; while (u8[p]) s += String.fromCharCode(u8[p++]); p++; return s; };
-
-  const sig = cstr();
-  if (sig !== 'UnityFS') throw new Error(`Không phải UnityFS bundle (signature "${sig}")`);
-  const fmt = dv.getUint32(p, false); p += 4;
-  const uv = cstr(), rev = cstr();
-  const declared = Number(dv.getBigInt64(p, false)); p += 8;
-  const ciSize = dv.getUint32(p, false); p += 4;
-  const uiSize = dv.getUint32(p, false); p += 4;
-  const flags  = dv.getUint32(p, false); p += 4;
-  const headerEnd = p;
-  const ic = flags & 0x3F;
-
-  let infoOff, info, dataStart;
-  if (flags & 0x80){
-    dataStart = (headerEnd + 15) & ~15;
-    infoOff = null;
-    const from = Math.min(declared, u8.length) - ciSize;
-    for (let off = from; off >= Math.max(0, from - 80000); off--){
-      try {
-        const cand = (ic === 2 || ic === 3)
-          ? lz4dec(u8.subarray(off, off + ciSize), uiSize)
-          : u8.subarray(off, off + ciSize).slice();
-        info = cand; infoOff = off; break;
-      } catch (e) { }
-    }
-    if (infoOff === null) throw new Error('Không tìm được blocksInfo ở cuối file.');
-  } else {
-    if (fmt >= 7 || (flags & 0x200)) p = (p + 15) & ~15;
-    infoOff = p;
-    const infoRaw = u8.subarray(p, p + ciSize);
-    if (ic === 2 || ic === 3) info = lz4dec(infoRaw, uiSize);
-    else if (ic === 0) info = infoRaw.slice();
-    else throw new Error(`blocksInfo nén kiểu ${ic} (chưa hỗ trợ)`);
-    dataStart = infoOff + ciSize;
-    if (flags & 0x200) dataStart = (dataStart + 15) & ~15;
-  }
-
-  const idv = new DataView(info.buffer, info.byteOffset, info.byteLength);
-  let q = 16;
-  const nB = idv.getUint32(q, false); q += 4;
-  const blocks = [];
-  for (let i = 0; i < nB; i++){
-    blocks.push({ u: idv.getUint32(q,false), c: idv.getUint32(q+4,false), f: idv.getUint16(q+8,false) });
-    q += 10;
-  }
-  const nN = idv.getUint32(q, false); q += 4;
-  const nodes = [];
-  for (let i = 0; i < nN; i++){
-    const off = Number(idv.getBigInt64(q,false)), sz = Number(idv.getBigInt64(q+8,false));
-    const nf = idv.getUint32(q+16,false); q += 20;
-    let nm = ''; while (info[q]) nm += String.fromCharCode(info[q++]); q++;
-    nodes.push({ off, size: sz, flags: nf, name: nm });
-  }
-  return { fmt, uv, rev, declared, ciSize, uiSize, flags, blocks, nodes,
-           dataStart, infoOff, info, headerEnd };
-}
-
-/* ═══════════ SerializedFile ═══════════ */
-function parseSF(cab){
-  const dv = new DataView(cab.buffer, cab.byteOffset, cab.byteLength);
-  const version = dv.getUint32(8, false);
-  if (version !== 22) throw new Error(`SerializedFile v${version} (tool chỉ hỗ trợ v22)`);
-  const metaSize = dv.getUint32(20, false);
-  const fileSize = Number(dv.getBigInt64(24, false));
-  const dataOffset = Number(dv.getBigInt64(32, false));
-
-  let p = 48;
-  const cstr = () => { let s=''; while (cab[p]) s += String.fromCharCode(cab[p++]); p++; return s; };
-  const unityVer = cstr();
-  const target = dv.getInt32(p, true); p += 4;
-  const hasTT = cab[p]; p += 1;
-
-  const i32 = () => { const v = dv.getInt32(p, true); p += 4; return v; };
-  const u32 = () => { const v = dv.getUint32(p, true); p += 4; return v; };
-
-  const tcount = i32();
-  const types = [];
-  for (let i = 0; i < tcount; i++){
-    const cid = i32();
-    p += 1;
-    p += 2;
-    if (cid === 114) p += 16;
-    const th = cab.slice(p, p+16); p += 16;
-    let nodes = null, sb = null;
-    if (hasTT){
-      const nn = i32(), sbs = i32();
-      nodes = [];
-      for (let k = 0; k < nn; k++){
-        const ver = dv.getUint16(p, true);
-        const level = cab[p+2], tflags = cab[p+3];
-        const to = dv.getUint32(p+4, true), no = dv.getUint32(p+8, true);
-        const bsize = dv.getInt32(p+12, true), idx = dv.getInt32(p+16, true), meta = dv.getInt32(p+20, true);
-        p += 32;
-        nodes.push({ ver, level, tflags, to, no, bsize, idx, meta });
-      }
-      sb = cab.slice(p, p + sbs); p += sbs;
-      const nd = i32(); p += nd * 4;
-    }
-    types.push({ cid, th, nodes, sb });
-  }
-
-  const ocount = i32();
-  const objs = [];
-  for (let i = 0; i < ocount; i++){
-    p = a4(p);
-    const ent = p;
-    const pid = dv.getBigInt64(p, true);
-    const off = Number(dv.getBigInt64(p+8, true));
-    const size = dv.getUint32(p+16, true);
-    const tid = dv.getInt32(p+20, true);
-    p += 24;
-    objs.push({ pid, off, size, tid, cid: types[tid].cid, ent });
-  }
-  return { version, metaSize, fileSize, dataOffset, unityVer, target, hasTT, types, objs, cab };
-}
-
-/* ═══════════ typetree reader ═══════════ */
-const COMMON = "AABB\0AnimationClip\0AnimationCurve\0AnimationState\0Array\0Base\0BitField\0bitset\0bool\0char\0ColorRGBA\0Component\0data\0deque\0double\0dynamic_array\0FastPropertyName\0first\0float\0Font\0GameObject\0Generic Mono\0GradientNEW\0GUID\0GUIStyle\0int\0list\0long long\0map\0Matrix4x4f\0MdFour\0MonoBehaviour\0MonoScript\0m_ByteSize\0m_Curve\0m_EditorClassIdentifier\0m_EditorHideFlags\0m_Enabled\0m_ExtensionPtr\0m_GameObject\0m_Index\0m_IsArray\0m_IsStatic\0m_MetaFlag\0m_Name\0m_ObjectHideFlags\0m_PrefabInternal\0m_PrefabParentObject\0m_Script\0m_StaticEditorFlags\0m_Type\0m_Version\0Object\0pair\0PPtr<Component>\0PPtr<GameObject>\0PPtr<Material>\0PPtr<MonoBehaviour>\0PPtr<MonoScript>\0PPtr<Object>\0PPtr<Prefab>\0PPtr<Sprite>\0PPtr<TextAsset>\0PPtr<Texture>\0PPtr<Texture2D>\0PPtr<Transform>\0Prefab\0Quaternionf\0Rectf\0RectInt\0RectOffset\0second\0set\0short\0size\0SInt16\0SInt32\0SInt64\0SInt8\0staticvector\0string\0TextAsset\0TextMesh\0Texture\0Texture2D\0Transform\0TypelessData\0UInt16\0UInt32\0UInt64\0UInt8\0unsigned int\0unsigned long long\0unsigned short\0vector\0Vector2f\0Vector3f\0Vector4f\0m_ScriptingClassIdentifier\0Gradient\0Type*\0int2_storage\0int3_storage\0BoundsInt\0m_CorrespondingSourceObject\0m_PrefabInstance\0m_PrefabAsset\0FileSize\0Hash128\0";
-const COMMON_B = enc(COMMON);
-
-function sname(sb, off){
-  const buf = (off & 0x80000000) ? COMMON_B : sb;
-  let o = off & 0x7fffffff, s = '';
-  while (buf[o]) s += String.fromCharCode(buf[o++]);
-  return s;
-}
-function buildNodes(t){
-  return t.nodes.map(n => ({
-    type: sname(t.sb, n.to), name: sname(t.sb, n.no),
-    level: n.level, meta: n.meta
-  }));
-}
-
-function makeReader(data){
-  const dv = new DataView(data.buffer, data.byteOffset, data.byteLength);
-  return { data, dv, p: 0, align(){ this.p = a4(this.p); } };
-}
-function readVal(nodes, i, r, trace){
-  const n = nodes[i];
-  const t = n.type;
-  const doAlign = (n.meta & 0x4000) !== 0;
-  const kids = [];
-  let j = i + 1;
-  while (j < nodes.length && nodes[j].level > n.level){
-    if (nodes[j].level === n.level + 1) kids.push(j);
-    j++;
-  }
-  let v;
-  switch (t){
-    case 'SInt8':  v = r.dv.getInt8(r.p);  r.p += 1; break;
-    case 'UInt8': case 'char': v = r.data[r.p]; r.p += 1; break;
-    case 'SInt16': case 'short': v = r.dv.getInt16(r.p,true); r.p += 2; break;
-    case 'UInt16': case 'unsigned short': v = r.dv.getUint16(r.p,true); r.p += 2; break;
-    case 'SInt32': case 'int': case 'Type*': v = r.dv.getInt32(r.p,true); r.p += 4; break;
-    case 'UInt32': case 'unsigned int': v = r.dv.getUint32(r.p,true); r.p += 4; break;
-    case 'SInt64': case 'long long': v = r.dv.getBigInt64(r.p,true); r.p += 8; break;
-    case 'UInt64': case 'unsigned long long': case 'FileSize':
-      v = r.dv.getBigUint64(r.p,true); r.p += 8; break;
-    case 'float':  v = r.dv.getFloat32(r.p,true); r.p += 4; break;
-    case 'double': v = r.dv.getFloat64(r.p,true); r.p += 8; break;
-    case 'bool':   v = r.data[r.p] !== 0; r.p += 1; break;
-    case 'string': {
-      const st = r.p;
-      const ln = r.dv.getInt32(r.p,true); r.p += 4;
-      v = new TextDecoder().decode(r.data.subarray(r.p, r.p+ln)); r.p += ln;
-      r.align();
-      if (trace) trace.push({ node: n.name, start: st, len: ln, val: v });
-      break;
-    }
-    case 'TypelessData': {
-      const ln = r.dv.getInt32(r.p,true); r.p += 4;
-      v = r.data.slice(r.p, r.p+ln); r.p += ln;
-      break;
-    }
-    default: {
-      if (kids.length && nodes[kids[0]].type === 'Array'){
-        const ai = kids[0];
-        const ak = [];
-        let k = ai + 1;
-        while (k < nodes.length && nodes[k].level > nodes[ai].level){
-          if (nodes[k].level === nodes[ai].level + 1) ak.push(k);
-          k++;
-        }
-        const size = r.dv.getInt32(r.p,true); r.p += 4;
-        v = [];
-        for (let m = 0; m < size; m++) v.push(readVal(nodes, ak[1], r, trace));
-        if (nodes[ai].meta & 0x4000) r.align();
-      } else {
-        v = {};
-        for (const c of kids) v[nodes[c].name] = readVal(nodes, c, r, trace);
-      }
-    }
-  }
-  if (doAlign) r.align();
-  return v;
-}
-
-function objBody(sf, o){ return sf.cab.subarray(sf.dataOffset + o.off, sf.dataOffset + o.off + o.size); }
-function readObj(sf, o, trace){
-  const nodes = buildNodes(sf.types[o.tid]);
-  const r = makeReader(objBody(sf, o));
-  const v = readVal(nodes, 0, r, trace);
-  return v;
-}
-
-/* ═══════════ PRESET 1: tráo bone_Hips ⇄ bone_Neck ═══════════ */
-const HIPS = enc('bone_Hips'), NECK = enc('bone_Neck');
-const H_HIPS = crc32(HIPS), H_NECK = crc32(NECK);
-
-function findSwapTargets(u8, from, to){
-  const hits = [];
-  const want = [
-    { nm: HIPS, lb:'bone_Hips', h: H_HIPS, ot: NECK, ol:'bone_Neck', cons:true  },
-    { nm: NECK, lb:'bone_Neck', h: H_NECK, ot: HIPS, ol:'bone_Hips', cons:true  },
-    { nm: HIPS, lb:'bone_Hips', h: H_NECK, ot: NECK, ol:'bone_Neck', cons:false },
-    { nm: NECK, lb:'bone_Neck', h: H_HIPS, ot: HIPS, ol:'bone_Hips', cons:false }
-  ];
-  for (const w of want){
-    const pat = new Uint8Array(20);
-    const pv = new DataView(pat.buffer);
-    pv.setInt32(0, 9, true);
-    pat.set(w.nm, 4);
-    pv.setUint32(16, w.h, true);
-    for (let i = from; i <= to - 20; i++){
-      let ok = true;
-      for (let k = 0; k < 20; k++) if (u8[i+k] !== pat[k]) { ok = false; break; }
-      if (ok) hits.push({ at: i + 4, ...w });
-    }
-  }
-  return hits.sort((a,b) => a.at - b.at);
-}
-
-function applyPreset1(orig, b){
-  const node = b.nodes[0];
-  if (b.blocks.some(x => (x.f & 0x3F) !== 0))
-    throw new Error('Bundle có block bị nén — preset 1 chỉ sửa được bundle lưu thô.');
-  const from = b.dataStart + node.off, to = from + node.size;
-  const hits = findSwapTargets(orig, from, to);
-  if (!hits.length) throw new Error('Không tìm thấy cặp bone_Hips / bone_Neck nào trong file này.');
-  const out = orig.slice();
-  for (const h of hits) out.set(h.ot, h.at);
-  const rows = hits.map(h => [`0x${hx(h.at).padStart(5,'0')}`, String(h.h), h.lb, h.ol]);
-  const st = hits.every(h => h.cons) ? 'nguyên bản'
-           : hits.every(h => !h.cons) ? 'đã hoán đổi' : 'lẫn lộn';
-  return {
-    out,
-    note: `Tìm thấy <b>${hits.length}</b> mục tiêu (trạng thái trước đó: <b>${st}</b>) — hoán đổi ${hits.length*4} byte.`,
-    cols: ['Offset','Hash (CRC32)','Trước','Sau'], rows
-  };
-}
-
-/* ═══════════ PRESET 2: bone_Head giả + indexer 12 mục ═══════════ */
-const MALE_PID = -9165109095992080675n, FEMALE_PID = 2680591970127643204n;
-const BACKPACK = 'bone_Left_Spine_Backpack';
-
-function patchMesh(sf, o, px, pz, s){
-  const trace = [];
-  const val = readObj(sf, o, trace);
-  const bones = val.meshData.umaBones;
-  const names = trace.filter(t => t.node === 'name');
-  if (names.length !== bones.length) throw new Error('Không khớp số xương với chuỗi tên.');
-
-  const idx = bones.findIndex(b => b.name === BACKPACK);
-  if (idx < 0) return null;
-  const tr = names[idx];
-
-  const body = objBody(sf, o);
-  const posOff = tr.start - 40;
-  const scOff  = tr.start - 12;
-
-  const oldFieldLen = 4 + tr.len + ((-(4 + tr.len)) & 3);
-  const nb = enc('bone_Head');
-  const newField = new Uint8Array(4 + nb.length + ((-(4 + nb.length)) & 3));
-  new DataView(newField.buffer).setInt32(0, nb.length, true);
-  newField.set(nb, 4);
-
-  const out = new Uint8Array(body.length - oldFieldLen + newField.length);
-  out.set(body.subarray(0, tr.start), 0);
-  out.set(newField, tr.start);
-  out.set(body.subarray(tr.start + oldFieldLen), tr.start + newField.length);
-
-  const odv = new DataView(out.buffer);
-  const before = { x: bones[idx].position.x, y: bones[idx].position.y, z: bones[idx].position.z,
-                   sx: bones[idx].scale.x, sy: bones[idx].scale.y, sz: bones[idx].scale.z };
-  if (px !== null) odv.setFloat32(posOff, px, true);
-  if (pz !== null) odv.setFloat32(posOff + 8, pz, true);
-  odv.setFloat32(scOff,     -s, true);
-  odv.setFloat32(scOff + 4,  s, true);
-  odv.setFloat32(scOff + 8,  1.0, true);
-
-  return { body: out, idx, before,
-           after: { x: px ?? before.x, y: before.y, z: pz ?? before.z, sx: -s, sy: s, sz: 1.0 } };
-}
-
-function wstr(s){
-  const sb = enc(s);
-  const f = new Uint8Array(a4(4 + sb.length));
-  new DataView(f.buffer).setInt32(0, sb.length, true);
-  f.set(sb, 4);
-  return f;
-}
-
-function rebuildIndexer(sf, o, known, targetSize){
-  const trace = [];
-  const val = readObj(sf, o, trace);
-  const items = val.Items;
-  const paths = trace.filter(t => t.node === '_Path');
-  if (paths.length !== items.length) throw new Error('Không khớp số _Path với số mục indexer.');
-
-  const have = new Set(items.map(it => it.m_Item.m_PathID));
-  const added = [];
-  for (const k of known){
-    if (have.has(k.pid)) continue;
-    const sib = items.find(it => it._TypeIndex === k.typeIndex);
-    added.push({
-      _QualifiedName: '', _TypeIndex: k.typeIndex, _Name: k.name,
-      m_Item: { m_FileID: 0, m_PathID: k.pid },
-      _Path: sib ? sib._Path.replace(/[^/]+\.asset$/, k.name + '.asset') : k.name + '.asset'
-    });
-  }
-  const all = [...items, ...added].sort((a,b) => a._Name < b._Name ? -1 : a._Name > b._Name ? 1 : 0);
-
-  const firstQN = trace.find(t => t.node === '_QualifiedName');
-  if (!firstQN) throw new Error('Indexer không có mục nào để tham chiếu bố cục.');
-  const body0 = objBody(sf, o);
-  const head = body0.subarray(0, firstQN.start - 4);
-  const fixed = all.reduce((acc, it) =>
-    acc + a4(4 + enc(it._QualifiedName).length) + 4 + a4(4 + enc(it._Name).length) + 12, 0);
-  const budget = targetSize - head.length - 4 - fixed - 24;
-  if (budget < all.length * 4)
-    throw new Error(`Không đủ chỗ cho ${all.length} mục (_Path cần tối thiểu ${all.length*4} B, còn ${budget} B).`);
-
-  const cur = all.map(it => it._Path.split('/').pop());
-  const total = () => cur.reduce((a,p) => a + a4(4 + enc(p).length), 0);
-  if (total() > budget) throw new Error('Không đủ chỗ cho _Path ngay cả khi chỉ giữ tên file.');
-  for (let k = 0; k < all.length; k++){
-    const parts = all[k]._Path.split('/');
-    for (let d = 2; d <= parts.length; d++){
-      const old = cur[k];
-      cur[k] = parts.slice(-d).join('/');
-      if (total() > budget){ cur[k] = old; break; }
-    }
-  }
-  let guard = 0;
-  while (total() < budget && guard++ < 2000){
-    let done = true;
-    for (let k = 0; k < all.length; k++){
-      const parts = all[k]._Path.split('/');
-      const depth = cur[k].split('/').length;
-      if (depth >= parts.length) continue;
-      const old = cur[k];
-      cur[k] = parts.slice(-(depth + 1)).join('/');
-      if (total() > budget){ cur[k] = old; } else { done = false; break; }
-    }
-    if (done) break;
-  }
-  guard = 0;
-  while (total() < budget && guard++ < 500){
-    let j = 0;
-    for (let k = 1; k < cur.length; k++) if (cur[k].length < cur[j].length) j = k;
-    cur[j] = './' + cur[j];
-  }
-  if (total() !== budget)
-    throw new Error(`Không khớp ngân sách _Path (${total()} ≠ ${budget}).`);
-
-  const parts = [head];
-  const cnt = new Uint8Array(4);
-  new DataView(cnt.buffer).setInt32(0, all.length, true);
-  parts.push(cnt);
-  for (let k = 0; k < all.length; k++){
-    const it = all[k];
-    parts.push(wstr(it._QualifiedName));
-    const ti = new Uint8Array(4);
-    new DataView(ti.buffer).setInt32(0, it._TypeIndex, true);
-    parts.push(ti);
-    parts.push(wstr(it._Name));
-    const pp = new Uint8Array(12);
-    const pv = new DataView(pp.buffer);
-    pv.setInt32(0, it.m_Item.m_FileID, true);
-    pv.setBigInt64(4, it.m_Item.m_PathID, true);
-    parts.push(pp);
-    parts.push(wstr(cur[k]));
-  }
-  const tail = new Uint8Array(24);
-  const tv = new DataView(tail.buffer);
-  tv.setInt32(0, val.BaseMaleBone.m_FileID, true);
-  tv.setBigInt64(4, val.BaseMaleBone.m_PathID, true);
-  tv.setInt32(12, val.BaseFemaleBone.m_FileID, true);
-  tv.setBigInt64(16, val.BaseFemaleBone.m_PathID, true);
-  parts.push(tail);
-
-  const len = parts.reduce((a,x) => a + x.length, 0);
-  if (len !== targetSize) throw new Error(`Indexer dựng ra ${len} B, cần ${targetSize} B.`);
-  const out = new Uint8Array(len);
-  let w = 0;
-  for (const x of parts){ out.set(x, w); w += x.length; }
-  return { body: out, names: all.map(i => i._Name), paths: cur, addedCount: added.length };
-}
-
-function rebuildCab(sf, repl){
-  const old = sf.cab.subarray(sf.dataOffset);
-  const order = [...sf.objs].sort((a,b) => a.off - b.off);
-  const chunks = [];
-  const newOff = new Map();
-  let prevEnd = 0, cursor = 0;
-  for (const o of order){
-    const gap = old.subarray(prevEnd, o.off);
-    chunks.push(gap); cursor += gap.length;
-    const body = repl.get(o.pid) ?? old.subarray(o.off, o.off + o.size);
-    newOff.set(o.pid, cursor);
-    chunks.push(body); cursor += body.length;
-    prevEnd = o.off + o.size;
-  }
-  const tail = old.subarray(prevEnd);
-  chunks.push(tail); cursor += tail.length;
-
-  const data = new Uint8Array(cursor);
-  let w = 0;
-  for (const c of chunks){ data.set(c, w); w += c.length; }
-
-  const meta = sf.cab.slice(0, sf.dataOffset);
-  const mdv = new DataView(meta.buffer);
-  for (const o of sf.objs){
-    if (mdv.getBigInt64(o.ent, true) !== o.pid) throw new Error('Lệch bảng object.');
-    const sz = repl.has(o.pid) ? repl.get(o.pid).length : o.size;
-    mdv.setBigInt64(o.ent + 8, BigInt(newOff.get(o.pid)), true);
-    mdv.setUint32(o.ent + 16, sz, true);
-  }
-  const cabLen = sf.dataOffset + data.length;
-  mdv.setBigInt64(0x18, BigInt(cabLen), false);
-
-  const cab = new Uint8Array(cabLen);
-  cab.set(meta, 0); cab.set(data, meta.length);
-  return cab;
-}
-
-function rebuildBundle(orig, b, cab){
-  const pad = b.blocks.reduce((a,x) => a + x.u, 0) - b.nodes[0].size;
-  const block = new Uint8Array(cab.length + Math.max(0, pad));
-  block.set(cab, 0);
-
-  const info = b.info.slice();
-  const idv = new DataView(info.buffer);
-  idv.setUint32(20, block.length, false);
-  idv.setUint32(24, block.length, false);
-  idv.setBigInt64(42, BigInt(cab.length), false);
-
-  const ic = b.flags & 0x3F;
-  let infoOut;
-  if (ic === 0){
-    infoOut = info;
-  } else {
-    const compOrig = orig.slice(b.infoOff, b.infoOff + b.ciSize);
-    const root = lz4Trace(compOrig, b.uiSize);
-    const patched = compOrig.slice();
-    const want = new Map();
-    for (let i = 0; i < info.length; i++){
-      const src = root[i];
-      if (src < 0){
-        if (info[i] !== b.info[i])
-          throw new Error(`blocksInfo: byte ${i} không truy được về literal.`);
-        continue;
-      }
-      if (want.has(src) && want.get(src) !== info[i])
-        throw new Error(`blocksInfo: byte ${i} xung đột với byte khác dùng chung nguồn.`);
-      want.set(src, info[i]);
-    }
-    for (const [src, val] of want) patched[src] = val;
-    const check = lz4dec(patched, b.uiSize);
-    for (let i = 0; i < info.length; i++)
-      if (check[i] !== info[i]) throw new Error('blocksInfo vá xong không khớp.');
-    infoOut = patched;
-  }
-
-  const head = [];
-  head.push(enc('UnityFS'), new Uint8Array([0]));
-  const fb = new Uint8Array(4); new DataView(fb.buffer).setUint32(0, b.fmt, false);
-  head.push(fb);
-  head.push(enc(b.uv), new Uint8Array([0]), enc(b.rev), new Uint8Array([0]));
-  const tailH = new Uint8Array(20);
-  const tdv = new DataView(tailH.buffer);
-  tdv.setUint32(8, infoOut.length, false);
-  tdv.setUint32(12, b.uiSize, false);
-  tdv.setUint32(16, b.flags, false);
-  head.push(tailH);
-  let hl = head.reduce((a,x) => a + x.length, 0);
-  const padded = (b.fmt >= 7 || (b.flags & 0x200)) ? ((hl + 15) & ~15) : hl;
-  const hdr = new Uint8Array(padded);
-  let w = 0;
-  for (const x of head){ hdr.set(x, w); w += x.length; }
-  const sizePos = hdr.length - padded + (hl - 20);
-  const total = padded + infoOut.length + block.length;
-  new DataView(hdr.buffer).setBigInt64(sizePos, BigInt(total), false);
-
-  const out = new Uint8Array(total);
-  out.set(hdr, 0); out.set(infoOut, padded); out.set(block, padded + infoOut.length);
-  return out;
-}
-
-function applyPreset2(orig, b, opt){
-  if (b.blocks.some(x => (x.f & 0x3F) !== 0))
-    throw new Error('Bundle có block bị nén — chưa hỗ trợ.');
-  const node = b.nodes[0];
-  const cab = orig.subarray(b.dataStart + node.off, b.dataStart + node.off + node.size);
-  const sf = parseSF(cab);
-
-  const male = sf.objs.find(o => o.pid === MALE_PID);
-  const female = sf.objs.find(o => o.pid === FEMALE_PID);
-  if (!male || !female) throw new Error('Không tìm thấy 2 UMAMeshAsset quen thuộc trong file này.');
-
-  const rows = [];
-  const repl = new Map();
-
-  const pm = patchMesh(sf, male, opt.mx, null, opt.s);
-  if (pm){
-    repl.set(MALE_PID, pm.body);
-    rows.push(['mesh nam', `umaBones[${pm.idx}]`, BACKPACK, 'bone_Head']);
-    rows.push(['', 'position.x', pm.before.x.toFixed(6), pm.after.x.toFixed(6)]);
-    rows.push(['', 'scale', `(${pm.before.sx.toFixed(4)}, ${pm.before.sy.toFixed(4)}, ${pm.before.sz.toFixed(4)})`,
-                            `(${pm.after.sx.toFixed(4)}, ${pm.after.sy.toFixed(4)}, ${pm.after.sz.toFixed(4)})`]);
-  }
-  const pf = patchMesh(sf, female, opt.fx, opt.fz, opt.s);
-  if (pf){
-    repl.set(FEMALE_PID, pf.body);
-    rows.push(['mesh nữ', `umaBones[${pf.idx}]`, BACKPACK, 'bone_Head']);
-    rows.push(['', 'position.x', pf.before.x.toFixed(6), pf.after.x.toFixed(6)]);
-    rows.push(['', 'position.z', pf.before.z.toFixed(6), pf.after.z.toFixed(6)]);
-    rows.push(['', 'scale', `(${pf.before.sx.toFixed(4)}, ${pf.before.sy.toFixed(4)}, ${pf.before.sz.toFixed(4)})`,
-                            `(${pf.after.sx.toFixed(4)}, ${pf.after.sy.toFixed(4)}, ${pf.after.sz.toFixed(4)})`]);
-  }
-  if (!repl.size) throw new Error(`Không tìm thấy xương ${BACKPACK} trong mesh nào — file có thể đã được sửa rồi.`);
-
-  const idxObj = sf.objs.find(o => {
-    const t = sf.types[o.tid];
-    if (t.cid !== 114 || !t.nodes) return false;
-    return buildNodes(t).some(n => n.level === 1 && n.name === 'Items');
-  });
-  if (!idxObj) throw new Error('Không tìm thấy UMAAssetIndexer.');
-
-  const known = [];
-  for (const o of sf.objs){
-    const t = sf.types[o.tid];
-    if (t.cid !== 114 || !t.nodes || o.pid === idxObj.pid) continue;
-    const nn = buildNodes(t).filter(n => n.level === 1).map(n => n.name);
-    const isRace   = nn.includes('raceName');
-    const isRecipe = nn.includes('recipeData');
-    if (!isRace && !isRecipe) continue;
-    const v = readObj(sf, o, null);
-    known.push({ pid: o.pid, name: v.m_Name, typeIndex: isRace ? 2 : 3 });
-  }
-
-  let delta = 0;
-  for (const [pid, body] of repl) delta += body.length - sf.objs.find(o => o.pid === pid).size;
-  const targetSize = idxObj.size - delta;
-
-  const si = rebuildIndexer(sf, idxObj, known, targetSize);
-  repl.set(idxObj.pid, si.body);
-  rows.push(['indexer', `${si.names.length} mục`,
-             `${si.names.length - si.addedCount} mục ban đầu`,
-             `thêm ${si.addedCount} mục · _Path rút gọn`]);
-
-  const newCab = rebuildCab(sf, repl);
-  const out = rebuildBundle(orig, b, newCab);
-  return {
-    out,
-    note: `Đã dựng lại bundle — ${repl.size} object thay đổi, dung lượng giữ nguyên ${out.length.toLocaleString('vi-VN')} byte.`,
-    cols: ['Vùng','Trường','Trước','Sau'], rows,
-    extra: si
-  };
-}
-
-/* ═══════════ PRESET 3: shader định vị + đổi màu ═══════════ */
-const XRAY_BLOB = {"backweapon":{"pid":"-3333330928057165289","size":8560,"z":"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"}};
-
-async function loadXray(key){
-  const e = XRAY_BLOB[key];
-  if (!e) throw new Error(`Không có shader nhúng tên "${key}".`);
-  const raw = Uint8Array.from(atob(e.z), c => c.charCodeAt(0));
-  const ds = new DecompressionStream('deflate');
-  const buf = new Uint8Array(await new Response(
-    new Blob([raw]).stream().pipeThrough(ds)).arrayBuffer());
-  if (buf.length !== e.size)
-    throw new Error(`Shader nhúng "${key}" giải ra ${buf.length} byte, cần ${e.size}.`);
-  return { body: buf, pid: BigInt(e.pid) };
-}
-
-function readShaderProps(body){
-  const dv = new DataView(body.buffer, body.byteOffset, body.byteLength);
-  let p = 0;
-  const rd = () => { const v = dv.getInt32(p, true); p += 4; return v; };
-  const str = () => {
-    const n = rd();
-    if (n < 0 || p + n > body.length) throw new Error('chuỗi hỏng trong shader');
-    const s = new TextDecoder().decode(body.subarray(p, p + n));
-    p = a4(p + n);
-    return s;
-  };
-  str();
-  const cnt = rd();
-  if (cnt < 0 || cnt > 500) throw new Error(`số property bất thường: ${cnt}`);
-  const props = [];
-  for (let i = 0; i < cnt; i++){
-    const name = str(), desc = str();
-    const na = rd();
-    if (na < 0 || na > 100) throw new Error('m_Attributes hỏng');
-    for (let k = 0; k < na; k++) str();
-    const type = rd();
-    p += 4;
-    const valOff = p;
-    const val = [dv.getFloat32(p,true), dv.getFloat32(p+4,true),
-                 dv.getFloat32(p+8,true), dv.getFloat32(p+12,true)];
-    p += 16;
-    str();
-    p += 4;
-    props.push({ name, desc, type, valOff, val });
-  }
-  return props;
-}
-
-const hex2rgb = h => {
-  const m = /^#?([0-9a-f]{6})$/i.exec(h.trim());
-  if (!m) return null;
-  const n = parseInt(m[1], 16);
-  return [((n>>16)&255)/255, ((n>>8)&255)/255, (n&255)/255];
-};
-const rgb2hex = v =>
-  '#' + v.slice(0,3).map(x => Math.round(Math.max(0,Math.min(1,x))*255)
-        .toString(16).padStart(2,'0')).join('').toUpperCase();
-
-const COLOR_MAP = {
-  _XRayColor:    { kind:'color', src:'xray', label:'màu súng' },
-  _OutLineColor: { kind:'color', src:'line', label:'màu viền súng' },
-  _DimColor:     { kind:'color', src:'dim',  label:'màu keo' },
-  _OutLineWidth: { kind:'float', src:'width',label:'độ dày viền' }
-};
-
-const XRAY_SHADERS = ['backweapon', 'brmobilebumpspec', 'brmobilebumpspecdecal'];
-const isXrayShader = path => {
-  const f = path.split('/').pop().replace(/\.shader$/, '');
-  return XRAY_SHADERS.includes(f);
-};
-
-function paintShader(body, opt, short, rows){
-  const props = readShaderProps(body);
-  const dv = new DataView(body.buffer, body.byteOffset, body.byteLength);
-  let n = 0;
-  for (const p of props){
-    const spec = COLOR_MAP[p.name];
-    if (!spec) continue;
-    let next;
-    if (spec.kind === 'color'){
-      const rgb = opt[spec.src];
-      const alpha = (p.name === '_XRayColor') ? opt.alpha : p.val[3];
-      next = [rgb[0], rgb[1], rgb[2], alpha];
-    } else {
-      next = [opt.width, p.val[1], p.val[2], p.val[3]];
-    }
-    const before = spec.kind === 'color' ? rgb2hex(p.val) : p.val[0].toFixed(2);
-    const after  = spec.kind === 'color' ? rgb2hex(next)  : next[0].toFixed(2);
-    for (let i = 0; i < 4; i++) dv.setFloat32(p.valOff + i*4, next[i], true);
-    n++;
-    if (rows){
-      const sw  = spec.kind === 'color' ? `<span class="swatch" style="background:${before}"></span>` : '';
-      const sw2 = spec.kind === 'color' ? `<span class="swatch" style="background:${after}"></span>` : '';
-      rows.push([short, p.name, sw + before, sw2 + after]);
-    }
-  }
-  return n;
-}
-
-async function applyPreset3(orig, b, opt){
-  const node = b.nodes[0];
-  if (!node) throw new Error('Bundle không có node nào.');
-
-  const { data, blockAt } = decompressAll(orig, b);
-  const cab = data.subarray(node.off, node.off + node.size);
-  const sf = parseSF(cab);
-
-  const abObj = sf.objs.find(o => o.cid === 142);
-  const nameOf = new Map();
-  if (abObj){
-    const v = readObj(sf, abObj, null);
-    for (const c of v.m_Container) nameOf.set(c.second.asset.m_PathID, c.first);
-  }
-
-  const slots = new Map();
-  for (const o of sf.objs){
-    if (o.cid !== 48) continue;
-    const path = nameOf.get(o.pid);
-    if (!path || !isXrayShader(path)) continue;
-    slots.set(path.split('/').pop().replace(/\.shader$/, ''), o);
-  }
-  if (!slots.size)
-    throw new Error('Không tìm thấy backweapon / brmobilebumpspec / brmobilebumpspecdecal ' +
-                    'trong bundle này. Đây có phải file shaders của game không?');
-
-  const rows = [];
-  const repl = new Map();
-  let swapped = 0, painted = 0;
-
-  for (const [key, o] of slots){
-    const bodyStart = sf.dataOffset + o.off;
-    const cur = cab.subarray(bodyStart, bodyStart + o.size);
-
-    let isXray = false;
-    try {
-      isXray = readShaderProps(cur).some(p => p.name === '_XRayColor' || p.name === '_DimColor');
-    } catch (e) { }
-
-    let body;
-    if (isXray){
-      body = cur.slice();
-    } else {
-      const x = await loadXray(key);
-      if (x.pid !== o.pid)
-        throw new Error(`pathID của ${key} không khớp shader nhúng ` +
-                        `(${o.pid} ≠ ${x.pid}) — bundle này khác phiên bản.`);
-      if (x.body.length > o.size)
-        throw new Error(`Shader X-Ray của ${key} (${x.body.length} B) lớn hơn shader gốc ` +
-                        `(${o.size} B) — không đệm vừa.`);
-      body = new Uint8Array(o.size);
-      body.set(x.body, 0);
-      swapped++;
-      rows.push([key + '.shader', '(toàn bộ shader)',
-                 `gốc ${o.size.toLocaleString('vi-VN')} B`,
-                 `X-Ray ${x.body.length.toLocaleString('vi-VN')} B + đệm`]);
-    }
-    painted += paintShader(body, opt, key + '.shader', rows);
-    repl.set(o.pid, body);
-  }
-
-  const out = rebuildShaders(orig, b, data, blockAt, sf, node, repl);
-  const what = swapped
-    ? `Đã thay <b>${swapped}</b> shader gốc bằng bản X-Ray và đặt màu`
-    : `Đã đổi màu <b>${slots.size}</b> shader định vị`;
-  return {
-    out,
-    note: `${what} — ${painted} giá trị, dung lượng giữ nguyên ` +
-          `${out.length.toLocaleString('vi-VN')} byte.`,
-    cols: ['Shader','Property','Trước','Sau'], rows, html: true
-  };
-}
-
-function decompressAll(orig, b){
-  const parts = [];
-  const blockAt = [];
-  let pos = b.dataStart, outPos = 0;
-  for (const blk of b.blocks){
-    const raw = orig.subarray(pos, pos + blk.c);
-    const ct = blk.f & 0x3F;
-    const dec = (ct === 2 || ct === 3) ? lz4dec(raw, blk.u) : raw.slice();
-    parts.push(dec);
-    blockAt.push({ start: outPos, end: outPos + blk.u, comp: blk.c, ct, srcOff: pos });
-    outPos += blk.u; pos += blk.c;
-  }
-  const data = new Uint8Array(outPos);
-  let w = 0;
-  for (const p of parts){ data.set(p, w); w += p.length; }
-  return { data, blockAt };
-}
-
-function rebuildShaders(orig, b, data, blockAt, sf, node, repl){
-  const touched = new Set();
-  for (const o of sf.objs){
-    const body = repl.get(o.pid);
-    if (!body) continue;
-    if (body.length !== o.size)
-      throw new Error(`Object ${o.pid} đổi kích thước (${o.size} → ${body.length}) — chưa hỗ trợ.`);
-    const abs = node.off + sf.dataOffset + o.off;
-    data.set(body, abs);
-    for (let i = 0; i < blockAt.length; i++){
-      const s = blockAt[i];
-      if (abs < s.end && abs + body.length > s.start) touched.add(i);
-    }
-  }
-  if (!touched.size) throw new Error('Không có gì thay đổi.');
-
-  const parts = [], newBlocks = [];
-  for (let i = 0; i < b.blocks.length; i++){
-    const blk = b.blocks[i], at = blockAt[i];
-    if (!touched.has(i)){
-      parts.push(orig.subarray(at.srcOff, at.srcOff + blk.c));
-      newBlocks.push({ u: blk.u, c: blk.c, f: blk.f });
-      continue;
-    }
-    const raw = data.subarray(at.start, at.end);
-    let comp, flags = blk.f;
-    if ((blk.f & 0x3F) === 0){
-      comp = raw;
-    } else {
-      comp = lz4enc(raw);
-      const back = lz4dec(comp, raw.length);
-      for (let k = 0; k < raw.length; k++)
-        if (back[k] !== raw[k]) throw new Error(`Nén lại block ${i} sai ở byte ${k}.`);
-      if (comp.length >= raw.length){ comp = raw; flags = blk.f & ~0x3F; }
-    }
-    parts.push(comp);
-    newBlocks.push({ u: blk.u, c: comp.length, f: flags });
-  }
-
-  const info = b.info.slice();
-  const idv = new DataView(info.buffer, info.byteOffset, info.byteLength);
-  let q = 20;
-  for (const nb of newBlocks){
-    idv.setUint32(q, nb.u, false);
-    idv.setUint32(q + 4, nb.c, false);
-    idv.setUint16(q + 8, nb.f, false);
-    q += 10;
-  }
-  const infoOut = ((b.flags & 0x3F) === 0) ? info : lz4enc(info);
-
-  const dataLen = parts.reduce((a, x) => a + x.length, 0);
-  const atEnd = !!(b.flags & 0x80);
-  const headLen = atEnd ? b.dataStart : b.infoOff;
-  let core = headLen + dataLen + infoOut.length;
-  if (!atEnd && (b.flags & 0x200))
-    core = ((headLen + infoOut.length + 15) & ~15) + dataLen;
-  if (core > orig.length)
-    throw new Error(`Nén lại phình ${(core - orig.length).toLocaleString('vi-VN')} byte so với ` +
-                    `dung lượng gốc — không đủ chỗ đệm.`);
-
-  const out = new Uint8Array(orig.length);
-  if (atEnd){
-    out.set(orig.subarray(0, headLen), 0);
-    let p = headLen;
-    for (const x of parts){ out.set(x, p); p += x.length; }
-    out.set(infoOut, p);
-  } else {
-    out.set(orig.subarray(0, b.infoOff), 0);
-    out.set(infoOut, b.infoOff);
-    let p = b.infoOff + infoOut.length;
-    if (b.flags & 0x200) p = (p + 15) & ~15;
-    for (const x of parts){ out.set(x, p); p += x.length; }
-  }
-  const sp = findSizePos(out);
-  const odv = new DataView(out.buffer);
-  odv.setBigInt64(sp, BigInt(atEnd ? core : out.length), false);
-  odv.setUint32(sp + 8, infoOut.length, false);
-  odv.setUint32(sp + 12, info.length, false);
-  return out;
-}
-
-function findSizePos(u8){
-  let p = 0;
-  while (u8[p]) p++;
-  p++; p += 4;
-  while (u8[p]) p++; p++;
-  while (u8[p]) p++; p++;
-  return p;
-}
-
-/* ═══════════ PRESET 4: định vị nhân vật (hologram) ═══════════ */
-const HOLO_BLOB = {"hologram":{"pid":"-8478029966577821520","size":7072,"z":"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"}};
-
-const HOLO_PROPS = {
-  _TintColor:     { kind:'color',  src:'tint', label:'màu nhân vật' },
-  _RimColor:      { kind:'color',  src:'rim',  label:'màu sáng mép' },
-  _ScanColor:     { kind:'color',  src:'scan', label:'màu quét' },
-  _Line:          { kind:'vec4', src:'line',   on:[100,100,50,50], off:[0,0,0,0] },
-  _LineAndGlitch: { kind:'vec4', src:'glitch', on:[0.5,0.5,5,0.1], off:[0,0,0,0] }
-};
-
-async function loadHolo(){
-  const e = HOLO_BLOB.hologram;
-  const raw = Uint8Array.from(atob(e.z), c => c.charCodeAt(0));
-  const ds = new DecompressionStream('deflate');
-  const buf = new Uint8Array(await new Response(
-    new Blob([raw]).stream().pipeThrough(ds)).arrayBuffer());
-  if (buf.length !== e.size)
-    throw new Error(`Shader hologram giải ra ${buf.length} byte, cần ${e.size}.`);
-  return { body: buf, pid: BigInt(e.pid) };
-}
-
-const ZTEST_NAMES = { 0:'Disabled',1:'Never',2:'Less',3:'Equal',4:'LEqual',
-                      5:'Greater',6:'NotEqual',7:'GEqual',8:'Always' };
-
-function findZTest(body, type){
-  const nodes = buildNodes(type);
-  const r = makeReader(body);
-  const hits = [];
-  const walk = (i, inState) => {
-    const n = nodes[i];
-    const align = (n.meta & 0x4000) !== 0;
-    const kids = [];
-    let j = i + 1;
-    while (j < nodes.length && nodes[j].level > n.level){
-      if (nodes[j].level === n.level + 1) kids.push(j);
-      j++;
-    }
-    const start = r.p;
-    const t = n.type;
-    if (t === 'SInt8' || t === 'UInt8' || t === 'char' || t === 'bool') r.p += 1;
-    else if (t === 'SInt16' || t === 'UInt16' || t === 'short' || t === 'unsigned short') r.p += 2;
-    else if (t === 'SInt32' || t === 'int' || t === 'Type*' || t === 'UInt32' ||
-             t === 'unsigned int' || t === 'float') r.p += 4;
-    else if (t === 'SInt64' || t === 'UInt64' || t === 'long long' ||
-             t === 'unsigned long long' || t === 'FileSize' || t === 'double') r.p += 8;
-    else if (t === 'string'){
-      const ln = r.dv.getInt32(r.p, true); r.p += 4 + ln; r.align();
-    } else if (t === 'TypelessData'){
-      const ln = r.dv.getInt32(r.p, true); r.p += 4 + ln;
-    } else if (kids.length && nodes[kids[0]].type === 'Array'){
-      const ai = kids[0];
-      const ak = [];
-      let k = ai + 1;
-      while (k < nodes.length && nodes[k].level > nodes[ai].level){
-        if (nodes[k].level === nodes[ai].level + 1) ak.push(k);
-        k++;
-      }
-      const size = r.dv.getInt32(r.p, true); r.p += 4;
-      for (let m = 0; m < size; m++) walk(ak[1], inState);
-      if (nodes[ai].meta & 0x4000) r.align();
-    } else {
-      for (const c of kids) walk(c, inState || n.name === 'm_State');
-    }
-    if (align) r.align();
-    if (n.name === 'zTest' && inState) hits.push(start);
-  };
-  walk(0, false);
-  return hits;
-}
-
-function paintHolo(body, opt, rows, label, type){
-  const props = readShaderProps(body);
-  const dv = new DataView(body.buffer, body.byteOffset, body.byteLength);
-  let n = 0;
-  for (const p of props){
-    const spec = HOLO_PROPS[p.name];
-    if (!spec) continue;
-    let next, before, after;
-    if (spec.kind === 'color'){
-      const rgb = opt[spec.src];
-      const a = opt[spec.src + 'A'];
-      next = [rgb[0], rgb[1], rgb[2], a];
-      before = rgb2hex(p.val); after = rgb2hex(next);
-    } else {
-      next = opt[spec.src] ? spec.on : spec.off;
-      before = `(${p.val.map(x => +x.toFixed(2)).join(', ')})`;
-      after  = `(${next.join(', ')})`;
-    }
-    for (let i = 0; i < 4; i++) dv.setFloat32(p.valOff + i*4, next[i], true);
-    n++;
-    if (rows){
-      const sw  = spec.kind === 'color' ? `<span class="swatch" style="background:${before}"></span>` : '';
-      const sw2 = spec.kind === 'color' ? `<span class="swatch" style="background:${after}"></span>` : '';
-      rows.push([label, p.name, sw + before, sw2 + after]);
-    }
-  }
-
-  const want = opt.xray ? 8 : 4;
-  const zs = findZTest(body, type);
-  for (const off of zs){
-    const old = dv.getFloat32(off, true);
-    if (old === want) continue;
-    dv.setFloat32(off, want, true);
-    n++;
-    if (rows) rows.push([label, 'zTest (xuyên tường)',
-      `${old} · ${ZTEST_NAMES[old] || '?'}`, `${want} · ${ZTEST_NAMES[want]}`]);
-  }
-  if (!zs.length && rows)
-    rows.push([label, 'zTest', 'không tìm thấy', '— bỏ qua']);
-  return n;
-}
-
-async function applyPreset4(orig, b, opt){
-  const node = b.nodes[0];
-  if (!node) throw new Error('Bundle không có node nào.');
-
-  const { data, blockAt } = decompressAll(orig, b);
-  const cab = data.subarray(node.off, node.off + node.size);
-  const sf = parseSF(cab);
-
-  const abObj = sf.objs.find(o => o.cid === 142);
-  const nameOf = new Map();
-  if (abObj){
-    const v = readObj(sf, abObj, null);
-    for (const c of v.m_Container) nameOf.set(c.second.asset.m_PathID, c.first);
-  }
-
-  const shaders = sf.objs.filter(o => o.cid === 48);
-  if (!shaders.length)
-    throw new Error('Bundle này không có shader nào — đây có phải optionalavatarres_commonab_shader không?');
-
-  const holo = await loadHolo();
-  const rows = [];
-  const shType = sf.types[shaders[0].tid];
-  const painted = holo.body.slice();
-  const nSet = paintHolo(painted, opt, rows, 'hologram', shType);
-
-  const repl = new Map();
-  let swapped = 0, skipped = 0;
-  for (const o of shaders){
-    if (o.size < painted.length){ skipped++; continue; }
-    const body = new Uint8Array(o.size);
-    body.set(painted, 0);
-    repl.set(o.pid, body);
-    swapped++;
-  }
-  if (!swapped)
-    throw new Error('Không shader nào đủ chỗ để thay bằng hologram.');
-
-  rows.push(['— áp dụng —', `${swapped} shader`,
-             `${shaders.length} shader trong bundle`,
-             `thay ${swapped}` + (skipped ? `, bỏ qua ${skipped} (quá nhỏ)` : '')]);
-
-  const out = rebuildShaders(orig, b, data, blockAt, sf, node, repl);
-  return {
-    out,
-    note: `Đã thay <b>${swapped}</b> shader nhân vật bằng hologram và đặt màu — ` +
-          `${nSet} giá trị, dung lượng giữ nguyên ${out.length.toLocaleString('vi-VN')} byte.`,
-    cols: ['Vùng','Property','Trước','Sau'], rows, html: true
-  };
-}
-
-/* ═══════════ giao diện ═══════════ */
-let FILE = null, ORIG = null, BUN = null, KIND = null, DET = null;
-
-function render(el, html){ $(el).innerHTML = html; }
-
-const BUILDS = {
-  uma: [
-    { name: 'Free Fire Thường', size: 46096, objs: 24, items: 8  },
-    { name: 'Free Fire Max',    size: 46640, objs: 24, items: 12 }
-  ],
-  shader: [
-    { name: 'Free Fire Thường', size: 1443632, shaders: 146 },
-    { name: 'Free Fire Max',    size: 1419165, shaders: 144 }
-  ],
-  holo: [
-    { name: 'Free Fire Thường', size: 382493, shaders: 48 },
-    { name: 'Free Fire Max',    size: 391791, shaders: 50 }
-  ]
-};
-
-function sha1b64(bytes){
-  const ml = bytes.length;
-  const pad = new Uint8Array((((ml + 8) >> 6) + 1) << 6);
-  pad.set(bytes); pad[ml] = 0x80;
-  const dv = new DataView(pad.buffer);
-  dv.setUint32(pad.length - 4, (ml << 3) >>> 0, false);
-  dv.setUint32(pad.length - 8, Math.floor(ml / 536870912), false);
-  let h0=0x67452301,h1=0xEFCDAB89,h2=0x98BADCFE,h3=0x10325476,h4=0xC3D2E1F0;
-  const w = new Uint32Array(80);
-  const rol = (x,n) => ((x << n) | (x >>> (32 - n))) >>> 0;
-  for (let i = 0; i < pad.length; i += 64){
-    for (let j = 0; j < 16; j++) w[j] = dv.getUint32(i + j*4, false);
-    for (let j = 16; j < 80; j++) w[j] = rol(w[j-3]^w[j-8]^w[j-14]^w[j-16], 1);
-    let a=h0,b2=h1,c=h2,d=h3,e=h4;
-    for (let j = 0; j < 80; j++){
-      let f, k;
-      if (j < 20)      { f = (b2 & c) | (~b2 & d);              k = 0x5A827999; }
-      else if (j < 40) { f = b2 ^ c ^ d;                        k = 0x6ED9EBA1; }
-      else if (j < 60) { f = (b2 & c) | (b2 & d) | (c & d);     k = 0x8F1BBCDC; }
-      else             { f = b2 ^ c ^ d;                        k = 0xCA62C1D6; }
-      const t = (rol(a,5) + f + e + k + w[j]) >>> 0;
-      e = d; d = c; c = rol(b2, 30); b2 = a; a = t;
-    }
-    h0=(h0+a)>>>0; h1=(h1+b2)>>>0; h2=(h2+c)>>>0; h3=(h3+d)>>>0; h4=(h4+e)>>>0;
-  }
-  const o = new Uint8Array(20), odv = new DataView(o.buffer);
-  [h0,h1,h2,h3,h4].forEach((h,i) => odv.setUint32(i*4, h, false));
-  return btoa(String.fromCharCode(...o));
-}
-const cdnSuffix = b64 => b64.replace(/\+/g,'~2B').replace(/\//g,'~2F').replace(/=/g,'~3D');
-
-function detectKind(orig, b){
-  const node = b.nodes[0];
-  if (!node) return { kind: null, why: 'Bundle không có node nào.' };
-
-  let isUMA = false;
-  if (!b.blocks.some(x => (x.f & 0x3F) !== 0)){
-    const from = b.dataStart + node.off, to = from + node.size;
-    const probe = ['bone_Hips', 'bone_Left_Spine_Backpack', 'UMAAssetIndexer'];
-    const hay = orig.subarray(from, to);
-    for (const kw of probe){
-      const pat = enc(kw);
-      outer: for (let i = 0; i <= hay.length - pat.length; i++){
-        for (let k = 0; k < pat.length; k++) if (hay[i+k] !== pat[k]) continue outer;
-        isUMA = true; break;
-      }
-      if (isUMA) break;
-    }
-  }
-
-  try {
-    const { data } = decompressAll(orig, b);
-    const cab = data.subarray(node.off, node.off + node.size);
-    const sf = parseSF(cab);
-    const nShader = sf.objs.filter(o => o.cid === 48).length;
-
-    if (nShader){
-      const ab = sf.objs.find(o => o.cid === 142);
-      let hit = 0, hasHolo = false, hasDecal = false;
-      if (ab){
-        const v = readObj(sf, ab, null);
-        for (const c of v.m_Container){
-          if (isXrayShader(c.first)) hit++;
-          const f = c.first.split('/').pop();
-          if (f === 'hologram.shader') hasHolo = true;
-          if (f === 'brmobilebumpspecdecal.shader') hasDecal = true;
-        }
-      }
-
-      if (hasHolo && !hasDecal){
-        let build = BUILDS.holo.find(x => x.shaders === nShader && x.size === orig.length);
-        let guess = false;
-        if (!build){ build = BUILDS.holo.find(x => x.shaders === nShader); guess = !!build; }
-        return {
-          kind: 'holo', build: build ? build.name : null, guess,
-          detail: `bundle shader nhân vật — ${nShader} shader, có hologram`
-        };
-      }
-
-      if (!hit)
-        return { kind: null, why: `Bundle có ${nShader} shader nhưng không có backweapon / brmobilebumpspec / brmobilebumpspecdecal.` };
-      let build = BUILDS.shader.find(x => x.shaders === nShader && x.size === orig.length);
-      let guess = false;
-      if (!build){
-        build = BUILDS.shader.find(x => x.shaders === nShader);
-        guess = !!build;
-      }
-      return {
-        kind: 'shader', build: build ? build.name : null, guess,
-        detail: `bundle shader súng — ${nShader} shader, ${hit} shader định vị`
-      };
-    }
-
-    if (isUMA || sf.types.some(t => t.cid === 114)){
-      let items = null;
-      const idx = sf.objs.find(o => {
-        const t = sf.types[o.tid];
-        return t.cid === 114 && t.nodes &&
-               buildNodes(t).some(n => n.level === 1 && n.name === 'Items');
-      });
-      if (idx){
-        try { items = readObj(sf, idx, null).Items.length; } catch (e) { }
-      }
-      let build = BUILDS.uma.find(x => x.size === orig.length && x.objs === sf.objs.length);
-      let guess = false;
-      if (!build && items !== null){
-        build = BUILDS.uma.find(x => x.items === items);
-        guess = !!build;
-      }
-      return {
-        kind: 'uma', build: build ? build.name : null, guess,
-        detail: `bundle UMA — ${sf.objs.length} object` +
-                (items !== null ? `, indexer ${items} mục` : '')
-      };
-    }
-  } catch (e) {
-    return { kind: null, why: `Không đọc được nội dung: ${e.message}` };
-  }
-  return { kind: null, why: 'Không nhận ra đây là bundle UMA hay bundle shader.' };
-}
-
-function applyKind(kind){
-  const pres = [...document.querySelectorAll('.pre')];
-  const okFor = v => kind === null ? false
-                  : v === '3' ? kind === 'shader'
-                  : v === '4' ? kind === 'holo'
-                  : kind === 'uma';
-  let firstOk = null;
-  for (const el of pres){
-    const inp = el.querySelector('input');
-    const ok = okFor(inp.value);
-    el.classList.toggle('off', !ok);
-    inp.disabled = !ok;
-    if (ok && firstOk === null) firstOk = el;
-    if (!ok && inp.checked) inp.checked = false;
-  }
-  if (firstOk && !pres.some(e => e.querySelector('input').checked)){
-    firstOk.querySelector('input').checked = true;
-  }
-  syncPanels();
-}
-
-function syncPanels(){
-  const sel = document.querySelector('input[name=p]:checked');
-  const v = sel ? sel.value : null;
-  for (const el of document.querySelectorAll('.pre'))
-    el.classList.toggle('sel', el.querySelector('input') === sel);
-  const adv = $('#advBox'), col = $('#colBox'), holo = $('#holoBox');
-  adv.classList.toggle('off',  v !== '2');
-  col.classList.toggle('off',  v !== '3');
-  holo.classList.toggle('off', v !== '4');
-  adv.open  = v === '2';
-  col.open  = v === '3';
-  holo.open = v === '4';
-}
-
-async function load(file){
-  FILE = file; ORIG = null; BUN = null; KIND = null; DET = null;
-  $('#go').disabled = true;
-  render('#out', '');
-  let buf;
-  try { buf = await file.arrayBuffer(); }
-  catch(e){ applyKind(null); return render('#info', `<div class="msg bad">Không đọc được file: ${esc(e.message)}</div>`); }
-  ORIG = new Uint8Array(buf);
-  try { BUN = parseBundle(ORIG); }
-  catch(e){ applyKind(null); return render('#info', `<div class="msg bad">${esc(e.message)}</div>`); }
-
-  const node = BUN.nodes[0];
-  const comp = BUN.blocks.filter(x => (x.f & 0x3F) !== 0).length;
-  const det = detectKind(ORIG, BUN);
-  KIND = det.kind; DET = det;
-
-  const warn = BUN.declared !== ORIG.length
-    ? `<div class="msg warn">Trường size trong header (${BUN.declared.toLocaleString('vi-VN')}) khác dung lượng thật (${ORIG.length.toLocaleString('vi-VN')}) — file có thể còn dữ liệu thừa ở đuôi. Tạo file mới sẽ sửa luôn.</div>` : '';
-  const bad = KIND ? '' :
-    `<div class="msg bad">${esc(det.why || 'Không nhận ra loại bundle.')} Tool này chỉ làm việc với <code>assetindexer</code> và <code>shaders</code>.</div>`;
-
-  const suffix = file.name.includes('.') ? file.name.slice(file.name.indexOf('.') + 1) : '';
-  const nowHash = cdnSuffix(sha1b64(ORIG));
-  const isPristine = suffix && suffix === nowHash;
-
-  const buildRow = det.build
-    ? `<tr><td>Phiên bản</td><td><b>${esc(det.build)}</b>${
-        det.guess ? ' <span class="dim">(phỏng đoán — dung lượng không khớp bản gốc đã biết)</span>'
-                  : (isPristine ? ' · bản gốc' : ' · đã chỉnh sửa')}</td></tr>`
-    : (KIND ? `<tr><td>Phiên bản</td><td>không rõ — dung lượng ${ORIG.length.toLocaleString('vi-VN')} byte không khớp Thường hay Max</td></tr>` : '');
-
-  render('#info', `${warn}${bad}<div class="panel"><h2>File nguồn</h2><table>
-    <tr><td>Tên</td><td>${esc(file.name)}</td></tr>
-    <tr><td>Dung lượng</td><td>${ORIG.length.toLocaleString('vi-VN')} byte</td></tr>
-    ${buildRow}
-    <tr><td>Định dạng</td><td>UnityFS fmt ${BUN.fmt} · ${esc(BUN.rev)}</td></tr>
-    <tr><td>Block</td><td>${BUN.blocks.length} · ${comp ? 'có nén' : 'uncompressed'} · flags 0x${hx(BUN.flags)}</td></tr>
-    ${node ? `<tr><td>Node</td><td>${esc(node.name)} ·${node.size.toLocaleString('vi-VN')} byte</td></tr>` : ''}
-    ${det.detail ? `<tr><td>Nhận diện</td><td>${esc(det.detail)}</td></tr>` : ''}
-  </table></div>`);
-
-  $('#drop').classList.add('has');
-  $('#dropText').innerHTML =
-    `<b>${esc(file.name)}</b><span>${ORIG.length.toLocaleString('vi-VN')} byte — bấm để chọn file khác</span>`;
-  applyKind(KIND);
-  $('#go').disabled = !KIND;
-}
-
-$('#go').onclick = async () => {
-  const p = document.querySelector('input[name=p]:checked').value;
-  const btn = $('#go');
-  btn.disabled = true;
-  const label = btn.textContent;
-  btn.textContent = 'Đang xử lý…';
-  let res;
-  try {
-    if (p === '1') res = applyPreset1(ORIG, BUN);
-    else if (p === '2') res = applyPreset2(ORIG, BUN, {
-      fx: parseFloat($('#fx').value), fz: parseFloat($('#fz').value),
-      mx: parseFloat($('#mx').value), s:  parseFloat($('#sc').value)
-    });
-    else if (p === '3') {
-      const grab = (id, name) => {
-        const v = hex2rgb($('#' + id).value);
-        if (!v) throw new Error(`Mã màu ${name} không hợp lệ: "${$('#'+id).value}" (cần dạng #RRGGBB).`);
-        return v;
-      };
-      res = await applyPreset3(ORIG, BUN, {
-        xray:  grab('tXray', 'súng'),
-        line:  grab('tLine', 'viền súng'),
-        dim:   grab('tDim',  'keo'),
-        width: parseFloat($('#rWidth').value),
-        alpha: parseFloat($('#rAlpha').value)
-      });
-    }
-    else {
-      const grab = (id, name) => {
-        const v = hex2rgb($('#' + id).value);
-        if (!v) throw new Error(`Mã màu ${name} không hợp lệ: "${$('#'+id).value}" (cần dạng #RRGGBB).`);
-        return v;
-      };
-      res = await applyPreset4(ORIG, BUN, {
-        tint:  grab('tTint', 'nhân vật'),  tintA:  parseFloat($('#rTintA').value),
-        rim:   grab('tRim',  'viền'),      rimA:   parseFloat($('#rRimA').value),
-        scan:  grab('tScan', 'quét'),      scanA:  parseFloat($('#rScanA').value),
-        xray:   $('#kXray').checked,
-        line:   $('#kLine').checked,
-        glitch: $('#kGlitch').checked
-      });
-    }
-  } catch(e){
-    render('#out', `<div class="msg bad">${esc(e.message)}</div>`);
-    return;
-  } finally {
-    btn.disabled = false;
-    btn.textContent = label;
-  }
-
-  const same = res.out.length === ORIG.length;
-  let nd = 0;
-  if (same) for (let i = 0; i < ORIG.length; i++) if (ORIG[i] !== res.out[i]) nd++;
-
-  render('#out', `
-    <div class="msg ok">${res.note}</div>
-    <div class="panel"><h2>Thay đổi</h2><div class="hexwrap"><table class="hex">
-      <tr>${res.cols.map(c => `<th>${esc(c)}</th>`).join('')}</tr>
-      ${res.rows.map(r => `<tr>
-        <td class="dim">${esc(r[0])}</td><td class="dim">${esc(r[1])}</td>
-        <td class="old">${res.html ? r[2] : esc(r[2])}</td>
-        <td class="new">${res.html ? r[3] : esc(r[3])}</td></tr>`).join('')}
-    </table></div>
-    ${res.extra ? `<div class="note"><b>_Path sau khi rút gọn</b> (chỉ dùng ở editor; runtime tra bằng _Name và PPtr):<br>${
-      res.extra.names.map((n,i) => `<code>${esc(n)}</code> → ${esc(res.extra.paths[i])}`).join('<br>')}</div>` : ''}
-    </div>
-    <div class="panel"><h2>Kết quả</h2><table>
-      <tr><td>Dung lượng</td><td>${res.out.length.toLocaleString('vi-VN')} byte ${same ? '— khớp file nguồn' : `— <b>khác nguồn ${(res.out.length-ORIG.length > 0 ? '+' : '')}${res.out.length-ORIG.length}</b>`}</td></tr>
-      ${same ? `<tr><td>Số byte đổi</td><td>${nd.toLocaleString('vi-VN')}</td></tr>` : ''}
-      ${KIND && DET && DET.build ? `<tr><td>Phiên bản</td><td>${esc(DET.build)}</td></tr>` : ''}
-    </table>
-    <div class="note" style="margin-top:12px">File tải về giữ nguyên tên gốc, chép đè thẳng lên file cũ:</div>
-    <span class="fname">${esc(FILE.name)}</span>
-    <div class="row" style="margin-top:14px"><button id="dl" type="button">Tải file đã sửa</button></div></div>`);
-
-  $('#dl').onclick = () => {
-    if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.saveFile) {
-      const bytes = res.out;
-      const CHUNK = 65536;
-      const parts = [];
-      for (let i = 0; i < bytes.length; i += CHUNK)
-        parts.push(String.fromCharCode.apply(null, bytes.subarray(i, Math.min(i + CHUNK, bytes.length))));
-      window.webkit.messageHandlers.saveFile.postMessage({name: FILE.name, b64: btoa(parts.join(''))});
-    } else {
-      const url = URL.createObjectURL(new Blob([res.out], { type:'application/octet-stream' }));
-      const a = document.createElement('a');
-      a.href = url; a.download = FILE.name;
-      document.body.appendChild(a); a.click(); a.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 4000);
-    }
-  };
-};
-
-for (const el of document.querySelectorAll('.pre')){
-  el.addEventListener('click', () => {
-    if (el.querySelector('input').disabled) return;
-    el.querySelector('input').checked = true;
-    syncPanels();
-  });
-}
-
-for (const el of document.querySelectorAll('.pre')){
-  el.classList.add('off');
-  el.querySelector('input').checked = false;
-}
-for (const id of ['advBox', 'colBox', 'holoBox']) $('#' + id).classList.add('off');
-$('#go').disabled = true;
-
-for (const [c, t] of [['cXray','tXray'], ['cLine','tLine'], ['cDim','tDim'],
-                      ['cTint','tTint'], ['cRim','tRim'], ['cScan','tScan']]){
-  const cel = $('#' + c), tel = $('#' + t);
-  cel.addEventListener('input', () => {
-    tel.value = cel.value.toUpperCase();
-    tel.classList.remove('bad');
-  });
-  tel.addEventListener('input', () => {
-    const v = hex2rgb(tel.value);
-    tel.classList.toggle('bad', !v);
-    if (v) cel.value = rgb2hex(v).toLowerCase();
-  });
-}
-$('#rWidth').addEventListener('input', e => { $('#wVal').textContent = (+e.target.value).toFixed(1); });
-$('#rAlpha').addEventListener('input', e => { $('#aVal').textContent = (+e.target.value).toFixed(2); });
-for (const [r, out] of [['rTintA','tintAVal'], ['rRimA','rimAVal'], ['rScanA','scanAVal']])
-  $('#' + r).addEventListener('input', e => { $('#' + out).textContent = (+e.target.value).toFixed(2); });
-
-const drop = $('#drop'), input = $('#file');
-drop.onclick = e => { if (e.target !== input) input.click(); };
-input.onchange = () => {
-  const f = input.files[0];
-  input.value = '';
-  if (f) load(f);
-};
-['dragenter','dragover'].forEach(ev =>
-  drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('over'); }));
-['dragleave','drop'].forEach(ev =>
-  drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('over'); }));
-drop.addEventListener('drop', e => { const f = e.dataTransfer.files[0]; if (f) load(f); });
-</script>
-</body>
-</html>
+v�-ʗ��i
+�٥���
+��
+��Zr���n���
+��Z����'����r��z{p��au��qﰉ�a�x���~�ƥ{
+�+ey�br��w?��^
+�ܥ
+��-
+���ӽ׏���ޖ�k]��4�o��y5ۭ��了ם�����)ޮ��v�ny�_
+��q����_��M@.����q<M����tO9ӭ
+��!���m�y۞4Ӿ~�j'�辚�貖�y!L�z>E�.����'�ǧ�����%jɨ��)i�
+
+n�~�,��׫��1
+
+�x��gU:�
+n�r
+����}
+m�$��.�ߜ�Z+ӽ�
+m�$��.��;�x��a��l��0�)�����W(����ןj�m����{�M���u߿>kּ�ݹ�Ǟ��m��on�u�6���oWx�'��ޥ�q��z��׫~,^
+m�$��.�߬�7����
+r�h�����
+~��ךq�^y��i����^�w���bq�^��2�צ��j{>���
+��]�x5�u�|Ҝ
+���+~��m�ȳ{李�-�M
+��"�*'��Z�+�
+�)��蠆�t��
+
+
+��A8C юTDK�
+�v�j�b�����k
+��"�*'~,^
+��t������t��!z(!�]4�
+m�$��.���m����<
+m�$v�)�����ۖ���
+���+~m�$v�)�����ۖ���
+v+)�����
+jX���zkz{^
+��-���r��z{\z{^
+��u�}��}
+��]�x6Ҝ
+����ܵ
+����+b�z)iȭ�M�y�
+
+�v�j�b�����k(buק
+����ܴ
+������z�����
+
+�v�j�b��j�
+m�$��.���m�w�]���
+n��z�i��%���m���nv�7
+n��z��iخ�m)
+��]�x6�v�
+��~�'m��4�
+�'m�]4
+��m��b�w�׫
+n�~���
+5Ҝw�k����M:�M���m���nv�6
+jx�jب��ۡ�݊x��8�˛�ϛ{8��Mz�M�
+
+�쟭����ۡ�݊x�
+��ڞ��kjW���Zr+r
+�M-���~��ƥ{Z)iȭ�
+
+�v�j�b��r�
+~���ȳ{��
+�������h�^)
+
+�v�j�b����^
+~���ȳ{m�
+~�����{�
+r�h���
+����}4�
+��mz����"���W�
+
+�v�j�b����^���
+m�$��.��b���
+�v'��]�u�8���9��
+���+~m�$��.�ߜ�*m{
+���+~��m�����(�����쥪ޞ
+
+�v�j�b��z�
+r�h����鮵�
+~���ȳ{^)
+����}4ۊq
+�)����u
+
+�v�j�b���
+�'m�]4
+��]�x5ޜ
+~���ȳ{^i
+~�����z�
+n��z��iخ�]�
+m�$��.��b���
+�v'��]�u�6���8�/
+r�h���
+n��z�
+r�좺h�{^
+n�~���
+8�y��m���nv�8
+����+b�w�׫�^l
+
+�v�j�b���xh��
+~)mz��m��,�O
+
+
+��v
+¶���~�'m��4����ѫ�
+��y�+u����b��z�Zuا�^��f��)�n�m�mx�
+m�$��.���m�w�]�ӿ��^�Zq��bv�k�5۝��M�
+m�$v�)�����ۖ��ڜ~���ߛi���~~)mz�庽v�
+��{�b�W��{~�,��zq~�����{�I^�׫��Zr)�ӗ���m��ڞ��k����j�
+r�h��;Qfj�"�M5ڜ]��ek'�{��	��צ�ǧ���j��
+��{�b�W�y�+y�'���~���ȳ{^)
+�ש�X���-�W��w�j�"�JZuا�Gb��Z��^��^��b��-��ܢ[����
+�ש�X���ek'�{�])ũb����~W���Z���߬�7�ޜ\�Z+����)�
+�ש�y���"v�vڜaz(!�m�ź+u����b��tv+)�����Z�('�+^���׫
+��-���r��z{\z{^��'��"��u��߰z(!��4~W����
+m�$��.��b���
+�v'��]�u�6���8�/�Z+}��j�"��h�Zq
+�ש�X�r�h���
+�ש�X���ܢZ+����k�y��߬�7�ڜ]��ek&��&j�"��h�Zq
+���z�>��zf��)���uڜii�b����u��׫��)֜l�X�����X�
+v+)����'`�'~�驕�^��%�i����~���q
+����i� ���v�k�5۝��M;n��z�i��%���m���nv�5
+n��z��iخ��q��]�x<�t�
+���驃���'��"��t��߰z(!��4r�h��;Qfj�"����&ڜ
+���驃�ڙ��߬�7�ڜ_�{~�蠆����%��گ
+���驃�^���߬�7�֜\�Z+����k�yٚ����)ڜe�w��蠆�x
+
+�W�߬�7�֜fj�"�M8�^�׫��Zr)��M^
+��ܢZ+����k�y��߬�7�ߚq����}4�jq
+��ޕ���
+�wk����mw�O4n��z�i��%���m���nv�5�+u����b��x�
+��]�x5�fj�"����&׊qm�$v�)�����ۖ��Ҝ~���ߛi���~~)mz�庽t�
+
+v�)n��z�y�Z�����v�ny�~[��^���v+�׊q��]�x6�u�m{~jX��ǧ��
+r�좺h�{^��ڞȭ������rH+��ݮ��v�ny�N&j�"����&׊q
+m�$v�)�����ۖ����y�"���rGk����[^��n��q
+v�)��ޭ�見ޭ�+u��r�h�����q��m�$��.���m���nv�4
+v�)mج�V�nZ��'��"��y������-����(���j���y
+v�)���r�h����鮵�_�{~�,��ni
+v�)��)i�b�
+x�z��׫��r��(�'[��^��(��끶��]�۞t
+
+�g�߬�7�ڜm{~�����+��iz���^�׫��Zr)�ӷ�r�h����鮵�
+����}4�jq~�����z�
+���{��tѺ+u��r�ej�r�ej�~���ȳ{]��
+��Zuا��q����'�楊	��
+����~r�u�%��گ了ם�'m�_4�Zuا���u�p�+^��Zq��¶�
+��Z�ߜ�)]~������\�j�����~���ȳ{]��(�ߛ��n����
+
+��p��h��ߖ�>ū���nH���ޭ�h����e�x-��!
+���z�~������\�j�����~���ȳ{]��b�ﬥ���+j�"v�Z��&����a�M
+���z��^�ߚ�('���~�����z�G(���j����^u�'��"��u�
+��m��ڞ��k����jǥz�^��)iȧ�N^���v)��^�ǺqѺ+u��n�m�mi��%��گ壘w
+���z���Zuا��qתq�tn��z����h�Zq��bv����b��"v�Z���Z+����)�
+���z�����~r�w�����(���j����^
+���z���Z�ߜ�)]���׫��-���
+�W\�Z+���������Z+������g(���j����^
+
+���z���ek(+���])�f��)�n�m�mz�
+�����ek'�{�]�ũb����~W���Z���׫ךq��bv�k�5۝��M|n��z��iخ�]�
+��]�x5ޜu�\��(��"�׫m�$��.���m�w�]�ӽ����ب�]�
+m�$v�)�����ۖ����y�"���rGk����[^��n��q
+������n��z���Z+���v�nyӎ
+���zV�׫��%��گ�qǧ����
+�wk����]�۞t
+��݊�ek)�覦��j{
+����������}��Mqǧ��(���j��i����{�
+���~�����z�G�߬�7��q�������h�zq
+���r�h����鮵�_�{~�,��ni�X�{�^�m�
+���~������\�j�����~���ȳ{]y�(���j����^vf��)���z�
+
+����^���v+���ii�b�
+u�x��߬�7�ߚq�������h�^)ź+u���(�'
+��(��%��گ﨑�+u��r�h��%������������7��ڞ�Z���
+m�$��.��(����,b���n����$��ڞ�Z���
+��i�(���j��m�[��^��(��ܢZ+�h��{+��گ�i��������z{
+m�$��.��(����,b���n�����w�kj{)j��
+��0j�ܢZ+�������+u��r�h��%�������������~m��쥪ޞ
+m�$��.��(����,b���n�����m��쥪ޞ
+
+n�m�w�ا����'��"��x��߰z(!��4n��z���^���v+��Jq��]�x5ڜv�
+m�$��.��b���
+�v'��]�u�6���8�/�Z+}�ܺ�(��"�׫
+n�~���
+6�v��m���nv�7��ڞȭ��ߊ[^�[
+n�m�xh����b���y��׫n����޲�t
+n�m�wb���y�)iȭˎ\��(�z-��e��
+����ek'�{�])��^��+j�+j���	��צ�ǧ��
+�'^v+)����w
+r�^~������\�j�����~���ȳ{]���rH+��ݽ����b���v)�֜y��׫�����8�
+��^r�h����鮵�_�{~�,��ni�f��)���uҜe�w��蠆�y
+~v�y�'��ښ)r����j'��'��"��v�[i� ���v����!��Zuا��q�Jq
+n��z��iخ��q����jF�y�>jYfj�"��h��qv+)�����$
+i��j�"��h�]�ź+u����u�(�'oj���)ޥ�]�x>��uڜ
+i��i��'.��+�����ܢZ+����k�y��߬�7�ۚq�ǫ�ǥy�g�w
+~Wlv+)����'`�'~�驕�^��%�i��^j֮����٢�f�׍)�W끪uҜfj�"��h�]�
+~Wei��v+)�����$~���ȳ{]y�(���j����^vf��)�n�m�n)
+~Wb����'m�]4~��x^�+_�{~}���+گ廉z�{~�,��zq��]�x;�i
+n��z�i��%���m���nv�6ٺ+u����b���Ŷ��
+�wk����]�ӧ(���j���y
+
+r�lv+)����'`�'~�驕�^��%�i��^j֮����٢�f���)�W끪u�fj�"��h�]�
+q�]��ޕج�V�nZ��'��"��u�\�Z+����k�yٚ����-����
+q�]��ޕئ~������\�j�����~���ȳ{]i
+r�0v+)�����`j�)ũb����q��z
+r�0�zn�ܩy�%��"v�x�az(!�~�Ɩ�v)�ڜ[��^�Zq��bv�k�5۝��M�
+n��z��iخ��qm�$��.���m���m4�˫���)�z��{�
+r�0�zn�ܩzױ��^�Y���"v�t~��x^�+_�{~}���+گ廉z�{~�,��zq
+��]�x<�iź+u���(�'k����]�۞t�f�׫�����;�
+m�$��.���m���m4��%��گK^�߭���~�溚^�Ƭ
+r�0�zn�ܩzױ���n��z���Z+������
+��]i�]�������z�
+��]��ޕ��vV�zWb��ZɹhrG�߬�7�ךqr�h����鮵�fj�"����&�
+��]��ޕ����Zm�[r�h����觑�'��ښ)r����j'
+�zn�ܩz����"v�u�F�q����%��گ�qǧ
+��rb��Z�)�w�nZ���u�^�m�Zqn��z��iخ�zq���ƥ��b���
+������m�[��^�Zq��bv�kny۞v�8
+��ج�V�~W���vҜ_��~¶�¶��������z�
+r��ek'�{��qjX���zkz{^�˫���)�z��߬�7�ߚq
+r"���i��ߜ�Z+�����z{p��aתq�蠆�z�.��+�����ߕ�g�w
+r�g(���j����^u�'��ښ)r����j'��'��"��u�
+��r�
+��
+n�r
+
+����FT��
+v+�v�ۡ�݊x����,�v�j�b�����k
+v+ܕ�,�v�j�b��j�
+v+ܕ�,�v�j�b��r��v+
+�g%j�(���ا��b�W�y����ὼ���܆'(�s��Z��v
+��Z��'n��v)��׬p(h�x��������������j،��l������
+n�m�x�rZ,x�ۡ�݊x�w%j�(���ا���ܩy��������k/ۺ�h
+�د
+�د
+
+v+ܕ�,¶�
+
+v+�u��
+v+�u��7�
+l��w����^�
+���j��)�{���Zu����m��ڕ�ڵ��z�ܢi������z�쥩
+�د
+�zn�ܩy��z'_�W���,�'^
+�د
+
+v+�v)ߣ�b
+
+���4s�L��)3H�,D�D��
+v+ܕ�,��ޖ'f�Ȝ=��
+�d�a�x\��
+v+�)^v+)�����`j�t���	��צ�ǧ��ߕ�~¶�¶�
+��^r؝���I�^r�-�W���u�)��'m�m4�Zuا�])ź+u����b��)Ŷ��
+�wk����]�ӧ(���j���y��^�Zq��bv�k�5۝��M�~��x^�+_�{~�,��~i
+��b�{ږ����'Z��Ѩ�	^J��Ͼ��m��
+�ǥy�
+n�m�x��� ���k m�ܩy������x\�����
+�د
+j�b�'[����h��ڹب
+�د
+
+v+ܕ�,���z�"v�ޱ�l
+��ޕ�Z��kzǥ
+�zn�ܩz����ڙ�oj[���^rG�
+v+
+v+ܕ�,�PӴ���د
+v+ܕ�,u:�w(u���Ǌ�?r�^r�^n���ל��(u�k�x6��!�xj؜�-zo+^�د
+v+ܕ�,��'{������y�'jo��د
+�د
+�V�z
+��ޕ�Z��k
+�zn�ܩz����ڙ�oj[�
+v+
+v+ܕ�,�`"�:ڀ)�j�?�b
+v+ܕ�,v'(u����y�J��{�ZrJZrOܡ׭�x\�כ�w����z����z�d�)�{��i�x%���vW�v+
+v+ܕ�,�v��M��~4�6�=4����y�y�݊
+�د
+�V�z
+��ޕ�Z��k
+�zn�ܩz����ڙ�oj[�
+v+
+v+ܕ�,�y����د
+v+ܕ�,v)��x&����x/���Ɯ�כi�0y�h��(u�(u�뚆��)y�ܡל�כ�j�W��jl��yƥ��x�g~)^n�Zu������&��݊
+v+ܕ�,���k ����:�K�w��Z+��.)�Z'm���*%��݊
+�د
+�V�z
+��ޕ�Z��k
+�zn�ܩz����ڙ�oj[�
+v+
+v+ܕ�,���xg��݊
+v+ܕ�,u8Z��'n�Zu��{�u�\��虹�r�^��h�����z�m�x
+�w���ب��Z��Z�����&���o�!i׫����&��݊
+v+ܕ�,���Ш���F)��Z+�'�*%����g�+�v+
+�د
+�V�z
+�د
+
+u�Z�[��,��ޕ�o��(�1
+��j����ޱ�w�˦���
+v+ܕ�,r�l
+v+ܕ�,q�]
+��ޔˬ�)jw%j��o�E���Z+��Z��Zm�
+v+ܕ�,r�0
+�zn�ܩy�%���qz������u�]u
+�zn�ܩzױ�'m^����n{]u�]l��er�����
+�د
+�د
+v+ܕ�,q�]
+��ޔ˯�{'��Z��Z��b�󮴸�x*%��쥩����
+v+ܕ�,r�0
+�zn�ܩy�%���p��z�����}��
+�zn�ܩzױ�'m.)޽�nxQEQl��er�����
+�د
+�د
+v+ܕ�,q�]
+��ޔˊz�)jw%j��oÊ`��������V�z
+v+ܕ�,r�0
+�zn�ܩy�%���p8���n{]u�]
+�zn�ܩzױ�'m)�j[��]u�[)zY\��$}�l
+�د
+�د
+�د
+v+ܕ�,��]
+��ޕܯ�{)jw%j��oκ���v����n'pU�x������
+�zn�ܩz���蝭h����I��m,��t�����
+�د
+v+ܕ�,i�]
+��ޕɮ�x,��ܕ�,v)���Z��Z���iV��M?o�Zm�
+�zn�ܩz���蝬	i����I��[-z�4�����
+�د
+v+ܕ�,��^2�!��,��^�؝�,�5鼭z؜�G!��W��x"�W(u�
+��j[���z��g'�Ƭ��^��b
+�׭j)l
+
+u�Z�[��,��ޕ�o��h��h
+��j����ޱ�x�˦���
+v+ܕ�,r�l
+v+ܕ�,q�]
+��ޔ˧�{����rV��ئ�8��*%��쥩����
+v+ܕ�,r�0
+�zn�ܩy�%���q8������4}��
+�zn�ܩzױ�'mN)���n{MQl��er�����
+�د
+�د
+v+ܕ�,q�]
+��ޔˬ�	����rV��ئ��
+�h��)j�i��
+v+ܕ�,r�0
+�zn�ܩy�%���q���n{M}�
+�zn�ܩzױ�'mF)�j[��AE[)zY\��$}�l
+�د
+�د
+v+ܕ�,q�]
+��ޔ˪��)jw%j��o�q�¢Z+��Z��Zm�
+v+ܕ�,r�0
+�zn�ܩy�%���q'�����4�M4
+�zn�ܩzױ�'mIƧ��n{M4�M,��er�����
+�د
+�د
+�د
+v+ܕ�,i�]
+��ޕ���l��ܕ�,v)�N)�
+�h��i��쥩ۉ�b��j]t������
+�zn�ܩz���蝭8��	��I��[-z�4�����
+�د
+v+ܕ�,i�]
+��ޖi�x&��Z��Z��b��b�*%��������n'k�`j]t������
+�zn�ܩz���蝭�h��f���^�M9��n{
+�د
+v+ܕ�,i�]
+��ޖi��l��ܕ�,v)�IƧ
+�h��i��쥩ۉ�jpj]t������
+�zn�ܩz���蝭'�	��I��[-z�4�����
+�د
+v+ܕ�,�
+��ޕ�Z��!�)��r��!y����z���^rG�
+���m{������)jw%j��l�z�@����)j쥩����
+��ޕ�Z��!�)��r��!y������
+����
+��x�)jw%j��oˊw������Z��Zm�
+��ޕ�Z��!�)��r��!y����ib��
+���6������rV��ئ���x	�X�r쥩�����V�z
+�د
+v+ܕ�,��^m{������\�׳M�-�	pk+?r�^��'���u�쵫^�h��f����毵�������xm�x+jƨ؜���r�^�*��r�^�ﵻg��^���g���j(b�x�X��'$r��'��\ny�u��r��w�܅8������h��+jhrx$r��jx'�#.��rv*���mnk���ے��b
+v+ܕ�,��^l�\�)�����(u�h��+joܡל��ij�/��r�Z�����{�b�*%��ܡץ��޲w��)����vy�r�m�� rxg���������r�^��.)�Z'm��(u����z�셧^��Z���
+a�h����2��*�	��[rxg��������!�	��{%��݊
+�׭j)l
+
+u�Z�[��,��ޕ�o�֝�1
+��j���x\�xi���o�i��
+v+ܕ�,~Wl
+v+ܕ�,~Wei��6�,�ب��i���zn�'_������݊
+v+ܕ�,~Wei��6�,�ب�?�i���zn�'_������_݊
+v+ܕ�,~Wei��5���ȭ����V�zX���bvloj[��M��~4ێ����݊
+v+ܕ�,~Wei���ƥ{���ޖ)�؝��ږ��y瞿v+
+�د
+v+ܕ�,��^N�q�(u�r�^��j�gr�^��(u�k��a��{/ܡ׭���j�jW��+��zϬ�Oܡ׿v+
+�׭j)l
+
+v+ܕ�,��,�)^�������h�^�
+n�m�x���b���y��~)^�����
+�د
+
+v+�v���د
+
+�����vx>
+v+ܕ�,��
+v+ܕ�,��{�b�W��g����د
+�W%j�,��l
+�
+v+ܕ�,�ש�}v+
+v+
+l���W��wez����
+���x����W��b�6��No��fqȭ��*���*�1�\�ך�ǭ����ڵ��r�^)^r{fr�^j��)�{����׬��^��ܡר�ب��Z��Z�����&���o�!i׫
+�د
+�X
+�
+v+ܕ�,�ש�}�v+
+v+
+l���g~)^n{k��
+���
+ߊW��wez�b�����[-�݊yh���z�!n��
+kzǭ�i��Z
+�د
+�X
+�
+v+ܕ�,�ש�}�v+
+v+
+m�����{�
+���
+���� �g'��)j
+�د
+�X
+�
+v+ܕ�,�ש�~?v+
+v+
+l����zƥ���W��
+���
+_�W�jYߊW�r����'��ܞ���)j
+�د
+
+�د
+
+���
+�r�4�D2
+R[
+v�.����D�鞞�r!�%�ǎ���ا�gi�D���.+-zw�rX��
+z�޽��
+�ں[
+r�춋ޮV�v�.����D�鞞�r!�'n��v)�V'�
+��������,.+-i�a��^
+��S�g��
+������zj/{��j� �2���ᶹ�r�v)�r��x
+�M
+
+
+��� c��AI4M��4p�
+r��!�?�I_�D�m��?���
+(�W��o즷�v�^z�?w�V&�Y�LA�p�#bB�p2g�W���V ����ƚ+��+��\�
+
+r�쵫���%v�.����D�鞞�r!���b
+r���'�'�y�]�˦z{`z�%zg���v�'�'�y�
+r��� �W�����whr鞞��I^���"�� ���k m
+��b��Z�)�}�l
+
+j̧q��rب�Zt�Z�X��Z�j(�W���
+��
+r�춷����y���޵�RA�$��DK
+r���/M�mk�������zױ
+r�춺0��/M�m��b�y����X�
+��i�����
+~��zص��0�W���b�
+r�춺0��,
+����W���v
+��gjg��
++z�Zq�����
+��e�y+�%�ǵ�����eiǿ�k�
+��ڙ�b�
+�V��+-��!����)�
+
+
+
+
+��ek)b��^�a
+���I�^rا���L��ب�����
+ۊ~��)�*'
+�V��+-~��i�l�x"�ױ
+r�춊mv�.���r����%zg���m��
+��oj[�����)�
+��m{B�{^�اu�~��'�v�
+���I�^r֩���
+�v�m
+
+j�b�Il��ek)b��%�y
+���I�^r�ږ穕����t�)�
+z[
+���I�^rا���L��ب����⡞�g����y�l��m��
+
+q�\���
+r��W���+.+bu���g�ǫ
+���I�^rا���L��ب��������� ��y�l��m��
+
+
+
+���I�^r֝tKޞ��קz�!jx
+r��ǥy�^uJ岉�I�^r�ږ�
+����-y�+�����
+j�b�Il����-y�+
+���>V��x
+j�b�Ii���j�!y�'��^��
+�x-��m
+
+
+
+�� ���k m��]�������ޭ�br
+���v*���
+jW��[��x�v��k
+��n�
+
+
+���>V��x
+j�b�Iij�
+���k(�����
+�� ���k m�ױ�*'�����
+�� ���k m��r���rH+��ݖ)�j����bz{uߗ^�a:�0zӍ
+z[
+j�b�Ii�����
+���k(����
+�� ���k m�ױ�*'���N��
+�� ���k m��r���rH+��ݖ)�j����bz{uߗ^�O9ӭ�
+7
+q�\�
+jW��:�۲��g�m�rng!����
+
+
+
+
+���>V��+-�&� ��y�l
+
+�اr
+r���hr鞞ڮz��zW����
+r��g������^
+r����+k�x,��eiǿ���m��
+r�쵮'���
+
+r��$B�0
+r�����H��}����۞
+~��z���nz��
+��\
+~��z�4��>��5��7�G5s
+�w4
+
+��n�{
+
+r�����f
+��\�EQE
+~��zش��^�a��	�L \n-1W<
+��n�w4�QEQE
+
+r���ܲw�M�mw(u�ޝ�z
+
+��x
+~�ܶ*'�>y�+r��J,�
+r���-���{|��ʋ�J,�
+r��{+rW���
+��bҍ
+��z)
+r���$��"�
+
+��e��h�
+��b�^
+��[
+v���{a��'{+���g�mvX�v)b��ڕ�+r/��+~
+��y��
+
+��b
+����+g���w��謶x�+^��o���
+��>�+h�Ԣ��a��'{+���g�b��ږ�drar��
+v�lz�+r˛j���(��+h
+��b����
+
+
+���n��
+
+r�춇߲�"��"�_"�
+��J~�a��'{+���g�~ǭ����h}
+��f��$�
+����
+��[
+v���{a��'{+���g�mvX�v)���[��"���
+��y��
+
+�_�
+��>�Z.�(�z�k�	��J뢲��f�r��m�˫
+��l���}
+~��z�4�id��l���v�l��
+
+��(�Ԣ��a��'{+���g�"���o+^rz.�(�
+��n�wl
+
+
+~�ܶ*'�>��+
+r��{+rW���
+���z۫�w�R)��
+�k-
+r�춋�
+r��r�^�H�D�r�
+r���vw�"{w�
+�k!�!��Y~
+r�춚޾w�"{w�
+�k)ߊY~
+r���K ��b�I2�O� \2O�yߐ� �w
+
+r��"
+r���+r++r/���܋����܋���
+��n�s���[��8ߞ��}���
+
+r��Ʀ{��
+�������[+q�����k+q�����{+q��
+
+r��颶[%zi^�j
+r��X����{�l
+r��if������
+��i��e��^�^u�X�����]yי�
+��b�W��
+��k�+ez�
+��z��拭��!۞k�ny
+��i��k
+
+~��z�%�I^�墨�n�+r
+���z
+��i��f���癨}�6�
+����
+��k�_�
+��z��拭��!۞k�ny
+��i��k
+
+
+
+
+��Z��h�H�
+��z)�0R�0�
+r����
+��[z�Kz}z�N}���^i�or{t
+��y˫���p
+r�춇ߋ�.
+��|���n��
+������
+��e
+r��X����I2�O�
+��zYb���r����܋�e�
+��[z�Kzv޲�ޞV޲ӟ~�߉�v��y�
+
+r���ܺ�'��
+
+�����v�y�a�
+
+��޲�ޟ
+zh�jw!���z�Kzv޲ӟ
+r���h�ƭ�h���޲�ޞ�
+~��z�"�Y,��d��(��a�$�����v!y�a�
+��޲�ޝ�܆��
+z[��
+
+r��X������܆�
+��i��e��^�^u�X����
+��b�W��
+��k�+ez�
+��z��拭��!۞k�ny
+��i��k
+
+~��z���h�I���.������
+��n�y��H���+����
+
+
+~�ܶ*'�>����(�Ԣ�
+r��X�9������`+����Ԣ���_�
+r���)���{'�}������R�7��Y~
+��bҍ
+��z++rW���h��R�7
+r���$��"�
+��e��h�
+��b�^ez�ݡ�+r/��+~ob����
+~��z�4�X��壘ӟ���
+�����^�an��
+r�춇߲�"��"�_"�
+��f��$�
+���י^��hn�܋聯���)^ony
+�_�
+��l���}
+~��z�4�id��(�#���h��)�
+
+r�춺(�w�"{w�
+�k*.�(�y����
+~��z�4���J,ޓ�
+��\�� ���
+��zX�9�.�G(�#�r���w墨Ԣ��.��)��ܺ
+��-�X�9�.�Ib��ܺ��
+
+��n�z�
+
+
+�I�!R
+~�ܶ*'���x�vW�
+r����{ ڵ�b{�n��z��o+^9��zۼo+^-��
+��i
+r���-�W��b�뼦ϒ������(Z�*z�)��~������
+
+r��Ƞr�k
+��"�I�!R���w��謨g��bRx��T��wezȠ��n��"
+r����v��H��}�}�lz��
+r���ܲ��z�,�
+r��ל���tۦm�ݾ�(�޸�����~
+r��Ȓ�7���R)��j_j[��
+r��蒋7���R)��j_j[��
+r���Z��o��T�{wڗږǩ�
+r���u�ĝ�
+r��'��,��
+
+��b��}��~�Z���j�
+���j4��
+u�ZJ֫��u�ĝߵ�^
+�w�9��Y
+r����ƭ�h�u�%j����^�a�Ȓ�7
+~��z�}�蚇�1�a��t~�&��4�J�
+��
+r��Ƨv'6��
+�>y˼��ڮ�����}���(�z蒋7
+��.m��k*~���Ȓ�7��'
+�w�q�݊w�9��}��y�
+q�\�
+
+���~��~{���k�	��J뢲��fq�hrK���'�
+z[
+��混�j4�m4����^
+�w�9��
+r��)ߡ���.m��k*i�Ȓ�7
+����'7�w�>yȧ~�Z�蒋7
+z[����)ߢ)ߡ��X�
+z[���w��譹hrK��'�H���!jk
+u�ZJ֫�)ߠ���Ȓ�7
+���j4�m4u�ZJ֫�֭i+Z�ߵ�^
+
+
+r��'o��j֕��"����ޮ)ߡ��x�߱�b���׋zx-
+��j�
+r��pbv��H��}�}�lz��
+r�쵹hrK
+~��zش�pb�
+nZ��n��v��H��}�}�lyȝ��R)��j�������v��H��^���ږ�
+��t
+
+r��sbv��H��}�}�lz��
+r��zz
+~��zش�sb�
+r�춇�6�z����(�޸�����36�z����(�޸��j[
+r��w�v��H��}��^�j[���
+��g�b��~���䭮)�~�&
+�
+�^�w���
+��^�����߲,޳7�j'~v�zy
+
+��n�w���z�^rV�y�"J,޺$����j��$�zz
+u�ZJ֫�)ߠ�ߊw��z�'
+
+
+�'���b��E�W�
+~�ܶ*'���y!\i
+r����{ ڵ�b{m��}��i���~ǭq���׋zx-
+r�����*'v��H��}�}�l
+��ޮȨ�m���0����+I��jX�y�b���z�"�{h�W!����
+r��g�i(�y��z�"����Gږ�
+r����y(�xۦm�ݾ�(�޸ۇږ�
+r��֭h�߱�M�fޭ��z�b�����}�l
+
+��i�
+r���-�W��b��n�>J���`�j��u�n����z۫�
+r����%^��-
+r��֫��]��"{wڛk��~
+r���M7n�~
+
+r��-�r���o��H������z����n�{
+r����r���o��T�{wڛk��~ⷭ���
+
+r���(�{b�
+r��ܩz
+~��zش��(�{b�
+r��ȝ�}
+��
+��
+��"w]x��z
+r���\i�%�ǩ��z��z
+��g�׬��e���
+��Z�4
+r��y��k�-�
+��^
+~��z�4�y��
+r����v��H��^����
+r��W�zWn����Z��n��
+r�����R)��j~���zz��R)��j~���
+r�쵻"��o��H�����v�����]��"{wڟ����zg�i��z�'�}��m-��
+���
+��^��������ޖ��j-�z�,މ�fz�
+
+��n�bq�i����
+r��wb�j~��
+
+�*^����ȝ��u�,
+
+
+r�춇(�{b�
+r�춆�
+~��zش��(�{b�
+��)
+r����
+r�춘�v���"{z�k�
+r�춇�6�z�o��A�'��)��k�
+r��ȳy��z�"�����z���
+r��؝v�����j~�Kk�
+���
+����!�'h}�"��buȝ�*^�؝r'^�
+
+��n�{ޮȨ�g�i(�y��y(�y֭h�߱�n�+rU��j���M;r��(n;i
+
+
+�ܩz��z��u��
+r��#�0�@ tx�jب�)b�@'�f���º���	♫b�t�j״���@Z����bzWtn+lz���tr��*%��F
+�jh����֭kG^��v�����v���ڮ���V�������֦{G��t~Z�Ah��jg�n7��A����p�'�A�i؞��D[A� =P���W��{t�+-�Z'�Z'�I��C������E���2���Z�*.�C(����*m�o��ג�7���������+
+V���^�؟�������+'^V��I�v���t��1��슉϶�&�f�x��y�t��'u�t��,���I�"ĭj؜�o�zօ��4��Z��&���y�G�ׅ��,�oϭ��l��z�ڗI�>��i�ڭ��9��r�&�'+��t���j؜ح��ej4����&�W��*'���y�t�������*&��ޞ�>��jg�n7��C϶����j]>�̢zz���������'�'+��t<�k9��r�>�ϭ��oC϶���+^����7��,z�>��{n��>��{n������:ڞ��m���oD.j׫�*'D^r��E�-"{tE�-9��z�,y�'wK�K!��t�,��"'�^�H���m"{z�D���4�֭���r�+��k�x4M�m��D����{n��{n���:ڞ��mʗ�z�jִP��׭"{w�E�޸�B'��.�Ƞ��b��.�Ƞ��e�x%�x4�{"�w��+�K�r�+�W����E^r�+��y�h�������*m�x��,!ק�'�z���bz{tO*^�)���-���{H��춊ځ���ݰ���o¢�޲�'v)�J��q㛍�-�oϭ��l�쵩�{I�>��i�,��t)^J,��v��]�
+r��#�0����8
+
+~�ܶ*'�v�z��}
+r�쵻������4�M4�#�0��
+��h���Ƿ�}��~
+��y���ϒ������(Z�*y����
+��n�{
+
+~�ܶ*'n�t�z�
+��n�{g�׬��g
+�*^�v�z���'jg�������
+��ޖy^��fz֧��Z
+
+
+
+~�ܶ*'��E�z�Z�
+r����{ ڵ�b{Z���}��u�Zo+^9��z�Z����ޞa
+��n�wZ��o�F��	�+)k�a��
+
+~�ܶ*'��U�g�׬��ki�
+r��y�u�"
+r����ʗ
+r��� �('�g�kLx�M4
+r��H�
+��c��
+��z9�u�%zx-�zz��z���W�z
+���u�#��ޖy^��~�H�����
+��
+
+��o
+��r
+q�H����ݾ�"{|����V�y�
+q�P���Ƭy�Z���j֫��~պ�j
+q�H��ק��!��o���z�'�^����z�~ٺ�j
+q�P��ק�맲('y�!��o���z�"��z��k����f�y�
+q�H���g�觵Ƭy<�z�ݾ�"{wںm�竧���
+q�P���g�맲('yا��ݾ�R)��j鶻����n��
+q�H�����h�	h��v���"{z�m�竧���
+q�P����맲('y�h�	h���b���
+��o��A�"�޸��k������y�
+q�~Z��ݾ�Z�}����z�~��j
+q�v�����v��Yhj޸��k������y�
+q�n�%��Z���Һ~պ�j
+q����
+r���k
+r��Y�v�����j鶻����
+�w�M�m
+�(u��y�z�Z��.m��k*鮟���~�
+��b�
+��kiǭ����!��^�v�z�Z��-�����
+n��
+
+q�O*^��,
+�Z
+r��Y�v�����j鶻����
+��Z��%�ǫ��~�z��Y
+n��
+
+u�ں[
+��"v�^�a��^�H��Kr��+��
+r�쵨���4
+r�쵩
+��dj/�
+��zI�u�%zx-�zz�%z����^���z��
+���u�$��ޖzzƢ��ޗ�Z����
+��
+
+r��ȳz�o��H�����k����
+
+~��zٴ�ȳzo�������uV���^��5���q
+���u��g�kLx�M+jX�
+z[
+
+~�ܢ{-r���/��^��ڙ��i�Z�zz�+���
+
+
+
+��hX�����	
+��n�{
+
+
+~�ܶ*'����ܬ~�޶���n˛j�����j֎}���(}�u�Z9��zߨ����ȳ
+~�ܶ*'��9��~�ki�
+r��zz��WM�׬��r��(�'
+r�춹���^i׫����ܬ~
+r����i�Z�zz�+���
+��n�{
+
+
+��DHD����w�*ln���ל�
+r��rI��n���x���)��n���ל
+r��� ��������D�+s}�"
+
+~�ܶ*'~)�K�M��z�.����
+r���
+r���
+�a�=)[n���x����Ң�D�%n���ל��'���
+�cD�[n���ל��4@����=*%n���x���'���
+�a�=)[n���x���4@���D�%n���ל��'����
+�cD�[n���ל���Ң��=*%n���x���'����
+
+~�ܢ{-�j{
+r�춖����{|���m
+r�춛�{ ڵ�b{
+Z���}�
+������m=���
+��lz�'�
+���H��}��m��
+~��z؟�������/�
+��h���
+~��z�4�m$�蟻Ⱦ�����j[n��
+��$�+l��!jؾ�
+
+
+��n�xb��(�֛i�~m�
+
+
+~�ܶ*'j�e��ޱ�u���
+r��zy��u�4
+��ۖ�$��&{_��
+���w����vW�nZ��禷�z�\�Ɯn�ݕ�n�
+r���虷Z���j�~��^��������u�"�
+r������u,�6���l���~�&�
+��b��^�a���w��謨g�٭�')n���x������y�'������
+r�춋�����X�
+~�ܢ{-����(���-��
+r�춺0���f��La����R����D��)��en%
+r���a�����(���)�
+�+lz���\�{!�x��Y
+��n�
+��
+��^Nkaɸb��^�a����+��x-�+kq�-��h�(b��^�aἭ
+r�l9��z�ڲ�}��Ě��0
+
+
+
+��DHD�n���w�v��w^����g?
+r������u�t�Oy�ݴ�N��qD0���ۯ4��}�Mv�7�N'
+r��(�)�'{��~�Ҧ)������
+
+~�ܶ*'��\�Ǭ���s
+r����q
+r������9��~�ki�
+r�쵺'z�ږg��6�j���
+r��v�z�kiǟ�[^��g�קjg
+��ڙ�%zx-��'z�^�a���w��謨g�Hi��'!�+g
+
+r��'qn�ޱ��t��{۝�� �< �
+����J޶���e
+r����jg���
+
+r�쵺ʆ��r��
+r�춚,9����Z�߸
+r���}�k�֫��v
+
+r�춉]'�t����k�������W�
+r��vޝ����y�
+r��w�'�vw�R)��
+�k.>��^�a��>��^�a
+��j֕��'{bzW[��ޮǭ"{w�Iە��k�
+����]��go
+
+r�춋����{|��ɺ�W���~�WE��]-������]���
+��lz��w+.m��k--��Z��
+��lz���X���k�֫
+��lz��w+.m��k+k�֫��%tX���ޞ�쵪��w�'�vW���
+
+r�춇o��j֕��(���}��
+r�쵷����n�޲'q��"�*'�&��"wh�+b�|�n�޲'q��"�*'
+���"wjW��&��"wjW��6��"wjW�
+��q��e���z�e��wښ,9�����
+��s��e���z�e��wښ,9������
+���z�e��w��}�����
+���z�e��w��}�����
+���z�e��w��}���Kk�
+
+��n�v�w*.�'qm��
+i�^�qm���rm��쳧6�~����~�̬�=t
+
+
+~�ܶ*'��k
+r���ޝ�
+r�����H���+���㏬nW���
+��j֕��n��z�����m,nW���m��
+~ǭ��
+��n�w
+
+
+~�ܶ*'���WH�ױz��I��{Z��J,�
+r����q
+r������9��~�ki�
+r��+^��ڔ�^�
+r�춖���kiǟ�[^��g�׿=�a
+��Z�%zx-�+^��^�a���w��謨g�Hi��ڶ�g"�ױz
+
+r���zw�I�b�鬙�b�+f��^�o�j�H
+r�쵧]y
+~�ܢ{-��䞌'
+��Z��Z�Jbu�'�)�
+r��ț�צ���v+b����'u�d�*^"w^
+i�^v��
+���'�y�Z���ʗ��ױ�ܩx��{�jg����
+��-zi�)^ =&������'
+����ț�&�=�a��eiǿ�欱��v�{欱�d�����,z
+
+
+r�쵩e�צ��]y�(�֛k�Z���5���V�5��o�Z��t
+
+r������
+���y��v�g�׿B楉��t֦
+����P6�k�	��J뢲'u�^�Hg�ɜ��ajg!���
+r�쵺�J����
+r���u��K.m��k-��-@�-j�~
+r����y֥����ǚqȭ
+i�>k�>zw"��.jX���Mjg�zx-��>k�>zw"��Z��^�a�]�
+r�쵻���mj��(�{�^i�^�a������n
+���v�jYezx-�
+���w��謨g��\����W���fs�ڶ'�+a�楖W���x�۹��
+
+r��˫jYfj�����j�l�X���)
+r���-jW.����ǚ���㏞��ezx-�
+��h��[����k�	��J뢲��!r?=�a��rHbr"�w�
+~��z�4��e���>
+r�춖��ƥ�O�j�l�X�
+~��z�vv����^�aw�
+r�춉]r��
+r�䥪���bq��
+��h��[���˫��]n��
+
+
+��`���
+��z�-jV�v���w��M
+��]�w���
+~��z�4��e���>
+r�춖��ƥ�O�j�l�X�
+r��ש�.�K)�+���
+��^��ij�l���(�ا�
+r�춉]r��
+r�䥪���bq�z�a�X�
+��h��[���˫��]z[v��}�ly��j
+
+��h���y�
+
+��w
+��z�-jV�v���w��
+��c
+~��z�5�˫���>�'ܺ�%zx-�˫�W���c
+r����.�
+
+��h��[��
+���w��謨g�Hi�	�r�j�m�֥n�`z
+
+r�춖���^i
+r������{|���
+��j֕�����}����H���ѩe���k�
+���������
+~��z�4��e���>
+r��+Z�Y
+�������-�+B楉��t֦
+r��ا{"�� ���
+��j֕��-���}��z�'�}����ʗ��ױ���
+��������
+�������-�+5��
+r�춚g{"�� ����
+r�춛�{ ڵ�b{
+in��z
+������m"�oȵ��X�x����
+����"{z㈭��-zi�=�a ;k�
+��������
+�������-�˫
+
+r��֢�w�R)��
+�k-�
+r����{ ڵ�b{Z�V�}��
+������m/jPZ����h��)^ ;k�
+����"{z�ڔ�xƥx'zo�j�H��
+������mv��Ajǅzf�x'zoŊW���
+����"{z�^�jPZ��^��^�ޛ�ڶ���
+�������֢
+
+r��W��������ǚů����
+��^�֫��R�7���0����+"w^��ݞ
+ڕ��r{Z��J,�
+r�춋����{|���W�
+��p
+~�ܢ{-Ƈ�j�l��lz�p��ezx-
+��n�v�w*.�v�zƥ�f��/�jg�j�lr��uם
+����]y�^�a
+
+
+~�ܶ*'���WBi���e
+r�춉]��n˛j�����j֎}�
+r�춊�z���첊�i��}����
+r���n�K
+r��w�9��{
+��i��ĝ���(�
+~�ܢ{-���׫
+r����Wl��������ĝ�(}
+r���n��˫�����ezx-
+r�쵺ʷ�������Wl������������ȳ
+��}���bu˫��
+r���n��w'.��+���W���
+���wh����ȳ
+
+r��֢��]��ڮ�����w
+r���n�Z�W.��+�֢�W���
+
+r��֭jw�R)��
+�k'.��+
+��p
+~�ܢ{-r�܆��֭jǭs>rW���
+
+r��g�j��i�%�Ǵ��Z���~ǭ
+r��go��j֕��&z֛���
+~�ܢ{-���~��
+�����(�޸������������w��謷!nx(n7�
+r����z�aj�)��ަX��bvW���h�,�
+���z�b�����߼(�����߁�h�'m��
+���z�"�������^����
+
+r��ƛ-��}֭h�߱�~u�Z���
+���z�b����1��b���q��zwږ�
+
+r��ƛ���{|���ƛ-�
+q��zٞ��i��֭jg�jW���
+��n�w
+
+
+~�ܶ*'���WA�wez�⁷
+r�춖�m�hrK+yۜy�Z�����u�4�,�
+r�쵹hrI��H���+���i�^�a�ƭ�f�Җ�
+nZ�ǭq��
+
+r��)ߡ��~�%��
+r��'o��j֕��"�����
+���z�"����F��%zx-����
+���z�"���ۆ��%zx-����
+���z�b����6(��nW���_j[
+
+r��'~V��Lw
+��b���
+���
+�w�:�b��
+z[
+r���&��₊��bq���}���}��r$��
+r�춺(�\�N��y�&��⁻�J,�
+r�춖�r�r��:���X�
+r����w�1�
+~��zش�)ߢW���b�
+r���ܮ�-
+��+s
+���~���w�
+���w��譹hrK���ע�ර�r�b���
+r��{�
+
+����Z�������l�ȧ~�
+���w��譹hrK���ע������פ��g��n�	�
+�����l�ȧ~�
+
+~�ܢ{-��/jZ�����\��l���
+r���^rIs�ל��\��[�$��
+~��zش�)ߢW���b�
+��!y�"�w��k�	��J뢶��,"w�'�Hg�Hi
+�w�:�ij�!y
+
+
+r���
+�杦�!zw�+r)��H���+���
+r����{"�� ����w�
+�ZV'�}��}����T�{w�Fߚ�ږ�
+�杦�!}
+�杦�!zw����H���+���zw���{"�� ���
+r��֢�y��H���+���
+r���o��j֕��-j)Gn��z
+���z�"����)ߠ뭕��ږ�
+���z�"����f�(�y���
+���z�"���צߕ�,}�l
+�杦�!���
+��a��v���ǚů����
+r�춖�u�[~k{m�Z��1�M!��yטe
+r��k���{|��ʖ�u�
+��p
+~�ܢ{-Ƈ�y�av��0�^�a
+r��ȳx�,���zx-��Zuם�~�
+r���-jZZuם�)ߠ뭕�����$���
+��j֕��!v��}����A�'��,�7���b�����Z����
+
+r�춋����{|����-j
+��lz�]�J.�ǭ�w�:�ii�^v����[��$��]yߢ����^�a
+��n�z.
+
+
+~�ܶ*'j�e��ޱ�v���n�m
+��ۖ�$��&{_��
+���w����vW�nZ���r��
+r��zy��u�4
+r��ƛ�����ڮ��m֭i+Z�ߧ�ר}��j֒����zz���zzȳ
+r����j�HW
+
+r��f�z��n;�wh���0���
+r����jW�~����v�)��D0���
+�����ޙ�^���w��謨g�٭�-�0�,��j����-���~)^�
+
+r�춺0
+r�춷��w�1�
+
+r�춙�j�!1�!�����)�lg�Yh��
+��f
+��e��L �?<�険
+��,��!��!�����h��)�'q �< �n���w�
+��,��!��"�*'ƙ�y�+{h,^w�fi�^�h,^w
+��,��!�ƥz��y�+z�m�X�y�)����������♛y�+z���X�y�
+�f��������♚~׫�+h,^w�fi�^����X�y�
+
+r�춗�j�!1�!��ޙ�^��_Ɗm:)�
+��_
+��e��E����ۡ�
+��,��!��!���޲��w@������y�
+��,��!��"�*'Ɨ�y�+{h,^w�_i�^�h,^w
+��,��!��"�*'Η�y�+{;h,^w�_i�^�;h,^w
+��,��!�ƥz��y�+z�m�X�y�)}�����������y�+z���X�y�
+������������~׫�+h,^w�_i�^����X�y�
+
+��ަ["��a��'{+��ʆx-��r�x "� "������!����-���
+
+r��'q9��~����v
+r����*^��b
+��\��u���u�+z۫����
+��n�v�WM�׬��&zy�z���yڙ�-zk
+
+��������w��謨g�٭�% ,z�'u�^
+
+r��I��
+~�ܢ{-���~��
+r����*^��b
+��\��u���u�(�'bw����r��{�
+r��yۺ)]6�^���׫�y^��u��g�v�
+r��+iǧ�)ܖ�^���x֦
+r��+yȩzy��nu�+yȩx6�
+���E���^r*^r��{�
+r����iӛ����e
+�z0�������������o�jg�ʗ��ױ��Zq��
+
+
+��]z[Z
+~�ܢ{-�'[�ܨ~���ץ����ܥzx-�����~)ݢ�bv���,�
+r��֫��R�7�w��ȳ{�^��
+
+r��ȫy����'u�^���w��I��{Z��J,�
+��e��bw�����&�w
+��,��!�w^���v�z�^�a�
+�)ڙ�%zx-��"i�^t*.�ٜm��
+����]yШ�{fs�ڶ�
+
+r��w�	��y���Кn��z�
+r�춋����WA�wez�⁹��&�
+��n�
+��
+��^vx%���vW�z�l�7�n7���Z�'n�	g���짢�ezx-���ƥy+k�x/��Mo+^
+r�lVx�x�Ě��0
+{kj�
+
+
+
+��DHD���z��覻
+r��t@c�K8�rLj�'�'~�}��}=��9�^���l�7��3x��Y{l[��ν��c���ic7M�mZR;q�k;MKMҼj)�vҲ��ܴ^��`_7��@$VVJ�:т�M��1	�6&
+i��?F5�A�il�I��+{�G�sc�uܤ�P�4�#}�����|�;��s��� 0DX"��H\IY-��Cɤ$�B�jICd�p\Q�(":�ǁ@d�7�H� *H�@3��(=x�D� ,t�"bP}�f���,�O*���1(��Oݥ���Z���׵Q-��Z)y_�О����_���g�����ޚ�Ԡ��W�q`0��Fi��/�a������^���O����HL�LK��?�V۴9�H+E
+OG�T<�I%?/ŔxR.̏�HF�+sdrU�|t\[h�'�2"�+�hT�J.5�%,�̛��Ot��鐓r���^�k���ˏύ��U�.t�\ݛ�[�e=��X���������}kc��X�����zo[�
+�se y(�DRJ����$�8�ܧ�i���9XO�^$�=9���꾱���Bݞ���HHJ+E�`Y���5m)<��pf
+�Ӳ/���R+��*�taN���~�Ey��tQ^��Ey�����|q_����he�!t���Ƶ��P�S�gM�XY
+�U:V���}q\�
+���-�ˋ��P�-��M��g-��ͽ����Ϟ>��G;�_���eޮ-��Ux��xx齧l�R�����ů���kz�_�ǲ�z,��z�_������5�
+�-�_�4���d-�z��.��k��_3%�����?)_֭�g+��?M�[��5Ez�
+�����/�hj
+�8��}#�P�H�od0<:���؈/tG8H�����'�-�W��
+�|��������ޱ=��=�p���?@
+ս*�;�����5E�n �'0����+8#�⑄K���雱d=,�;٫�G���9��3DZ}E=�8=�J���p`�6�ں���M�Q�l �>C���D��mx��@o�ۤ��/t@0�p��dtzJmt'<�|���j��j�Ӌ�e�
+\���Xxk;l�,���S�ܐMD�a%�~ā�q9��LJBǴ�D�2��Gw�,�N��٭ˤ��!A&W��z�x8ӮK+�LL^�K��܌�;�H�J$#�W(\�v���܀ڷ����p"�����J�%۲��][&D0 ԇ�;���D_���]�<&n���F��6�G����H�n�]��Bz�R�C>����"�G���otD�"
+q�(�M��<�B�zGG}����y����pϐ
+��G�j#-=��7�]��^0���O!.���Y!ޞ �X&-�l�-8T��I��Zx��l8Kʤr��Ѐ��f����q�V`%t7q7�Ql�GbvH
+�e�ծ;f��ɌB
+���L��E��x7��x�2Ce�� 9�s9��G�;ߥ�[�^�k��E'=ι�9���tĖ�jN����l6�Ho?.�s�r��q�佪>;;{����ap2�����ev~�6� �Fj�]������1������w�D��aZ���?�\�1�s����I��h��R�{R.�m�h�
+��XM=ly�.rL���4*�(�)DQ�;rx�2���'u,UF�W��^`ޠ������ �9>GU�F��l�R뵡j����"|�B�pO��2�6����������T{P��B� 0:R�]�ty',4�>����S�)��#����0X�o�Gt�8�p���{Չ;�ʲ�D=��]���@^�<�޻�2{���T���1#�4 ���������ߤ+v
+��Y����n�=����ݙ;Iy����"��;^C|n �۳s�/j��M����ǔ#.o �	RJ"K^~��ȼ.�?�{S��
+�׭n����9�m��o�~n�45���󀂜,���-`5�����qWHʶ���o�Ǹ�S繴f�8��'���p=NIӑ���G�{*#誰�;M�^@�|` ����>��wd7bv P���Ñ�TK7�D�mz` 94-��s&���"�C�2o2�:��0h0��A|��n8i�0l���AV�����߃�Na�w,
+�Ҍ�"�[BUU��4��ӽa�z��ޤ�N��J:2=��R,0
+:l�k�u��D�d�kp�!Db1)�nks�.a��t3����u���f�StY��6����/ͽ�d2�\Q���S˵)�P�|jl�w�S�v��:�)wؚE�׵6���C�MG�J|�f�����BT��@��W�N!������-����d<��&�5j��ϟbh��f�'X�.r��� �� ^h�v]��+Z��?���M����[�x����	P�v�
+����)�{8��p���q5������ݰ��h�𐱂,+���{M4/n�,5�!�/�,��A\�rۃ�Pv/�y��d��0X��a`�ä�W��<6�S��SӍSn�	�{A�[j�5�j^�XK3n�5@�3{�)T���{�H�6 ;�OL��-ouބ�������k�4��j�}U���FU6�Y��`���&k�k�9E-
+V�E]6X������#��r
+��w�ӷ�S
+
+j̧q��rب�Zuz��G�
+r������,�d{
+�����0����+*�r�Zu��x-�G�
+r�춶�R)��
+�k'�f����q�!j��u�-
+r���'{ �r����,��Ҷ���ן��^
+r�쵻����{|��ɬ��������
+�����k-�榦*^N�]���k n}��
+���~W���^�,�
+���w���(Zu��x${("�����^�ao+^rw��7
+��n�v�w&�~��(�ש�
+
+
+~�ܶ*'��J�z�뢛��
+r����{ ڵ�b{�w&�}��n�ro+^9��z��w&��ޞa
+��i
+r�춷\�{-���z�'�}������+z۫�
+r���k
+r��z�
+�����ۡܥzx-��k�	��J뢷!�(g���!i׫
+r�����7��7��׫u�(u��w+.m��k*i�
+��)�
+��n�{
+
+��
+r�����
+��'�G'��4���w����k����&���r{
+r�춚�
+~��zش����
+r��v�z�ku���
+r��v�
+����v��Ka��'{+����m�&��!�
+~��z�4�v���-
+r��ܩz�
+��
+r����9��
+r����v��Yhj�����y��z�e��wڟ����
+v��Yhj����-�睾�Z�}��]���
+��z
+��
+��
+��)����v�y׬rܩz��9��j
+
+��n�zk��
+
+
+r���ڸ
+r��o��־��{����
+���z۫�{�
+r��zZ�ǈ�ٵ�
+��n�y��ny�ny�͹����}����
+
+r�춸��
+��%�Ǵ�f��ƭ��.�����C���\v�
+����)�תZu+Z�ݴ�����)���j�
+
+r��#�9� 
+�tZ�*%��"��(����kk)Zm�f���
+��.)�
+�h�H�u�%��+rX�zV�zY��)�
+�8�
+�h�H�u�%��+qئ��ޖk�z
+��.)�Z'm�H�u�hj�+s��Zm�]���
+
+
+r��t@c� 1I������ۮj�W��jl���j�W��jl��yƥ
+r��+�����^���
+r���Z�)�+��kz�Zq�셧^�
+��n�u��� �E(�r[�z�
+
+
+~�ܶ*'����(Zu�ۡܨ��!��k�
+r�춚���iԡi׫>�)��
+r����{ ڵ�b{�w&�}��n�ro+^9��z��w&��ޞa
+��g
+~�ܢ{-��鮊l
+r���^p#�9� �gjg
+��)y�(�ا�
+��g{
+��)y�"��(��
+r�춸��l��,�
+r�쵩i��gjg�]�
+�h��mjZaj�ڗ
+��m������jZa
+z[
+��m��p��a���֛ڗjoj]
+
+r�쵷������$�w\�Z+����i��i��t��b��v
+r�쵧�z�)y�"��(��끽�{������-�X�y�
+~��zش������z�e��wڛڔ���.'{b���
+��
+����
+r���,��$�w\�Z+���rV�����l�)^m�$��.���~����Z
+r���6����)�r�h��Z��Z��0j�!�ܥy���
+�wZ~׫��Z
+��,��!�+��ڙ�0�������o�~׫
+
+
+��n�y
+
+
+j̧q��rب��i�#�zǭފ⁺)
+r��zy��u�4
+���u�a��'{+����wezHg���u��
+
+r��֭i�hr@-u�(��޲�%���
+r��ƛu�Z��ڮ����^���ר}���׬�7
+r����j�HW
+
+r�쵦�n;���~)ݢ�"w^6
+r��v�x��{
+���9�
+r����iӛ���l���e
+~�ܢ{-r���֢���jg�~ǭrǜ�wZ�ǭ��ڶq���
+
+
+r���h����Ʃ
+~�ܢ{-���~��
+����<r��{�
+r�춖��v�x��z�)�
+��Z��^��J�z�Z�(�ا�
+�Z-�ǭ��a��b��h�������Zu��
+
+��%��,�7
+���w��謨g�٭�&�rLj�'��桸�y����^s�뚆��)y�^q�~
+��'���vW��')�'��!i׫�Ơjg��x
+
+r�춺0
+r�춷��w�1�
+��l��iy�)j)�y�
+
+~�ܢ{-�쨡�%��
+r�쵺�+Z��u�Z9��zߨ��
+r��˫q�칶�����ܒ���n�rJ֫��,�7
+
+��b�z�����
+��
+���k*�iԡi׫>�)�˫�����ڙ��E���Z+�v�{��*%�
+q�\�
+
+��[��
+���^��
+n�rr��'
+z[
+r���j+e��W���{
+��i��)�
+���w��讖����jG����l��^�xg�
+���Ƙ�n�ݕ��)�)�
+��[�ܥzx-��"�
+���w���(Zu����q���w)^�aY��Zu��s
+�ȳx!�	�
+n�r���{|��ʋ"�
+n�r��qn�r
+����~
+��,��!�쾲�z�h��!i׫
+��,�7���jW�������T�
+_�Z��w)^�a���q�^J����SA�
+
+�����~����(Zu�ۡܨ����!i׫��,
+��e��h�'[��
+
+
+r�춋����WR��^��+��j֛��$���^��e
+r��Z�����
+��n������!i׫��灹����ٮ
+�k��Z-�ȳ{�셧^�xo
+��n�
+��
+��^�������`��ݺx%�"���
+��ezx-���ƥy+k�x/��Mo+^
+r�lJ�z�뢗��$�q&���,�٥���
+
+
+
+~�ܶ*'u�(��޲�%���
+r�춖��
+r�쵹hr@-
+��i���j֒�����O��
+~�ܢ{-nY(}���,
+r�춶������ڮ����)�ϛ�G
+r���[�G��q
+r��לrݜ�ys�ל���K�k%��
+�������ל
+nZ�i��l�����O�ǧv��>�>nY.r��nYr�+p�ߦ�
+��O�ϛ�K��ϛ�G
+
+r��֭jw�R)��
+�k*.��,
+��p
+~�ܢ{-���j�lu�Z��i�����
+��n�wZ���� 
+
+
+~�ܶ*'���WR��^��+��j֛��$���^��e
+r���.r���z
+~�ܢ{-���~��
+r�쵺ʷ������
+���w'(�ا�
+���w)^�a�ȳ
+���w�����y�h�'b��m��,�7��ܥzx-��Z��
+r�쵦잇^�����Z���~ǭ��
+u�Z��[�ܚn
+~��zش��hr@-����
+r����� �
+����ǧu�����W���l�֫��.r�i�b
+
+
+��h��^vȳz�k�	��J뢲�� ��
+
+r�춖�����hrK
+~��zش����,����
+r�쵹dm�hrK"j��� �
+��h��^v�
+���������˛j��ɫl�ß}�l�ß��
+����$��������GnY
+r��{�
+
+r�춶�u�Z��ڮ��j�-j�Z���
+��\�j_��,nY
+����1�]
+r����
+z[
+r���>���
+r�쵶��\�u��jkk	^�a
+~��z�4������>
+���rI+k	-��0����+6ybnZ�+���z
+��(��^�a��%zx-��&���~V���dLw
+
+��������&
+����$��������jezx-���j
+
+
+r��)ߡ��~�%��
+r��'o��j֕��"����ޮ)ߡ��x�߱�b���׋zx-
+��j�
+~�ܢ{-������$
+���z�"����v�}�l
+���z�"�����'m�ږ�
+���z�"��z��'m�ږ�
+��t
+
+r��)ߠ�m�Z��1�]"��%χ�r)�
+
+r��֭h���������ǚů����
+r�쵫D��ߕ�,�4
+r���t��j�'u�Z���j�[�w�9�
+��\���y�Kz�j֋z�����^�a
+���w[~V��Lv�
+r�ޅ�-���w�:�ezx-��yן�j֋z
+��(��+�	^�a
+���w����劘g��+{�+�	^�a���q�^J����S[�׬���
+v���x rHg��f
+
+r�춋����{|��ʊ�W���
+���w
+��lz�+�.m��k-!y�Kz}
+��i��-�
+~�ܢ{-Ƈ�j�l��lz�i��ezx-
+��lzا~���
+z[
+��lz�+�.m��k-�w�9��
+��lzا~�����~��
+��in)ߠ���)ߠ뭕��
+��ߕ�,��Қ~םy
+~�ܢ{-Ƈ�j�l��lz�i��ezx-
+
+r���_�wR�7���.
+r�춇o��j֕��(���}��
+���z�b����)(�֭w\�����^�a}�l
+���z�"�������w�:�ezx-����
+���z�"�������)ߢW���_j[
+��n�z.
+
+
+~�ܶ*'~)�J,�>�.
+��i
+��z�)��
+���
+��z�)���
+��z�)���
+��n�z
+
+
+��DHD���{톉h���
+r��s�;�K8h��+jjbw�8��6�޺���^v�ȳ{�;�7��Հ���w��۾?��z?���VOR�r2��o�D͐��V��n�!GYi�D1��%��T1����R�&Rۮ��{��aF����r��,�*��`�=��Ɠq�gM�k�2��fLư�B�({������}���0���xR�VKtrP�i	 �Z�P�=�kJ��q�P+��R)�
+�?��B�h
+^8�9�*F��c�(n;c�ʡ�� D���J-&S��ile~���65�TK~z��^W�4'��?=�f���{s�7��u("�B�U��X$c��m���cf2��-���b��鄤�fR:�S�b�U���e
+�QB����IO��e��#�R�����B���+���L����=E��C�"��K%3&�/��*�zd$ܧ6;���'��f�r���lfUz��7W7f�V��Oe�V?��k6s�q�_Z��9V3���ޛÖ�Cx�\�HJ*������|�+3�7)�Zh���VS�d�:ON_���������g�38R��i�xrE<A�[JO*���4���T��uD����S��j��Q^uy�W�e��^eb�45_W儧q�x�]%e�q�G&�1 T���rVB��N����\W=}-y��t����"Kx�;c�Y�jso}0a{��珽�����}eYw��x{f�^>�^:oi�1G��5��+�k�z�ާW��쇲ދ:��W��}t}"~Mn¿�o×��;b��^�&��������p��p.O�W��p������~��e�Q^�C~,�����Z��:��#�H�T3�+�����v"�� (�/��9�sU��#�a_8￿i2���7�Op��(�+���oJ��<����Ql[�,��'#1����x�a�x��f�YK:��j���~m|L��QOx�A6R��=t:͂'���"o�g��{� >���";[@�%mP��6�;�C��4A\(�����]	�,�;B(sZ�뚠���l�W?�xd���07�kT���$Q%Ih_� k\Ne����)�m�b���<(S�_��kr�8��PI��m��^4���SW���xt7#)��&���� ]�-� 6��!�\�b1p�ҭ�v켡�×A�ɑ�!��b�.���p��|iI��~<Q�6;��Ͱ��,8��.ۯ�m��P��ǥԩϮA�uu����㇅��G3J$�m����:�P�Aޑ���cl6wB�adtp3�s���Z��OA���
+�Wo�W�3�8SÈK��i8�VHw��;V	�i[9N��(�t9h�$x� N��ܣ��  h�#Y���%\c��	]
+�M��[<؝���x�k�ف���c���!>xl�
+�l^"���j�z/Hl��h|����c�ת� ���I�D�nNAt:51%�Z�� ��r��
+�� ��Ë���:���wz9/j�����+=��\�v:�t�E]��ͻ{(���We*�,ĩs�Lx ����g]��(|�V�bjO��>L|��,+�RA���(F~��^ԋ�sZ-��f�O[ƞp���*�@�
+��1�Qo��o��$���0��KQ���E�W�7�=)��<�#�;�@���l��&�2��hZ��53sH�)��� �L�
+�-����{@m2|�� l��'zб���WjI�
+6��fh��;��tJb���;w9D;�[���'N#�'pk�5bN�G�2���b�x17����5w����G-�U �~LA���� %�i|@v�n��`7�
+݂�p�cu�s�z�oq~B��fN�^B$���H��Nא��66����ګ,�h(cu1�˛�2�T���ן�<2/����^����|5�[�`�#��E� ek�����M
+x<�F�� �'+��X
+d�r�?��U�2��&|@��F��=���m�?���k��*f\EӒt�Fl���Ƭ^ʈ��*���v��9`)�3vρ�<����M���2D�lp�q���Q��^�NMrr�ɪ�o��ȪP䌛̱N�<�&i��G��4���x�L317�U��k�mw�㓘x�B5��=��VЕUk�y�-z4�Xq���E��/��s���d���N�)��@ki�3�1��3�Q�Jg[����m� ��?�*�C4�9١�Vz3
+�u���otY�@WtA�:����A�y��:_Z�9b���]��� Ά�B��&�y��M�E����Q����2���y}�P�/6�>(���~"2�;}�gh�vb�	���Z����ؚ>�E�ٺ,��8˜�,y�/� �+�A=}�
+օ��O���`'��1���;�ţ/�T:ݤx�r��
+B�^�!=�/<e m�Mn%h�����7l5zfZ8�$,`�
+�"�A��M۹�
+�a�/?�W9�������D;��58�*�XX;��3��
+�x��G7���AT�[��x�b�ڵ
+{ڄ���Ōۭ�_�8����
+D�9G�����<�M���&�K[�]w�=}f�6�<���+���Uu�vѕM�V_��E�(�pI��Z�QKC�U�WFM����A����+܂������T
+
+r��s�;��8�
+�8��*%��"��(����b��Zm�f�xg�
+��
+�h�H�u�%��+r����ޖk��	�
+�'�*%��"��(����jyZm�f���
+���zH�v����ܖ)ޢ}t�]4�Nt����M
+���x	�X�r"���s�+r	b��h�Nt�5����M
+
+
+j̧q��rب�Ztz%
+r����,��,�a�Z ��
+r�춶�R)��
+�k'�f����q�!j��u�-
+r���'{ �r����,��Ҷ���ן��^
+r�쵻����{|��ɬ��������
+�����k-�榦*^N�]���k n}��
+���~W���^�,�
+���w���(Zu��Z ����*�n��zx-���y�޲,�
+��n�v�w&�~��(�ש�
+
+
+r�쵔�I?� ��8�i�^wS^���-�,�J�j^��
+�j�j׫��-��������	pk+
+
+~�ܶ*'~)�e7����ܩ
+r��zz��WM�׬�*^
+r�춹���^i׫n�r
+r���
+r����(�J֭
+r��y�u�"
+r�쵩b�y�zִǍ4�
+r��H�
+��c��
+��z9�u�%zx-�zz��z���W�z
+���u�#��ޖy^��~�H�����
+��
+
+r���Z���
+r����ʗ
+��R"{|�B'��\���n�%���
+z[��R"{u����z��h��n�Ƞ��l������
+z[��R"{w�ا����T"{w
+���	�v)���hj���
+z[��R"{z���޸�Z'�Z'
+���	�vZ'�Z'��b����]���z�~
+z[��l���
+r��Y�v�����j鶻�����Y�jX�
+z[��Sʗ�z�j�
+r��Y�v�����j鶻�����Y
+z[��"v�^�a��^�H��Kr��+��
+r�쵨���4
+r�쵩
+��dj/�
+��zI�u�%zx-�zz�%z����^���z��
+���u�$��ޖzzƢ��ޗ�Z����
+��
+
+r��ȳz�o��H�����k����
+~��zٴ�ȳzo���djMb�+Z�
+���u��g�kLx�M+jX�
+z[
+~�ܢ{-r���0jY�t�jק������j�
+
+����	�jX�
+���jg�M�-�t�jס��)��l���
+
+��d����
+��n�xb�
+
+
+~�ܶ*'����z%��ʊm��,��ޖܩ
+r�춚���iԡi׫>�)��
+r����{ ڵ�b{�w&�}��n�ro+^9��z��w&��ޞa
+��g
+~�ܢ{-��鮊l
+r���^ps�;��8�����
+��)y�(�ا�
+��g{[y�+y��z
+��)y�"��(��
+r�춸��l��,�
+r�쵪)��^r���
+��m������
+m����oh^ƛڕ��z��oh^�w�
+z[
+��m��l��,��)y�'�����
+m���ojY�����b��v���
+i�^�w��:"
+
+~��zش������z�e��wڛڔ���.'{b���
+��
+����
+r���,��$�w\�Z+���rV�����l�)^m�$��.���~����Z
+r���6����)�r�h��Z��Z��0j�!�ܥy���
+�wZ~׫��Z
+��,��!��ޖ�ڙ�0�������o�~׫
+
+
+
+r�����mƶ��
+r��;�wYM�-n�r�*^
+~�ܢ{-���;
+r�춉]v��Yhj�������
+��%w���'�)�
+v��Yhj�����j{m��
+��
+��������n�Zm�sM�-�짶x
+�WYLD���*%w����I?� ����
+
+�������
+��,��!��ޗ4޲�!�f����
+��n�y
+
+
+j̧q��rب��i�#�zǭ�⁺)
+r��zy��u�4
+���u�a��'{+����wezHg���u��
+
+r��֭i�hr@-u�(��޲�%���
+r��ƛu�Z��ڮ����^���ר}���׬�7
+r����j�HW
+
+r�쵦�n;���~)ݢ�"w^6
+r��v�x��{
+���9�
+r����iӛ���l���e
+~�ܢ{-r���֢���jg�~ǭrǜ�wZ�ǭ��ڶq���
+
+
+r���Zu������׫��"w�
+��!i׫�W���
+���w����vW��Hg��!i׫������ب��Z��Z�����&���o�!i׫��
+
+r��%����hi��
+r�춺0
+r���Sʗ�~ܩz�!i׫�Kb
+r�춖��ם��hn�r�X�
+r��t������薊Z�{^v�m��,��h�����
+
+r�춷��w�1�
+��l��iy�,�*iy�
+~�ܢ{-��셧^�
+��,�7�j)�y�^�a�H���~��'�)�
+r�쵺�w�R)��
+�k*,�7
+n�r��ij)�y�
+��e��h�'[��
+����~
+
+��0j�^
+���w��謨g��Zu���m����h��+j
+
+��,��!������l��^
+��z�%zx-��Zu�����n�ݕ
+������~�H���[�欒*iyڮ�
+
+r�춋����WR��^��+��j֛��$���^��e
+��n�
+��
+��^��n������!i׫�ﵹ���h����ٮ
+�'��+kv���x �x.�z.�W���m��jW�������T��
+r�lVx��^�ܓ�Ě��0�f���
+
+
+
+���ا
+��E �'�YND���YAP��R�49�P�N{�
+
+~�ܶ*'���z���٥zX����L��i
+
+r��,4
+�f
+�����*�N�,��=��n"��
+�����*�1�l�7��4���ۈ�zk5
+
+��z
+�����*�N�,�׎7�}���^��x
+�����*�1�l�7��_u�!i׫�^8
+
+��h
+�����*�N�,��͸�{!i׫��
+�����*�1�l�7��^���Zu���
+
+
+
+~�ܶ*'��o��׬
+r��i[�׬���
+r�춖����{|���i~�
+��lz���)i٥�4
+r����{ ڵ�b{
+Zu��}�
+v��H��}�i�^�a����Gږ�
+v��H��}�i�^�a���墊��w����]�j[
+��a�Lz�v�Ma�LD ��a�L}�Q!�Lu�}�㾡�LB�=��]
+r��	��H��}�����
+r�춺%�|g�}��
+~��zش��������
+~��z��^���#v��H��}��>j[
+~��z���?4�ﰎ�%�?��?��?���׭
+��Z�F��W!��wz
+~��z���#�
+��_
+������q���Lyͻ��
+z[������q�4ǡ�@@
+z[������q��q�4��u�
+z[}��vM1�P�
+r���蕮~羓�#
+y�\r�%om�of�
+
+�Ht��!�~om!��sHw���!��
+
+r�춉��H���+���҇o��j֕��(n��z
+�Hu�hw���F���v��H��}��ږ�
+��n�v�����)�~�&
+�
+�^
+
+r���gJ�ߋ�Ᾰ��eiǿ��6��������ZަV�{���
+
+~�ܶ*'u�^rҢ��+�
+r��zy��u�4
+���u�޶��)ݞ�e���wezHg���u��
+
+��b�C }�l
+��ۖ�$��&{_��
+r���虷Z���j�~��^��������u�"�
+r�춚�m���Ǌ��w�-���*b���i�)i�0 ,��H�ױz
+r��������ڮ��~�&�
+~�ܢ{-�
+��
+r�춖�zw$
+��^��+��b�(Z�W���~��ezx-�/�
+~��z�4������>�'�k(������'�)�z��z
+����y��j
+
+���P���
+
+
+
+��
+r��֭iל�jkz� �Z+�
+r��ƛu�Z��ڮ����^���ר}���׬�7
+r����j�HW
+r��t�i׫�����׫��"w�%zx-
+
+��҅�^
+r�쵦�~����v���x
+��a��!j�薇ږǡj��q�_j[
+���
+r����iӛ���n{�
+~�ܢ{-r���֢��
+���^��J�z���-�+~
+r�����-��b��h
+���Z �����^���h���
+��ۮj�W��jl��yƥ��z�Z�7�j[k�
+
+
+
+��Z�z%��
+�
+��[�)]B
+(h����q��z�'J�z�l�7��(%zx-
+��`��,}�l
+���W[�)]B
+(h����q��z�'J�z�.z��)]
+��n�
+�)݆�hn�u�����Wgjg��Y`��,
+u�Z�V��^��z���gJ�z�!i׫r%�
+�
+
+
+
+��b
+��n�y"���\!��vW��(Zu�셧^�xg�Hg���rLj�'��桸�y����^s�뚆��)y�^q�
+��[�)]B
++!i׫~)��!i׫�t�i׫�ȳz��W���
+��`��,}�l
+���W
+n�t,4���^���wl��^��҅�^
+�笱���
+
+��n�
+�)ݲ�z��W[�)]n�vv�z{����
+u�Z�V��^��z�'�t�i׫��z�b��Zu��
+
+
+
+���P�,~ܩz�(��mr'u�
+��b�鬞�e
+r��'q������
+r����*^��b
+��n�{\��u���u�
+n�t�z�l�g��W�z]g���"צ
+
+���
+����鬭�9��~'q��e"צ�W���\j�!
+
+��[�)]B
++�i��wl�7��(%zx-��������
+��`��,}�l
+���Wb�鬞�e
+n�t,4�����q�צ�+^�
+�笱���
+
+��n�
+�)ݺf��)]n�u����ڙ��X.z�
+u�Z�V��^P�,~��W���hn7��
+�צ�{��)�{��צ�g
+
+
+q�\�
+��n�y"���\!Ȩg��'�ۧ�鞲Ơ
+
+��n�y"���\!Ȩg�xg���n�ݕ��n�ݕ�!i׫
+
+
+~�ܶ*'j�eȨ�vH�
+r�춚ޱ��g�����$���-��%���
+r�춉���wg�Y_j[
+�y"��!i׫
+��"��h�
+�)ݺf
+��_��-:I�
+~�ܢ{-zZ���
+r��)�zZ�z��zW���➛�
+r�춉(�Z+�zoj[�
+zW%j���m�%z�ߢ
+�z]�ƛ��h
+��$~*��'�Y_��-:G�
+��$�z\��$yا��^rG�}�l
+
+����N��޲�&y窹��I�^r�+�zn��^rG�
+~*��*���I�^r�+�zn��^rG����
+
+�)�=�ޖ
+
+
+~�ܶ*'�)�=�ޖ
+r��ǥv�.������'�y�h�)��ڙ�\��$y
+r����ǥ��nz{�
+~�ܢ{-zZv�.������'�y�h�	e��
+zW%j���m�%zǥzZ�z��zW���➛���
+r�쵧oi���(��%�a�Z!�Z�
+i�ܕ�,.+-�� ��~�
+r�\��,.+-�� ��~�
+��hrV������ �W�}��
+i����
+r�h���
+��h����
+
+
+j̧q��rب�Zu��
+��~)^9��eCg�YJ ��YC9�
+��b���y�k�
+���z�.
+��[�
+������j+_�W������z
+q�\�橦\��wg�Ykz۫���u�����%j�&��t�g���W��Ǧz���݊
+9���{|��ɻ�
+���P�Z�ǁ�wex�H
+q�\�橦\��wg�Ykz۫���u�����%j�&��u�zg����د
+
+r��zx
+��^�
+r���&�
+nZ���׫���qt���
+r��׭u�^rҢ�ӑ `T
+(�Cu�d�wC7^
+
+r����
+u�%j��9���
+v+ܕ�,��0j�Ӯx,�7������z�T5ל���v��ƥy+k�x/��M��x%�a��HW���m��jW�������T���-��ݖ+����N��颲ƥ�݊
+r�쵶�(�C
+v+ܕ�,��i׬q׭���x'�zږ���wey:(�|��Y����r�^j��)�{���z�(u�!i׫��(u�݊
+
+r��˟~,_�W�jg���nu��W�jg��'~)^����w^���
+r��z0�!q�ҹ����Zվ�9
+r��+�+-�w�����˟~,g�ڲ
+
+r�쵻���h�׭n�
+��]>�n�v�[z�z��W
+u�`��,���rV��ئ��wn�	g�Hg�Hinxn+���
+����b����!����
+(�C��]>�n�v�d�x+v���xD��zx-���ƥy+k�x/��Mo+^���S�x!k#��]��
+
+���z��~��v�uدrV����zXv)^����i�^
+��]N�v�^����ڙ��w�k
+��]���x?��]9���h.��䭮)�/�5��{�]��
+n�u0
+��]�g��]��'�܅I��C_�׬p
+������
+��]Z��]��T5�hrK%zx-��&���w(��޲ǝ~V��La�
+~V���]��
+��^��]6�^��mu���^�����^�,޶��q�^J����S[�׿���
+u�]z֢���t�gv)���]z�z�^������
+�֛��݊
+
+v�)rV������]��
+v�)M�m�yެt�
+m�~)^�����)js� i^�a���q�^J����S[�כ��g~)^�?���
+j�eȨ�t�
+��b���y҈4
+
+
+��'rX���2�
+r�춗hr鞞ڮz��zW���➛������^rG���n
+r�쵻g�
+n�݊ƛ��m��
+r��V�zV�ױ�*'���
+n��{B�{^�֧�
+��kz
+��
+��u����r>��z�ND��P
+z[��v����r>��zݎD��P
+Z�ǅ���ږ�Ζ���e��_����
+�Z�ǅ����ږ笥��xYhj���n
+
+z[��w
+r��
+�n'gjg
+r���^�j�o蝽�n
+��톺0����+2k�jg��x!�_�v����'vxDa�
+��n�{
+
+�����j�e��ޱ�w9C
+ƶ�����z����
+�)ނ�����z���x
+v)����)�z
+�'m�����e��kZ'm����
+jZaj����e��kZaj���
+
+
+z[
+r��
+�n'gjg
+r���^�j�o蝽�n
+��톺0����+2k�jg��x!�_�v����'vxDa�
+��n�{
+
+�����j�e��ޱ�x9C
+�)킶��8��xg��b��)j�Z����/j[�
+�)����F)��z�
+Z�ǅ��������
+�Ƨ����'����Ƨ����e��kIƧ���
+ƶ��z���^rG�
+�)ސ��y�^rG�
+�X�r�+\��^rG�
+
+
+q�\�
+���z�.�دrV��k m�^�Ǧz���݊
+��n�
+~)ږ\
+n�݊ƛ��_j[
+n��{B�{^��Zm�
+
+
+r��Ʀz����ezx-��HW���
+��gw
+�����W��H�D��zx-�/��� h�z�.�)��
+
+���z�.
+v+ܕ�,��(�����^�د
+v+ܕ�,��ޖ��������%j�!{+j�ZnW���,��
+��ޱ�%�f�r�^��?���
+��+�&j��
+��%j��g�r�?��]rV��ئz�+��]
+��%j�(��޲f��������
+��%j�'{
+޲f��ޱ�������
+�֛��݊
+�����v+ܕ�,��^o�ڶ�Hb��'��!vxv+h����)������jg�<�kn
+����ڝ���f��'(u�rܡמ��ޱ�m��Z�"���n�݊
+�د
+v+ܕ�,��ޖ�����kZnW
+��]���x?��]��(��^�a���q�^J����S[�׬jg������v���z޲������D��zx-�O�z�.�W���~9�������
+�����]I��z/�v�gv��ƥy+k�x/��M���
+(�CD�6�Wm��O�)۟�]�׬p1n�w�]��
+�֛�
+v+ܕ�,��^�ܥzf��)���uڜE�W���"�����q�i���w��?v+
+���rV���ڙ�pRv�{�)j
+v+ܕ�,��,�)^�������x���'��e�*^n�m�t�~)^��ۺ�h��b��b
+
+vZ'rX�
+��"��0����"��0���ٞ�Ơxv�vW���v�0y�"�g����ݕ�챫�)^
+r�쵼�z�޲��
+r��!�4���~
+r�춖��
+~��zش���z�^�a���P�
+�������+k�x�����¡ך��r��eo+^�˛j���#���/�CJo+^�W���
+�)ݣnH���,j�jwez�,j���W���Lz���ڙ�H,Iڙ���hj�����
+z[
+r����Qܭ�x��y�TD���hn����mʗ���bq�b��r׭��ky�
+r�쵧hr鞞�+y�^W�z{Z
+j�~��i�0�ZtRv�
+v�.���n�rj�^�С�WZi�brF�zj/
+��S�g���.���G�n7��DK��x�M
+
+
+
+
+~�ܢ{-zZv�.������'�y�h�	e��
+zV�tKޞ��קz�%��
+������'�y�h�)��b���y�޶��
+zZ�z��zW���➛�r���m��
+�)�=�ޖ
+
+
+
+~�ܢ{-zZv�.������'�y�h�	e��
+zW%j���Zu�
+zZ�z��zW���➛�r���_j[
+
+~�ܢ{-��i���(�1��h�~��%j���Zu�
+��b���y�k�
+
+~�ܢ{-r�qz����k'�w�.)�p8��8�
+q8������kQ�gq��IƧ
+r��ǥ��^��
+q�Zu�/z{K��^��➛�
+��oj[�q�oj[���)���j�
+��\��,.+-�騽��
+
+��Zu�/z{K��^��➛�
+r���^�j�nץ��n
+��\��,.+-�� ���v
+���z[ږ竁��{���0z���
+
+
+�h���tKޞ��קz����^�V���m
+��z{~z֫��oj[���b��u
+�	i���tKޞ��קz����^iV���m
+��z{~z֫��oj[���b��v
+~�ܢ{-�����ӊ{@�)�V�����V��'�jpj
+���tKޞ��קz����^�����m
+��z{~z֫��oj[���b��v
+
+r������)���
+v�)�w%�����j��)�ا��\�'$
+�zn��܅��
+r������_�W�
+�zn����
+��塧_
+
+v��z{^��ڂ�ޭ�+�!z
+v�)i�D���.+-zw�z�����z{Cy����k��%j���Zu�/z
+v����y���+�!z
+v�)i�D���.+-zw�z�����z{Cy����k��%j���kzj/z��
+v�)i�D���.+-zw�v�)y�'���u�ZN�����~)^�H�~Zu
+��+��
+��
+�f
