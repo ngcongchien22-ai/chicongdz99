@@ -66,13 +66,14 @@
     font-size: 42px;
     margin-bottom: 14px;
   }
-  .onboarding-title {
+    .onboarding-title {
     font-size: 22px;
     font-weight: 700;
-    color: #6e0606;
+    color: #fff; /* Đổi thành màu trắng cho dễ nhìn */
     margin: 0 0 8px;
     letter-spacing: -0.01em;
   }
+
   .onboarding-title span {
     background: linear-gradient(135deg, #4A7DFF, #a855f7);
     -webkit-background-clip: text;
@@ -446,9 +447,16 @@
 
 <script>
 /* ═══════════ XỬ LÝ ONBOARDING VIEW ═══════════ */
-document.getElementById('closeOnboardingBtn').addEventListener('click', () => {
-  document.getElementById('onboardingView').classList.add('hidden');
+document.getElementById('closeOnboardingBtn').addEventListener('click', (e) => {
+  e.preventDefault();
+  const overlay = document.getElementById('onboardingView');
+  overlay.classList.add('hidden');
+  // Thêm dòng này để ẩn hẳn khỏi DOM sau khi mờ dần, tránh bị cản tay bấm các nút bên dưới
+  setTimeout(() => {
+    overlay.style.display = 'none';
+  }, 300);
 });
+
 
 /* ═══════════ KẾT NỐI GOOGLE SHEETS & TRÌNH PHÁT NHẠC ═══════════ */
 const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1WJq4EWe-hlahMC0GPcLkjYkKXcDJnA6FX4f-pVgCTpY/export?format=csv';
