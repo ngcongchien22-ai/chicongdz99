@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>UMA Mod</title>
+<title>chi congdz</title>
 <style>
   :root{
     --bg:#070B14; --panel:rgba(13,21,38,0.82); --ink:#E2ECFF; --muted:#5A6A8A; --line:rgba(74,125,255,0.18);
@@ -44,6 +44,80 @@
   }
 
   .wrap{max-width:540px;margin:0 auto}
+
+  /* ── ONBOARDING OVERLAY ── */
+  .onboarding-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(3, 7, 18, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 20px;
+    opacity: 1;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+  }
+  .onboarding-overlay.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+  .onboarding-card {
+    background: rgba(13, 21, 38, 0.95);
+    border: 1px solid rgba(74, 125, 255, 0.35);
+    border-radius: 20px;
+    padding: 28px 24px;
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.6), 0 0 20px rgba(74, 125, 255, 0.2);
+    animation: onboardingPop 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @keyframes onboardingPop {
+    0% { transform: scale(0.9); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .onboarding-icon {
+    font-size: 42px;
+    margin-bottom: 14px;
+  }
+  .onboarding-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 8px;
+    letter-spacing: -0.01em;
+  }
+  .onboarding-title span {
+    background: linear-gradient(135deg, #4A7DFF, #a855f7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .onboarding-desc {
+    color: var(--muted);
+    font-size: 14px;
+    margin: 0 0 24px;
+    line-height: 1.5;
+  }
+  .onboarding-btn {
+    width: 100%;
+    padding: 13px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #2E63DB, #6040C8);
+    color: #fff;
+    border: 0;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(74, 125, 255, 0.4);
+    transition: filter 0.15s;
+  }
+  .onboarding-btn:hover {
+    filter: brightness(1.08);
+  }
 
   /* ── hướng dẫn ── */
   .guide{border-radius:16px;padding:16px;margin-bottom:14px;
@@ -157,6 +231,17 @@
 </style>
 </head>
 <body>
+
+  <!-- ONBOARDING VIEW -->
+  <div id="onboardingView" class="onboarding-overlay">
+    <div class="onboarding-card">
+      <div class="onboarding-icon">👋</div>
+      <h2 class="onboarding-title">Xin chào bố là <span>chicongdz</span></h2>
+      <p class="onboarding-desc">Chào mừng bố đã quay trở lại với hệ thống công cụ mod game. Mọi thứ đã sẵn sàng để sử dụng!</p>
+      <button id="closeOnboardingBtn" class="onboarding-btn">Đóng thông báo</button>
+    </div>
+  </div>
+
 <div class="wrap">
 
   <div id="drop">
@@ -366,6 +451,11 @@
 </div>
 
 <script>
+/* ═══════════ XỬ LÝ ONBOARDING VIEW ═══════════ */
+document.getElementById('closeOnboardingBtn').addEventListener('click', () => {
+  document.getElementById('onboardingView').classList.add('hidden');
+});
+
 /* ═══════════ tiện ích ═══════════ */
 const $ = s => document.querySelector(s);
 const hx = n => n.toString(16);
@@ -430,8 +520,6 @@ function lz4dec(src, outSize){
   return dst;
 }
 
-/* Nén LZ4 block (greedy hash-chain). Tỉ lệ kém LZ4HC vài phần trăm nhưng
-   đủ dùng để đóng gói lại block đã sửa. */
 function lz4enc(src){
   const n = src.length;
   if (!n) return new Uint8Array(0);
@@ -503,10 +591,6 @@ function lz4enc(src){
   return new Uint8Array(out);
 }
 
-/* Truy vết nguồn gốc từng byte của kết quả giải nén.
-   - literal  → { src: offset trong luồng nén }
-   - match    → { from: vị trí byte đầu ra mà nó sao chép lại }
-   Nhờ đó biết được sửa byte nào trong luồng nén để đổi byte đầu ra mong muốn. */
 function lz4Trace(src, outSize){
   const litOf  = new Int32Array(outSize).fill(-1);
   const copyOf = new Int32Array(outSize).fill(-1);
@@ -524,7 +608,6 @@ function lz4Trace(src, outSize){
     let sp = o - off;
     for (let k = 0; k < ml; k++){ copyOf[o] = sp; o++; sp++; }
   }
-  /* Lần về gốc: byte match nào cuối cùng cũng bắt nguồn từ một literal. */
   const root = new Int32Array(outSize).fill(-1);
   for (let k = 0; k < outSize; k++){
     let cur = k, guard = 0;
@@ -553,9 +636,6 @@ function parseBundle(u8){
 
   let infoOff, info, dataStart;
   if (flags & 0x80){
-    /* blocksInfoAtTheEnd: blocksInfo nằm cuối phần dữ liệu thực dùng.
-       Trường size có thể sai (file còn đuôi thừa) nên dò ngược để tìm.
-       Vùng dữ liệu vẫn căn lề 16 sau header, kể cả khi cờ 0x200 không bật. */
     dataStart = (headerEnd + 15) & ~15;
     infoOff = null;
     const from = Math.min(declared, u8.length) - ciSize;
@@ -565,7 +645,7 @@ function parseBundle(u8){
           ? lz4dec(u8.subarray(off, off + ciSize), uiSize)
           : u8.subarray(off, off + ciSize).slice();
         info = cand; infoOff = off; break;
-      } catch (e) { /* thử vị trí trước đó */ }
+      } catch (e) { }
     }
     if (infoOff === null) throw new Error('Không tìm được blocksInfo ở cuối file.');
   } else {
@@ -575,7 +655,6 @@ function parseBundle(u8){
     if (ic === 2 || ic === 3) info = lz4dec(infoRaw, uiSize);
     else if (ic === 0) info = infoRaw.slice();
     else throw new Error(`blocksInfo nén kiểu ${ic} (chưa hỗ trợ)`);
-    /* sau blocksInfo còn căn lề 16 trước khi vào vùng dữ liệu */
     dataStart = infoOff + ciSize;
     if (flags & 0x200) dataStart = (dataStart + 15) & ~15;
   }
@@ -622,9 +701,9 @@ function parseSF(cab){
   const types = [];
   for (let i = 0; i < tcount; i++){
     const cid = i32();
-    p += 1;                              // stripped
-    p += 2;                              // scriptTypeIndex
-    if (cid === 114) p += 16;            // scriptHash
+    p += 1;
+    p += 2;
+    if (cid === 114) p += 16;
     const th = cab.slice(p, p+16); p += 16;
     let nodes = null, sb = null;
     if (hasTT){
@@ -639,7 +718,7 @@ function parseSF(cab){
         nodes.push({ ver, level, tflags, to, no, bsize, idx, meta });
       }
       sb = cab.slice(p, p + sbs); p += sbs;
-      const nd = i32(); p += nd * 4;     // typeDependencies
+      const nd = i32(); p += nd * 4;
     }
     types.push({ cid, th, nodes, sb });
   }
@@ -676,7 +755,6 @@ function buildNodes(t){
   }));
 }
 
-/* Đọc giá trị theo typetree; ghi lại offset của mọi chuỗi vào trace */
 function makeReader(data){
   const dv = new DataView(data.buffer, data.byteOffset, data.byteLength);
   return { data, dv, p: 0, align(){ this.p = a4(this.p); } };
@@ -799,7 +877,6 @@ function applyPreset1(orig, b){
 const MALE_PID = -9165109095992080675n, FEMALE_PID = 2680591970127643204n;
 const BACKPACK = 'bone_Left_Spine_Backpack';
 
-/* Sửa một mesh: đổi tên xương Backpack → bone_Head, đặt position + scale */
 function patchMesh(sf, o, px, pz, s){
   const trace = [];
   const val = readObj(sf, o, trace);
@@ -808,11 +885,11 @@ function patchMesh(sf, o, px, pz, s){
   if (names.length !== bones.length) throw new Error('Không khớp số xương với chuỗi tên.');
 
   const idx = bones.findIndex(b => b.name === BACKPACK);
-  if (idx < 0) return null;                       // mesh này không có
+  if (idx < 0) return null;
   const tr = names[idx];
 
   const body = objBody(sf, o);
-  const posOff = tr.start - 40;                   // position(12) rotation(16) scale(12) name
+  const posOff = tr.start - 40;
   const scOff  = tr.start - 12;
 
   const oldFieldLen = 4 + tr.len + ((-(4 + tr.len)) & 3);
@@ -839,7 +916,6 @@ function patchMesh(sf, o, px, pz, s){
            after: { x: px ?? before.x, y: before.y, z: pz ?? before.z, sx: -s, sy: s, sz: 1.0 } };
 }
 
-/* Ghi một chuỗi Unity: [int32 độ dài][bytes][đệm căn 4] */
 function wstr(s){
   const sb = enc(s);
   const f = new Uint8Array(a4(4 + sb.length));
@@ -848,13 +924,6 @@ function wstr(s){
   return f;
 }
 
-/*
-  Dựng lại UMAAssetIndexer:
-   - Thêm mọi recipe/race có trong bundle mà indexer chưa liệt kê (4 mục _max).
-   - Rút gọn _Path để tổng kích thước object khớp đúng `targetSize`,
-     nhờ đó dung lượng file cuối bằng đúng bản gốc.
-  _Name / _TypeIndex / m_Item (PPtr) giữ nguyên tuyệt đối — runtime chỉ dùng chúng.
-*/
 function rebuildIndexer(sf, o, known, targetSize){
   const trace = [];
   const val = readObj(sf, o, trace);
@@ -862,7 +931,6 @@ function rebuildIndexer(sf, o, known, targetSize){
   const paths = trace.filter(t => t.node === '_Path');
   if (paths.length !== items.length) throw new Error('Không khớp số _Path với số mục indexer.');
 
-  /* mục hiện có + mục còn thiếu (đối chiếu theo pathID của object trong bundle) */
   const have = new Set(items.map(it => it.m_Item.m_PathID));
   const added = [];
   for (const k of known){
@@ -876,18 +944,16 @@ function rebuildIndexer(sf, o, known, targetSize){
   }
   const all = [...items, ...added].sort((a,b) => a._Name < b._Name ? -1 : a._Name > b._Name ? 1 : 0);
 
-  /* head = mọi thứ trước mảng Items (int32 số mục nằm ngay trước _QualifiedName đầu tiên) */
   const firstQN = trace.find(t => t.node === '_QualifiedName');
   if (!firstQN) throw new Error('Indexer không có mục nào để tham chiếu bố cục.');
   const body0 = objBody(sf, o);
   const head = body0.subarray(0, firstQN.start - 4);
   const fixed = all.reduce((acc, it) =>
     acc + a4(4 + enc(it._QualifiedName).length) + 4 + a4(4 + enc(it._Name).length) + 12, 0);
-  const budget = targetSize - head.length - 4 - fixed - 24;    // 4 = size mảng, 24 = 2 PPtr cuối
+  const budget = targetSize - head.length - 4 - fixed - 24;
   if (budget < all.length * 4)
     throw new Error(`Không đủ chỗ cho ${all.length} mục (_Path cần tối thiểu ${all.length*4} B, còn ${budget} B).`);
 
-  /* rút gọn _Path: bắt đầu từ tên file, nối dần thư mục cha cho đến sát ngân sách */
   const cur = all.map(it => it._Path.split('/').pop());
   const total = () => cur.reduce((a,p) => a + a4(4 + enc(p).length), 0);
   if (total() > budget) throw new Error('Không đủ chỗ cho _Path ngay cả khi chỉ giữ tên file.');
@@ -899,7 +965,6 @@ function rebuildIndexer(sf, o, known, targetSize){
       if (total() > budget){ cur[k] = old; break; }
     }
   }
-  /* phần dư còn lại: nới thêm thư mục cha cho mục nào vừa khít, không chèn ký tự rác */
   let guard = 0;
   while (total() < budget && guard++ < 2000){
     let done = true;
@@ -913,7 +978,6 @@ function rebuildIndexer(sf, o, known, targetSize){
     }
     if (done) break;
   }
-  /* nếu vẫn thiếu vài byte, đệm bằng './' ở đầu một đường dẫn (vẫn là path hợp lệ) */
   guard = 0;
   while (total() < budget && guard++ < 500){
     let j = 0;
@@ -923,7 +987,6 @@ function rebuildIndexer(sf, o, known, targetSize){
   if (total() !== budget)
     throw new Error(`Không khớp ngân sách _Path (${total()} ≠ ${budget}).`);
 
-  /* ghi lại object */
   const parts = [head];
   const cnt = new Uint8Array(4);
   new DataView(cnt.buffer).setInt32(0, all.length, true);
@@ -958,7 +1021,6 @@ function rebuildIndexer(sf, o, known, targetSize){
   return { body: out, names: all.map(i => i._Name), paths: cur, addedCount: added.length };
 }
 
-/* Dựng lại CAB với các object đã thay */
 function rebuildCab(sf, repl){
   const old = sf.cab.subarray(sf.dataOffset);
   const order = [...sf.objs].sort((a,b) => a.off - b.off);
@@ -989,40 +1051,32 @@ function rebuildCab(sf, repl){
     mdv.setUint32(o.ent + 16, sz, true);
   }
   const cabLen = sf.dataOffset + data.length;
-  mdv.setBigInt64(0x18, BigInt(cabLen), false);      // m_FileSize (big-endian)
+  mdv.setBigInt64(0x18, BigInt(cabLen), false);
 
   const cab = new Uint8Array(cabLen);
   cab.set(meta, 0); cab.set(data, meta.length);
   return cab;
 }
 
-/* Dựng lại bundle, tái dùng luồng LZ4 blocksInfo của file gốc */
 function rebuildBundle(orig, b, cab){
-  /* Bản gốc đệm block thêm một số byte 0 sau node (ở đây là 4). Giữ đúng
-     lượng đệm đó thì block — và do đó cả file — dài đúng như cũ. */
   const pad = b.blocks.reduce((a,x) => a + x.u, 0) - b.nodes[0].size;
   const block = new Uint8Array(cab.length + Math.max(0, pad));
   block.set(cab, 0);
 
   const info = b.info.slice();
   const idv = new DataView(info.buffer);
-  idv.setUint32(20, block.length, false);           // block.u
-  idv.setUint32(24, block.length, false);           // block.c
-  idv.setBigInt64(42, BigInt(cab.length), false);   // node.size
+  idv.setUint32(20, block.length, false);
+  idv.setUint32(24, block.length, false);
+  idv.setBigInt64(42, BigInt(cab.length), false);
 
   const ic = b.flags & 0x3F;
   let infoOut;
   if (ic === 0){
     infoOut = info;
   } else {
-    /* blocksInfo mới chỉ khác bản gốc ở vài byte kích thước, và những byte đó
-       nằm trong vùng literal của luồng LZ4 — vá thẳng vào luồng đã nén để giữ
-       nguyên độ dài như bản gốc (tự nén lại sẽ dài hơn, làm lệch dung lượng). */
     const compOrig = orig.slice(b.infoOff, b.infoOff + b.ciSize);
     const root = lz4Trace(compOrig, b.uiSize);
     const patched = compOrig.slice();
-    /* Một byte trong luồng nén có thể sinh ra nhiều byte đầu ra (qua match),
-       nên gom yêu cầu lại và chỉ chấp nhận khi mọi byte liên quan cùng giá trị. */
     const want = new Map();
     for (let i = 0; i < info.length; i++){
       const src = root[i];
@@ -1100,7 +1154,6 @@ function applyPreset2(orig, b, opt){
   }
   if (!repl.size) throw new Error(`Không tìm thấy xương ${BACKPACK} trong mesh nào — file có thể đã được sửa rồi.`);
 
-  /* Tìm UMAAssetIndexer */
   const idxObj = sf.objs.find(o => {
     const t = sf.types[o.tid];
     if (t.cid !== 114 || !t.nodes) return false;
@@ -1108,7 +1161,6 @@ function applyPreset2(orig, b, opt){
   });
   if (!idxObj) throw new Error('Không tìm thấy UMAAssetIndexer.');
 
-  /* Mọi RaceData / UMATextRecipe trong bundle — để bổ sung mục còn thiếu */
   const known = [];
   for (const o of sf.objs){
     const t = sf.types[o.tid];
@@ -1121,8 +1173,6 @@ function applyPreset2(orig, b, opt){
     known.push({ pid: o.pid, name: v.m_Name, typeIndex: isRace ? 2 : 3 });
   }
 
-  /* Kích thước đích của indexer: bù lại đúng phần mà 2 mesh đã co lại,
-     để tổng CAB — và do đó dung lượng file — không đổi. */
   let delta = 0;
   for (const [pid, body] of repl) delta += body.length - sf.objs.find(o => o.pid === pid).size;
   const targetSize = idxObj.size - delta;
@@ -1144,12 +1194,8 @@ function applyPreset2(orig, b, opt){
 }
 
 /* ═══════════ PRESET 3: shader định vị + đổi màu ═══════════ */
+const XRAY_BLOB = {"backweapon":{"pid":"-3333330928057165289","size":8560,"z":"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"}};
 
-/* 3 shader X-Ray trich tu ban mod, nen deflate + base64.
-   Dung de ghep vao bundle GOC o preset 3. */
-const XRAY_BLOB = {"backweapon":{"pid":"-3333330928057165289","size":8560,"z":"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"},"brmobilebumpspecdecal":{"pid":"893500320385684910","size":4656,"z":"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"},"brmobilebumpspec":{"pid":"3504935391519681939","size":8560,"z":"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"}};
-
-/* Giải nén một shader đã nhúng (deflate + base64) */
 async function loadXray(key){
   const e = XRAY_BLOB[key];
   if (!e) throw new Error(`Không có shader nhúng tên "${key}".`);
@@ -1162,9 +1208,6 @@ async function loadXray(key){
   return { body: buf, pid: BigInt(e.pid) };
 }
 
-/* Đọc danh sách property của một Shader (class 48) và offset byte của m_DefValue.
-   SerializedProperty: m_Name, m_Description, m_Attributes[], m_Type(i32),
-   m_Flags(u32), m_DefValue[0..3](f32), m_DefTexture{m_DefaultName, m_TexDim} */
 function readShaderProps(body){
   const dv = new DataView(body.buffer, body.byteOffset, body.byteLength);
   let p = 0;
@@ -1176,7 +1219,7 @@ function readShaderProps(body){
     p = a4(p + n);
     return s;
   };
-  str();                                   // Shader.m_Name
+  str();
   const cnt = rd();
   if (cnt < 0 || cnt > 500) throw new Error(`số property bất thường: ${cnt}`);
   const props = [];
@@ -1186,13 +1229,13 @@ function readShaderProps(body){
     if (na < 0 || na > 100) throw new Error('m_Attributes hỏng');
     for (let k = 0; k < na; k++) str();
     const type = rd();
-    p += 4;                                // m_Flags
+    p += 4;
     const valOff = p;
     const val = [dv.getFloat32(p,true), dv.getFloat32(p+4,true),
                  dv.getFloat32(p+8,true), dv.getFloat32(p+12,true)];
     p += 16;
-    str();                                 // m_DefTexture.m_DefaultName
-    p += 4;                                // m_TexDim
+    str();
+    p += 4;
     props.push({ name, desc, type, valOff, val });
   }
   return props;
@@ -1208,7 +1251,6 @@ const rgb2hex = v =>
   '#' + v.slice(0,3).map(x => Math.round(Math.max(0,Math.min(1,x))*255)
         .toString(16).padStart(2,'0')).join('').toUpperCase();
 
-/* Những property tool biết cách chỉnh, và lấy giá trị từ đâu */
 const COLOR_MAP = {
   _XRayColor:    { kind:'color', src:'xray', label:'màu súng' },
   _OutLineColor: { kind:'color', src:'line', label:'màu viền súng' },
@@ -1216,16 +1258,12 @@ const COLOR_MAP = {
   _OutLineWidth: { kind:'float', src:'width',label:'độ dày viền' }
 };
 
-/* Chỉ đụng đúng 3 shader định vị. Các shader gốc của game cũng có
-   _OutLineColor / _DimColor (uibgglass, toonoutline…) nhưng không liên quan
-   wallhack — đổi chúng sẽ hỏng giao diện và viền toon. */
 const XRAY_SHADERS = ['backweapon', 'brmobilebumpspec', 'brmobilebumpspecdecal'];
 const isXrayShader = path => {
   const f = path.split('/').pop().replace(/\.shader$/, '');
   return XRAY_SHADERS.includes(f);
 };
 
-/* Ghi màu vào một shader body (sửa tại chỗ, không đổi độ dài) */
 function paintShader(body, opt, short, rows){
   const props = readShaderProps(body);
   const dv = new DataView(body.buffer, body.byteOffset, body.byteLength);
@@ -1262,7 +1300,6 @@ async function applyPreset3(orig, b, opt){
   const cab = data.subarray(node.off, node.off + node.size);
   const sf = parseSF(cab);
 
-  /* Ánh xạ pathID → đường dẫn asset, để nhận diện shader theo tên */
   const abObj = sf.objs.find(o => o.cid === 142);
   const nameOf = new Map();
   if (abObj){
@@ -1270,8 +1307,7 @@ async function applyPreset3(orig, b, opt){
     for (const c of v.m_Container) nameOf.set(c.second.asset.m_PathID, c.first);
   }
 
-  /* Xem 3 shader định vị đang ở dạng nào */
-  const slots = new Map();                  // key → object
+  const slots = new Map();
   for (const o of sf.objs){
     if (o.cid !== 48) continue;
     const path = nameOf.get(o.pid);
@@ -1283,35 +1319,29 @@ async function applyPreset3(orig, b, opt){
                     'trong bundle này. Đây có phải file shaders của game không?');
 
   const rows = [];
-  const repl = new Map();                   // pid → body mới
+  const repl = new Map();
   let swapped = 0, painted = 0;
 
   for (const [key, o] of slots){
     const bodyStart = sf.dataOffset + o.off;
     const cur = cab.subarray(bodyStart, bodyStart + o.size);
 
-    /* Đã là bản X-Ray chưa? (nhận biết qua property đặc trưng) */
     let isXray = false;
     try {
       isXray = readShaderProps(cur).some(p => p.name === '_XRayColor' || p.name === '_DimColor');
-    } catch (e) { /* không đọc được -> coi như chưa */ }
+    } catch (e) { }
 
     let body;
     if (isXray){
-      body = cur.slice();                   // giữ nguyên, chỉ sơn lại màu
+      body = cur.slice();
     } else {
-      const x = await loadXray(key);        // thay bằng shader X-Ray nhúng sẵn
+      const x = await loadXray(key);
       if (x.pid !== o.pid)
         throw new Error(`pathID của ${key} không khớp shader nhúng ` +
                         `(${o.pid} ≠ ${x.pid}) — bundle này khác phiên bản.`);
       if (x.body.length > o.size)
         throw new Error(`Shader X-Ray của ${key} (${x.body.length} B) lớn hơn shader gốc ` +
                         `(${o.size} B) — không đệm vừa.`);
-      /* Giữ NGUYÊN kích thước object: phần dư đệm 0.
-         Nhờ vậy chỉ những block chứa shader mới phải nén lại, các block khác
-         giữ nguyên byte gốc — nếu để object co lại thì mọi block phía sau đều
-         dịch, phải nén lại toàn bộ, và bộ nén ở đây kém LZ4HC ~5% nên sẽ vượt
-         dung lượng gốc. Đệm 0 lại nén rất tốt. */
       body = new Uint8Array(o.size);
       body.set(x.body, 0);
       swapped++;
@@ -1335,7 +1365,6 @@ async function applyPreset3(orig, b, opt){
   };
 }
 
-/* Giải nén mọi block, ghi lại block nào phủ vùng nào */
 function decompressAll(orig, b){
   const parts = [];
   const blockAt = [];
@@ -1354,17 +1383,7 @@ function decompressAll(orig, b){
   return { data, blockAt };
 }
 
-/*
-  Dựng lại bundle shaders sau khi thay/sơn shader.
-
-  Thay shader làm object đổi độ dài → phải dựng lại CAB (bảng object + vùng dữ
-  liệu), rồi nén lại toàn bộ block. Bộ nén ở đây kém LZ4HC gốc vài phần trăm;
-  phần phình ra được bù bằng vùng đệm cuối file để dung lượng không đổi.
-*/
 function rebuildShaders(orig, b, data, blockAt, sf, node, repl){
-  /* Mọi object giữ nguyên kích thước (shader X-Ray đã được đệm 0 cho bằng
-     shader gốc), nên chỉ cần ghi đè tại chỗ vào luồng dữ liệu đã giải nén và
-     nén lại đúng những block bị đụng. */
   const touched = new Set();
   for (const o of sf.objs){
     const body = repl.get(o.pid);
@@ -1380,7 +1399,6 @@ function rebuildShaders(orig, b, data, blockAt, sf, node, repl){
   }
   if (!touched.size) throw new Error('Không có gì thay đổi.');
 
-  /* Nén lại block bị đụng, giữ nguyên byte gốc cho các block còn lại */
   const parts = [], newBlocks = [];
   for (let i = 0; i < b.blocks.length; i++){
     const blk = b.blocks[i], at = blockAt[i];
@@ -1404,7 +1422,6 @@ function rebuildShaders(orig, b, data, blockAt, sf, node, repl){
     newBlocks.push({ u: blk.u, c: comp.length, f: flags });
   }
 
-  /* blocksInfo: giữ nguyên bố cục gốc, chỉ cập nhật kích thước block */
   const info = b.info.slice();
   const idv = new DataView(info.buffer, info.byteOffset, info.byteLength);
   let q = 20;
@@ -1416,7 +1433,6 @@ function rebuildShaders(orig, b, data, blockAt, sf, node, repl){
   }
   const infoOut = ((b.flags & 0x3F) === 0) ? info : lz4enc(info);
 
-  /* 5. ráp lại, đệm 0 cho bằng đúng dung lượng file nguồn */
   const dataLen = parts.reduce((a, x) => a + x.length, 0);
   const atEnd = !!(b.flags & 0x80);
   const headLen = atEnd ? b.dataStart : b.infoOff;
@@ -1427,7 +1443,7 @@ function rebuildShaders(orig, b, data, blockAt, sf, node, repl){
     throw new Error(`Nén lại phình ${(core - orig.length).toLocaleString('vi-VN')} byte so với ` +
                     `dung lượng gốc — không đủ chỗ đệm.`);
 
-  const out = new Uint8Array(orig.length);           // phần dư tự là 0
+  const out = new Uint8Array(orig.length);
   if (atEnd){
     out.set(orig.subarray(0, headLen), 0);
     let p = headLen;
@@ -1442,38 +1458,28 @@ function rebuildShaders(orig, b, data, blockAt, sf, node, repl){
   }
   const sp = findSizePos(out);
   const odv = new DataView(out.buffer);
-  /* Với blocksInfoAtTheEnd, blocksInfo nằm ngay sau vùng dữ liệu chứ không ở
-     cuối file — phần đệm nằm sau nó. Trường size phải khai đúng phần thực
-     dùng, nếu không hàm dò blocksInfo sẽ tìm sai chỗ. */
   odv.setBigInt64(sp, BigInt(atEnd ? core : out.length), false);
-  odv.setUint32(sp + 8, infoOut.length, false);      // ciSize
-  odv.setUint32(sp + 12, info.length, false);        // uiSize
+  odv.setUint32(sp + 8, infoOut.length, false);
+  odv.setUint32(sp + 12, info.length, false);
   return out;
 }
 
-/* Vị trí trường size (int64 BE) trong header UnityFS */
 function findSizePos(u8){
   let p = 0;
-  while (u8[p]) p++;               // "UnityFS"
-  p++; p += 4;                     // \0 + version
-  while (u8[p]) p++; p++;          // unityVersion
-  while (u8[p]) p++; p++;          // unityRevision
+  while (u8[p]) p++;
+  p++; p += 4;
+  while (u8[p]) p++; p++;
+  while (u8[p]) p++; p++;
   return p;
 }
 
 /* ═══════════ PRESET 4: định vị nhân vật (hologram) ═══════════ */
+const HOLO_BLOB = {"hologram":{"pid":"-8478029966577821520","size":7072,"z":"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"}};
 
-/* hologram.shader goc, nen deflate + base64. Dung de thay toan bo
-   shader nhan vat o preset 4. */
-const HOLO_BLOB = {"hologram":{"pid":"-8478029966577821520","size":7072,"z":"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"}};
-
-/* 48 shader nhân vật đều được thay bằng hologram, nên mọi thứ trên người
-   (da, tóc, quần áo, mũ) đều vẽ bằng shader phát sáng này. */
 const HOLO_PROPS = {
   _TintColor:     { kind:'color',  src:'tint', label:'màu nhân vật' },
   _RimColor:      { kind:'color',  src:'rim',  label:'màu sáng mép' },
   _ScanColor:     { kind:'color',  src:'scan', label:'màu quét' },
-  /* Bật/tắt hiệu ứng: tắt = (0,0,0,0), bật = giá trị gốc của shader */
   _Line:          { kind:'vec4', src:'line',   on:[100,100,50,50], off:[0,0,0,0] },
   _LineAndGlitch: { kind:'vec4', src:'glitch', on:[0.5,0.5,5,0.1], off:[0,0,0,0] }
 };
@@ -1489,16 +1495,9 @@ async function loadHolo(){
   return { body: buf, pid: BigInt(e.pid) };
 }
 
-/*
-  zTest quyết định XUYÊN TƯỜNG, và nó KHÔNG phải property — nằm trong
-  m_ParsedForm.m_SubShaders[].m_Passes[].m_State.zTest (float 4 byte).
-    4 = LEqual  → chỉ vẽ khi ở gần hơn, bị tường che (mặc định)
-    8 = Always  → luôn vẽ, xuyên qua mọi vật cản
-  Bản mod gốc đặt 8. Dò offset bằng chính typetree thay vì hardcode. */
 const ZTEST_NAMES = { 0:'Disabled',1:'Never',2:'Less',3:'Equal',4:'LEqual',
                       5:'Greater',6:'NotEqual',7:'GEqual',8:'Always' };
 
-/* Tìm offset byte của mọi m_State.zTest trong một Shader object */
 function findZTest(body, type){
   const nodes = buildNodes(type);
   const r = makeReader(body);
@@ -1539,14 +1538,12 @@ function findZTest(body, type){
       for (const c of kids) walk(c, inState || n.name === 'm_State');
     }
     if (align) r.align();
-    /* SerializedShaderFloatValue { float val; FastPropertyName name; } */
     if (n.name === 'zTest' && inState) hits.push(start);
   };
   walk(0, false);
   return hits;
 }
 
-/* Ghi 3 màu + 2 vector hiệu ứng + zTest vào một bản sao hologram */
 function paintHolo(body, opt, rows, label, type){
   const props = readShaderProps(body);
   const dv = new DataView(body.buffer, body.byteOffset, body.byteLength);
@@ -1574,7 +1571,6 @@ function paintHolo(body, opt, rows, label, type){
     }
   }
 
-  /* zTest — thứ thực sự làm xuyên tường */
   const want = opt.xray ? 8 : 4;
   const zs = findZTest(body, type);
   for (const off of zs){
@@ -1611,14 +1607,10 @@ async function applyPreset4(orig, b, opt){
 
   const holo = await loadHolo();
   const rows = [];
-  /* Sơn màu + đặt zTest một lần rồi dùng chung cho mọi shader */
   const shType = sf.types[shaders[0].tid];
   const painted = holo.body.slice();
   const nSet = paintHolo(painted, opt, rows, 'hologram', shType);
 
-  /* Thay từng shader bằng bản hologram đã sơn, đệm 0 cho bằng kích thước cũ.
-     Giữ nguyên kích thước object → chỉ nén lại block bị đụng, và dung lượng
-     file không đổi. Shader nhỏ hơn hologram thì bỏ qua (không đệm vừa). */
   const repl = new Map();
   let swapped = 0, skipped = 0;
   for (const o of shaders){
@@ -1649,15 +1641,6 @@ let FILE = null, ORIG = null, BUN = null, KIND = null, DET = null;
 
 function render(el, html){ $(el).innerHTML = html; }
 
-/*
-  Vân tay của các bản gốc đã biết, để phân biệt Free Fire Thường và Max.
-
-  shaders: số shader là dấu hiệu bền — preset 3 không thêm/bớt shader nào.
-
-  assetindexer: hai bản khác nhau DUY NHẤT ở indexer (Thường 8 mục, Max 12).
-  Preset 2 thêm 4 mục vào bản Thường nên nó thành 12 — trùng dấu hiệu của Max.
-  Vì vậy phải dựa vào DUNG LƯỢNG, thứ mà cả 3 preset đều giữ nguyên tuyệt đối.
-*/
 const BUILDS = {
   uma: [
     { name: 'Free Fire Thường', size: 46096, objs: 24, items: 8  },
@@ -1673,7 +1656,6 @@ const BUILDS = {
   ]
 };
 
-/* Tên file gốc trên CDN = Base64(SHA1(nội dung)), '/'→~2F '+'→~2B '='→~3D */
 function sha1b64(bytes){
   const ml = bytes.length;
   const pad = new Uint8Array((((ml + 8) >> 6) + 1) << 6);
@@ -1705,17 +1687,11 @@ function sha1b64(bytes){
 }
 const cdnSuffix = b64 => b64.replace(/\+/g,'~2B').replace(/\//g,'~2F').replace(/=/g,'~3D');
 
-/*
-  Nhận diện bundle thuộc loại nào, dựa vào NỘI DUNG chứ không theo tên file.
-    'uma'    → có UMAMeshAsset / UMAAssetIndexer  → preset 1, 2
-    'shader' → có 3 shader định vị                → preset 3
-*/
 function detectKind(orig, b){
   const node = b.nodes[0];
   if (!node) return { kind: null, why: 'Bundle không có node nào.' };
 
   let isUMA = false;
-  /* Bundle UMA: 1 block thô, nhận diện nhanh bằng chuỗi tên xương */
   if (!b.blocks.some(x => (x.f & 0x3F) !== 0)){
     const from = b.dataStart + node.off, to = from + node.size;
     const probe = ['bone_Hips', 'bone_Left_Spine_Backpack', 'UMAAssetIndexer'];
@@ -1749,9 +1725,6 @@ function detectKind(orig, b){
         }
       }
 
-      /* Hai bundle đều chứa backweapon + brmobilebumpspec, và cả hai đều có
-         hologram — nên phải tách bằng brmobilebumpspecdecal, thứ chỉ bundle
-         súng mới có. Bundle nhân vật = có hologram nhưng không có decal. */
       if (hasHolo && !hasDecal){
         let build = BUILDS.holo.find(x => x.shaders === nShader && x.size === orig.length);
         let guess = false;
@@ -1764,8 +1737,6 @@ function detectKind(orig, b){
 
       if (!hit)
         return { kind: null, why: `Bundle có ${nShader} shader nhưng không có backweapon / brmobilebumpspec / brmobilebumpspecdecal.` };
-      /* Số shader là dấu hiệu bền (preset 3 không thêm/bớt shader nào);
-         dung lượng dùng để xác nhận. Lệch dung lượng thì chỉ là phỏng đoán. */
       let build = BUILDS.shader.find(x => x.shaders === nShader && x.size === orig.length);
       let guess = false;
       if (!build){
@@ -1779,7 +1750,6 @@ function detectKind(orig, b){
     }
 
     if (isUMA || sf.types.some(t => t.cid === 114)){
-      /* số mục indexer là dấu hiệu phân biệt Thường (8) và Max (12) */
       let items = null;
       const idx = sf.objs.find(o => {
         const t = sf.types[o.tid];
@@ -1787,16 +1757,11 @@ function detectKind(orig, b){
                buildNodes(t).some(n => n.level === 1 && n.name === 'Items');
       });
       if (idx){
-        try { items = readObj(sf, idx, null).Items.length; } catch (e) { /* bỏ qua */ }
+        try { items = readObj(sf, idx, null).Items.length; } catch (e) { }
       }
-      /* Phân biệt theo dung lượng: Thường 46.096, Max 46.640.
-         Không dùng số mục indexer làm căn cứ chính, vì preset 2 thêm 4 mục vào
-         bản Thường khiến nó cũng thành 12 mục — trùng dấu hiệu của Max. */
       let build = BUILDS.uma.find(x => x.size === orig.length && x.objs === sf.objs.length);
       let guess = false;
       if (!build && items !== null){
-        /* Dung lượng lạ (game cập nhật?) — đoán tạm theo số mục indexer.
-           Chỉ đáng tin khi file chưa qua preset 2. */
         build = BUILDS.uma.find(x => x.items === items);
         guess = !!build;
       }
@@ -1812,7 +1777,6 @@ function detectKind(orig, b){
   return { kind: null, why: 'Không nhận ra đây là bundle UMA hay bundle shader.' };
 }
 
-/* Bật/tắt preset theo loại bundle; tự chọn preset đầu tiên còn dùng được */
 function applyKind(kind){
   const pres = [...document.querySelectorAll('.pre')];
   const okFor = v => kind === null ? false
@@ -1834,7 +1798,6 @@ function applyKind(kind){
   syncPanels();
 }
 
-/* Hiện đúng khung tinh chỉnh cho preset đang chọn */
 function syncPanels(){
   const sel = document.querySelector('input[name=p]:checked');
   const v = sel ? sel.value : null;
@@ -1870,7 +1833,6 @@ async function load(file){
   const bad = KIND ? '' :
     `<div class="msg bad">${esc(det.why || 'Không nhận ra loại bundle.')} Tool này chỉ làm việc với <code>assetindexer</code> và <code>shaders</code>.</div>`;
 
-  /* Tên gốc trên CDN là Base64(SHA1) — file đã mod thì hash không còn khớp */
   const suffix = file.name.includes('.') ? file.name.slice(file.name.indexOf('.') + 1) : '';
   const nowHash = cdnSuffix(sha1b64(ORIG));
   const isPristine = suffix && suffix === nowHash;
@@ -1887,13 +1849,11 @@ async function load(file){
     ${buildRow}
     <tr><td>Định dạng</td><td>UnityFS fmt ${BUN.fmt} · ${esc(BUN.rev)}</td></tr>
     <tr><td>Block</td><td>${BUN.blocks.length} · ${comp ? 'có nén' : 'uncompressed'} · flags 0x${hx(BUN.flags)}</td></tr>
-    ${node ? `<tr><td>Node</td><td>${esc(node.name)} · ${node.size.toLocaleString('vi-VN')} byte</td></tr>` : ''}
+    ${node ? `<tr><td>Node</td><td>${esc(node.name)} ·${node.size.toLocaleString('vi-VN')} byte</td></tr>` : ''}
     ${det.detail ? `<tr><td>Nhận diện</td><td>${esc(det.detail)}</td></tr>` : ''}
   </table></div>`);
 
   $('#drop').classList.add('has');
-  /* Chỉ thay phần chữ — nếu ghi đè innerHTML của #drop thì <input id="file">
-     bên trong bị huỷ, và lần chọn file sau sẽ không kích hoạt onchange nữa. */
   $('#dropText').innerHTML =
     `<b>${esc(file.name)}</b><span>${ORIG.length.toLocaleString('vi-VN')} byte — bấm để chọn file khác</span>`;
   applyKind(KIND);
@@ -1993,7 +1953,6 @@ $('#go').onclick = async () => {
   };
 };
 
-/* chọn preset */
 for (const el of document.querySelectorAll('.pre')){
   el.addEventListener('click', () => {
     if (el.querySelector('input').disabled) return;
@@ -2002,7 +1961,6 @@ for (const el of document.querySelectorAll('.pre')){
   });
 }
 
-/* lúc chưa có file: ẩn hết preset, khung tinh chỉnh, và khoá nút */
 for (const el of document.querySelectorAll('.pre')){
   el.classList.add('off');
   el.querySelector('input').checked = false;
@@ -2010,7 +1968,6 @@ for (const el of document.querySelectorAll('.pre')){
 for (const id of ['advBox', 'colBox', 'holoBox']) $('#' + id).classList.add('off');
 $('#go').disabled = true;
 
-/* bộ chọn màu: đồng bộ hai chiều giữa ô màu và ô mã hex */
 for (const [c, t] of [['cXray','tXray'], ['cLine','tLine'], ['cDim','tDim'],
                       ['cTint','tTint'], ['cRim','tRim'], ['cScan','tScan']]){
   const cel = $('#' + c), tel = $('#' + t);
@@ -2029,12 +1986,11 @@ $('#rAlpha').addEventListener('input', e => { $('#aVal').textContent = (+e.targe
 for (const [r, out] of [['rTintA','tintAVal'], ['rRimA','rimAVal'], ['rScanA','scanAVal']])
   $('#' + r).addEventListener('input', e => { $('#' + out).textContent = (+e.target.value).toFixed(2); });
 
-/* drag & drop */
 const drop = $('#drop'), input = $('#file');
 drop.onclick = e => { if (e.target !== input) input.click(); };
 input.onchange = () => {
   const f = input.files[0];
-  input.value = '';              // để chọn lại cùng file vẫn kích hoạt onchange
+  input.value = '';
   if (f) load(f);
 };
 ['dragenter','dragover'].forEach(ev =>
