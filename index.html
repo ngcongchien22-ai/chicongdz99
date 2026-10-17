@@ -720,7 +720,7 @@ function parseBundle(u8){
         info = cand; infoOff = off; break;
       } catch (e) { }
     }
-    if (infoOff === null) throw new Error('Không tìm được blocksInfo ở cuối file.');
+    if (infoOff === null) throw new Error('Không tìm thấy blocksInfo ở cuối file.');
   } else {
     if (fmt >= 7 || (flags & 0x200)) p = (p + 15) & ~15;
     infoOff = p;
@@ -1147,7 +1147,7 @@ function rebuildBundle(orig, b, cab){
   if (ic === 0){
     infoOut = info;
   } else {
-    const compOrig = orig.slice(b.infoOff, b.infoOff + b.ciSize);
+    const compOrig = orig.subarray(b.infoOff, b.infoOff + b.ciSize);
     const root = lz4Trace(compOrig, b.uiSize);
     const patched = compOrig.slice();
     const want = new Map();
@@ -1445,7 +1445,12 @@ function decompressAll(orig, b){
   for (const blk of b.blocks){
     const raw = orig.subarray(pos, pos + blk.c);
     const ct = blk.f & 0x3F;
-    const dec = (ct === 2 || ct === 3) ? lz4dec(raw, blk.u) : raw.slice();
+    let dec;
+    try {
+      dec = (ct === 2 || ct === 3) ? lz4dec(raw, blk.u) : raw.slice();
+    } catch (err) {
+      throw new Error(`Lỗi giải nén block tại offset ${pos} (Kiểu: ${ct}): ${err.message}`);
+    }
     parts.push(dec);
     blockAt.push({ start: outPos, end: outPos + blk.u, comp: blk.c, ct, srcOff: pos });
     outPos += blk.u; pos += blk.c;
@@ -1976,7 +1981,7 @@ $('#go').onclick = async () => {
       });
     }
   } catch(e){
-    render('#out', `<div class="msg bad">${esc(e.message)}</div>`);
+    render('#out', `<div class="msg bad">Lỗi xử lý: ${esc(e.message)}</div>`);
     return;
   } finally {
     btn.disabled = false;
