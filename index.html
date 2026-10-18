@@ -26,7 +26,7 @@
     min-height: 100vh;
   }
 
-  /* ── ONBOARDING & AUTH OVERLAY ── */
+  /* ── AUTH & ONBOARDING OVERLAY ── */
   .onboarding-overlay {
     position: fixed;
     top: 0; left: 0; width: 100vw; height: 100vh;
@@ -612,14 +612,13 @@
 </head>
 <body>
 
-  <!-- AUTHENTICATION OVERLAY (NHẬP KEY & SERVER KEY) -->
+  <!-- AUTHENTICATION OVERLAY (CHỈ NHẬP KEY) -->
   <div id="authOverlay" class="onboarding-overlay">
     <div class="onboarding-card">
-      <div class="onboarding-icon">🔐</div>
-      <h2 class="onboarding-title">Xác Thực <span>Hệ Thống</span></h2>
-      <p class="onboarding-desc">Vui lòng nhập Key và Server Key hợp lệ được cấp từ Google Sheets để tiếp tục truy cập.</p>
-      <input type="text" id="keyInput" class="auth-input" placeholder="Nhập Key của bạn..." autocomplete="off" spellcheck="false">
-      <input type="text" id="serverKeyInput" class="auth-input" placeholder="Nhập Server Key..." autocomplete="off" spellcheck="false">
+      <div class="onboarding-icon">🔑</div>
+      <h2 class="onboarding-title">Nhập Key <span>Hệ Thống</span></h2>
+      <p class="onboarding-desc">Vui lòng nhập Key hợp lệ của bạn để truy cập vào hệ thống.</p>
+      <input type="text" id="keyInput" class="auth-input" placeholder="Nhập Key tại đây..." autocomplete="off" spellcheck="false">
       <button id="authBtn" class="onboarding-btn" type="button">Xác Nhận</button>
       <div id="authError"></div>
     </div>
