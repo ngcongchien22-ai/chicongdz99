@@ -683,7 +683,7 @@ input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer}
     <div class="empty-tab">Tab Aim VIP đang trống.</div>
   </div>
 
-  <!-- TAB 3: ĐỊNH VỊ (Chứa chọn file, màu sắc, cấu hình và hướng dẫn) -->
+  <!-- TAB 3: ĐỊNH VỊ (Chứa chọn file, màu sắc, cấu hình, nút tạo file và hướng dẫn) -->
   <div id="dinh-vi" class="tab-content">
     <div id="drop">
       <div id="dropText">
@@ -810,8 +810,12 @@ input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer}
       <div class="note">Trục cục bộ: <code>x</code> âm hơn = cao hơn, <code>z</code> = trái/phải, <code>y</code> = trước/sau. Scale ghi vào là <code>(−s, +s, 1.0)</code>.</div>
     </details>
 
+    <div class="row" style="margin-top:16px; margin-bottom:16px;">
+      <button id="go" disabled>Tạo file</button>
+    </div>
+
     <!-- Hướng dẫn sử dụng đặt trong tab định vị -->
-    <div class="guide" style="margin-top: 14px;">
+    <div class="guide">
       <div class="guide-title">Hướng dẫn sử dụng</div>
       <ul class="steps">
         <li>
@@ -844,10 +848,6 @@ input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer}
         </li>
       </ul>
     </div>
-  </div>
-
-  <div class="row" style="margin-bottom:16px; margin-top: 16px;">
-    <button id="go" disabled>Tạo file</button>
   </div>
 
   <div id="out"></div>
