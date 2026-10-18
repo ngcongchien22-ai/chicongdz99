@@ -1,12 +1,11 @@
-// Cấu hình Google Sheet URL kết nối
-const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1WJq4EWe-hlahMC0GPcLkjYkKXcDJnA6FX4f-pVgCTpY/export?format=csv&gid=0';
+// Cấu hình Google Sheet URL kết nối (Google Sheet ID: 1-E9K7vlE4BQTq6KfaXRYW2CjV3PAKNmSa5T-j7Wq8tE)
+const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1-E9K7vlE4BQTq6KfaXRYW2CjV3PAKNmSa5T-j7Wq8tE/export?format=csv&gid=0';
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Xử lý xác thực Key & Server Key khi truy cập web
+  // Xử lý xác thực Key khi truy cập web
   const authOverlay = document.getElementById("authOverlay");
   const authBtn = document.getElementById("authBtn");
   const keyInput = document.getElementById("keyInput");
-  const serverKeyInput = document.getElementById("serverKeyInput");
   const authError = document.getElementById("authError");
   const onboardingView = document.getElementById("onboardingView");
   const closeOnboardingBtn = document.getElementById("closeOnboardingBtn");
@@ -16,12 +15,11 @@ document.addEventListener("DOMContentLoaded", () => {
     authOverlay.classList.add("hidden");
   }
 
-  async function verifyKeys() {
+  async function verifyKey() {
     const userKey = keyInput.value.trim();
-    const serverKey = serverKeyInput.value.trim();
 
-    if (!userKey || !serverKey) {
-      authError.textContent = "Vui lòng nhập đầy đủ Key và Server Key!";
+    if (!userKey) {
+      authError.textContent = "Vui lòng nhập Key của bạn!";
       return;
     }
 
@@ -39,9 +37,12 @@ document.addEventListener("DOMContentLoaded", () => {
       let isValid = false;
       const now = new Date();
 
+      // Duyệt qua các hàng trong sheet (Cột 0: keys, Cột 1: expire)
       for (let i = 1; i < rows.length; i++) {
-        const [dbKey, dbExpire, dbServerKey] = rows[i];
-        if (dbKey && dbKey === userKey && dbServerKey && dbServerKey === serverKey) {
+        const dbKey = rows[i][0];
+        const dbExpire = rows[i][1];
+        
+        if (dbKey && dbKey === userKey) {
           // Kiểm tra hạn sử dụng (Expire date)
           if (dbExpire && dbExpire !== "" && dbExpire !== "undefined") {
             const expireDate = new Date(dbExpire);
@@ -64,10 +65,10 @@ document.addEventListener("DOMContentLoaded", () => {
       if (isValid) {
         localStorage.setItem("chicong_authenticated", "true");
         authOverlay.classList.add("hidden");
-        onboardingView.classList.remove("hidden"); // Hiện bảng chào mừng chicongdz
+        onboardingView.classList.remove("hidden"); // Hiện bảng chào mừng
       } else {
         if (!authError.textContent) {
-          authError.textContent = "Key hoặc Server Key không chính xác!";
+          authError.textContent = "Key không tồn tại hoặc không chính xác!";
         }
       }
     } catch (err) {
@@ -79,18 +80,21 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  authBtn.addEventListener("click", verifyKeys);
-  keyInput.addEventListener("keypress", (e) => { if (e.key === "Enter") verifyKeys(); });
-  serverKeyInput.addEventListener("keypress", (e) => { if (e.key === "Enter") verifyKeys(); });
-
-  closeOnboardingBtn.addEventListener("click", (e) => {
-    e.preventDefault();
-    const overlay = document.getElementById('onboardingView');
-    overlay.classList.add('hidden');
-    setTimeout(() => {
-      overlay.remove(); // Xóa hẳn khỏi DOM để tránh chiếm diện tích màn hình
-    }, 300);
+  authBtn.addEventListener("click", verifyKey);
+  keyInput.addEventListener("keypress", (e) => { 
+    if (e.key === "Enter") verifyKey(); 
   });
+
+  if (closeOnboardingBtn) {
+    closeOnboardingBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      const overlay = document.getElementById('onboardingView');
+      overlay.classList.add('hidden');
+      setTimeout(() => {
+        overlay.remove();
+      }, 300);
+    });
+  }
 
   // Tải danh sách nhạc và playlist từ Google Sheets
   loadPlaylistFromGoogleSheets();
@@ -119,7 +123,7 @@ async function loadPlaylistFromGoogleSheets() {
       }
     }
 
-    if (playlist.length > 0) {
+    if (playlist.length > 0 && songSelect) {
       songSelect.innerHTML = '<option value="">-- Chọn bài hát --</option>';
       playlist.forEach((song, index) => {
         const opt = document.createElement('option');
@@ -129,45 +133,49 @@ async function loadPlaylistFromGoogleSheets() {
       });
       audioEl.src = playlist[0].link;
       songSelect.value = playlist[0].link;
-    } else {
+    } else if (songSelect) {
       songSelect.innerHTML = '<option value="">Không có bài hát nào trong Sheets</option>';
     }
   } catch (err) {
     console.error('Lỗi tải danh sách nhạc:', err);
-    songSelect.innerHTML = '<option value="">Lỗi kết nối Google Sheets</option>';
+    if (songSelect) songSelect.innerHTML = '<option value="">Lỗi kết nối Google Sheets</option>';
   }
 }
 
-songSelect.addEventListener('change', () => {
-  const selectedUrl = songSelect.value;
-  if (!selectedUrl) return;
-  audioEl.src = selectedUrl;
-  if (isPlaying) {
-    audioEl.play().catch(e => console.log('Không thể phát:', e));
-  }
-});
+if (songSelect) {
+  songSelect.addEventListener('change', () => {
+    const selectedUrl = songSelect.value;
+    if (!selectedUrl) return;
+    audioEl.src = selectedUrl;
+    if (isPlaying) {
+      audioEl.play().catch(e => console.log('Không thể phát:', e));
+    }
+  });
+}
 
-togglePlayBtn.addEventListener('click', () => {
-  if (!audioEl.src) {
-    alert('Vui lòng chọn bài hát trước!');
-    return;
-  }
-  
-  if (isPlaying) {
-    audioEl.pause();
-    isPlaying = false;
-    togglePlayBtn.textContent = 'Bật nhạc';
-    togglePlayBtn.style.background = 'linear-gradient(135deg,#2E63DB,#6040C8)';
-  } else {
-    audioEl.play().then(() => {
-      isPlaying = true;
-      togglePlayBtn.textContent = 'Tắt nhạc';
-      togglePlayBtn.style.background = 'linear-gradient(135deg,#E85060,#E8A030)';
-    }).catch(e => {
-      alert('Trình duyệt chặn phát tự động, hãy bấm chọn bài trước.');
-    });
-  }
-});
+if (togglePlayBtn) {
+  togglePlayBtn.addEventListener('click', () => {
+    if (!audioEl.src) {
+      alert('Vui lòng chọn bài hát trước!');
+      return;
+    }
+    
+    if (isPlaying) {
+      audioEl.pause();
+      isPlaying = false;
+      togglePlayBtn.textContent = 'Bật nhạc';
+      togglePlayBtn.style.background = 'linear-gradient(135deg,#2E63DB,#6040C8)';
+    } else {
+      audioEl.play().then(() => {
+        isPlaying = true;
+        togglePlayBtn.textContent = 'Tắt nhạc';
+        togglePlayBtn.style.background = 'linear-gradient(135deg,#E85060,#E8A030)';
+      }).catch(e => {
+        alert('Trình duyệt chặn phát tự động, hãy bấm chọn bài trước.');
+      });
+    }
+  });
+}
 
 /* ═══════════ TIỆN ÍCH ═══════════ */
 const $ = s => document.querySelector(s);
@@ -1186,14 +1194,6 @@ function findSizePos(u8){
 
 /* ═══════════ PRESET 4: định vị nhân vật (hologram) ═══════════ */
 const HOLO_BLOB = {"hologram":{"pid":"-8478029966577821520","size":7072,"z":"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"}};
-
-const HOLO_PROPS = {
-  _TintColor:     { kind:'color',  src:'tint', label:'màu nhân vật' },
-  _RimColor:      { kind:'color',  src:'rim',  label:'màu sáng mép' },
-  _ScanColor:     { kind:'color',  src:'scan', label:'màu quét' },
-  _Line:          { kind:'vec4', src:'line',   on:[100,100,50,50], off:[0,0,0,0] },
-  _LineAndGlitch: { kind:'vec4', src:'glitch', on:[0.5,0.5,5,0.1], off:[0,0,0,0] }
-};
 
 async function loadHolo(){
   const e = HOLO_BLOB.hologram;
