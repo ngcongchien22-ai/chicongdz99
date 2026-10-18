@@ -1,25 +1,27 @@
-// Cấu hình Google Sheet URL kết nối (Google Sheet ID: 1-E9K7vlE4BQTq6KfaXRYW2CjV3PAKNmSa5T-j7Wq8tE)
-const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1-E9K7vlE4BQTq6KfaXRYW2CjV3PAKNmSa5T-j7Wq8tE/export?format=csv&gid=0';
+// Cấu hình Google Sheet URL kết nối
+const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1WJq4EWe-hlahMC0GPcLkjYkKXcDJnA6FX4f-pVgCTpY/export?format=csv&gid=0';
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Xử lý xác thực Key khi truy cập web
+  // Xử lý xác thực Key & Server Key khi truy cập web
   const authOverlay = document.getElementById("authOverlay");
   const authBtn = document.getElementById("authBtn");
   const keyInput = document.getElementById("keyInput");
+  const serverKeyInput = document.getElementById("serverKeyInput");
   const authError = document.getElementById("authError");
   const onboardingView = document.getElementById("onboardingView");
   const closeOnboardingBtn = document.getElementById("closeOnboardingBtn");
 
-  // Kiểm tra trạng thái đã xác thực trước đó trong localStorage
+  // Kiểm tra trạng thái đã đăng nhập trước đó chưa (Lưu ở localStorage)
   if (localStorage.getItem("chicong_authenticated") === "true") {
     authOverlay.classList.add("hidden");
   }
 
-  async function verifyKey() {
+  async function verifyKeys() {
     const userKey = keyInput.value.trim();
+    const serverKey = serverKeyInput.value.trim();
 
-    if (!userKey) {
-      authError.textContent = "Vui lòng nhập Key của bạn!";
+    if (!userKey || !serverKey) {
+      authError.textContent = "Vui lòng nhập đầy đủ Key và Server Key!";
       return;
     }
 
@@ -28,23 +30,25 @@ document.addEventListener("DOMContentLoaded", () => {
     authError.textContent = "";
 
     try {
-      const response = await fetch(SHEET_CSV_URL);
-      const csvText = await response.text();
+      const response = await fetch(SHEET_CSV_URL + '&t=' + Date.now(), { cache: 'no-store' });
+      if (!response.ok) throw new Error("Lỗi kết nối HTTP: " + response.status);
       
-      // Parse CSV dữ liệu từ Sheet (Cột đầu tiên tương ứng với `keys`, cột thứ hai là `expire`)
+      const csvText = await response.text();
       const rows = csvText.split("\n").map(row => row.split(",").map(cell => cell.trim().replace(/^"|"$/g, '')));
       
       let isValid = false;
       const now = new Date();
 
       for (let i = 1; i < rows.length; i++) {
-        const dbKey = rows[i][0];   // Cột 'keys'
-        const dbExpire = rows[i][1]; // Cột 'expire'
-        
-        if (dbKey && dbKey === userKey) {
-          if (dbExpire) {
+        const [dbKey, dbExpire, dbServerKey] = rows[i];
+        if (dbKey && dbKey === userKey && dbServerKey && dbServerKey === serverKey) {
+          // Kiểm tra hạn sử dụng (Expire date)
+          if (dbExpire && dbExpire !== "" && dbExpire !== "undefined") {
             const expireDate = new Date(dbExpire);
-            if (expireDate > now) {
+            if (!isNaN(expireDate.getTime()) && expireDate > now) {
+              isValid = true;
+              break;
+            } else if (isNaN(expireDate.getTime())) {
               isValid = true;
               break;
             } else {
@@ -60,31 +64,35 @@ document.addEventListener("DOMContentLoaded", () => {
       if (isValid) {
         localStorage.setItem("chicong_authenticated", "true");
         authOverlay.classList.add("hidden");
-        onboardingView.classList.remove("hidden"); // Hiển thị bảng chào mừng chicongdz
+        onboardingView.classList.remove("hidden"); // Hiện bảng chào mừng chicongdz
       } else {
         if (!authError.textContent) {
-          authError.textContent = "Key không tồn tại hoặc không chính xác!";
+          authError.textContent = "Key hoặc Server Key không chính xác!";
         }
       }
     } catch (err) {
       console.error(err);
-      authError.textContent = "Không thể kết nối tới Google Sheets để kiểm tra Key!";
+      authError.textContent = "Lỗi kết nối Google Sheets! (Hãy bật quyền chia sẻ 'Anyone with the link').";
     } finally {
       authBtn.textContent = "Xác Nhận";
       authBtn.disabled = false;
     }
   }
 
-  authBtn.addEventListener("click", verifyKey);
-  keyInput.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") verifyKey();
+  authBtn.addEventListener("click", verifyKeys);
+  keyInput.addEventListener("keypress", (e) => { if (e.key === "Enter") verifyKeys(); });
+  serverKeyInput.addEventListener("keypress", (e) => { if (e.key === "Enter") verifyKeys(); });
+
+  closeOnboardingBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    const overlay = document.getElementById('onboardingView');
+    overlay.classList.add('hidden');
+    setTimeout(() => {
+      overlay.remove(); // Xóa hẳn khỏi DOM để tránh chiếm diện tích màn hình
+    }, 300);
   });
 
-  closeOnboardingBtn.addEventListener("click", () => {
-    onboardingView.classList.add("hidden");
-  });
-
-  // Tải danh sách nhạc từ Google Sheets cho trình phát nhạc nền
+  // Tải danh sách nhạc và playlist từ Google Sheets
   loadPlaylistFromGoogleSheets();
 });
 
@@ -96,18 +104,18 @@ let isPlaying = false;
 
 async function loadPlaylistFromGoogleSheets() {
   try {
-    const response = await fetch(SHEET_CSV_URL);
+    const response = await fetch(SHEET_CSV_URL + '&t=' + Date.now(), { cache: 'no-store' });
     const csvText = await response.text();
-    const rows = csvText.split('\n').map(r => r.split(',').map(cell => cell.trim().replace(/^"|"$/g, '')));
+    const rows = csvText.split('\n').map(r => r.split(','));
     let playlist = [];
-
-    // Giả lập đưa danh sách bài hát dựa trên các dòng key/dữ liệu hoặc tuỳ chỉnh theo ý muốn
     for (let i = 1; i < rows.length; i++) {
       const row = rows[i];
-      if (row[0]) {
-        let name = "Nhạc nền định vị #" + i + " (Key: " + row[0] + ")";
-        let link = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-" + ((i % 16) + 1) + ".mp3";
-        playlist.push({ name, link });
+      if (row.length >= 2) {
+        let name = row[0].replace(/^"|"$/g, '').trim();
+        let link = row.slice(1).join(',').replace(/^"|"$/g, '').trim();
+        if (name && link) {
+          playlist.push({ name, link });
+        }
       }
     }
 
