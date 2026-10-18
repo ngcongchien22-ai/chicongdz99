@@ -2,26 +2,24 @@
 const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1-E9K7vlE4BQTq6KfaXRYW2CjV3PAKNmSa5T-j7Wq8tE/export?format=csv&gid=0';
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Xử lý xác thực Key & Server Key khi truy cập web
+  // Xử lý xác thực Key khi truy cập web
   const authOverlay = document.getElementById("authOverlay");
   const authBtn = document.getElementById("authBtn");
   const keyInput = document.getElementById("keyInput");
-  const serverKeyInput = document.getElementById("serverKeyInput");
   const authError = document.getElementById("authError");
   const onboardingView = document.getElementById("onboardingView");
   const closeOnboardingBtn = document.getElementById("closeOnboardingBtn");
 
-  // Kiểm tra trạng thái đã đăng nhập trước đó chưa (Lưu ở localStorage)
+  // Kiểm tra trạng thái đã xác thực trước đó trong localStorage
   if (localStorage.getItem("chicong_authenticated") === "true") {
     authOverlay.classList.add("hidden");
   }
 
-  async function verifyKeys() {
+  async function verifyKey() {
     const userKey = keyInput.value.trim();
-    const serverKey = serverKeyInput.value.trim();
 
-    if (!userKey || !serverKey) {
-      authError.textContent = "Vui lòng nhập đầy đủ Key và Server Key!";
+    if (!userKey) {
+      authError.textContent = "Vui lòng nhập Key của bạn!";
       return;
     }
 
@@ -33,16 +31,17 @@ document.addEventListener("DOMContentLoaded", () => {
       const response = await fetch(SHEET_CSV_URL);
       const csvText = await response.text();
       
-      // Parse CSV dữ liệu từ Sheet (Cột 0: keys, Cột 1: expire, Cột 2: createdBy / Server Key)
+      // Parse CSV dữ liệu từ Sheet (Cột đầu tiên tương ứng với `keys`, cột thứ hai là `expire`)
       const rows = csvText.split("\n").map(row => row.split(",").map(cell => cell.trim().replace(/^"|"$/g, '')));
       
       let isValid = false;
       const now = new Date();
 
       for (let i = 1; i < rows.length; i++) {
-        const [dbKey, dbExpire, dbServerKey] = rows[i];
-        if (dbKey === userKey && dbServerKey === serverKey) {
-          // Kiểm tra hạn sử dụng (Expire date)
+        const dbKey = rows[i][0];   // Cột 'keys'
+        const dbExpire = rows[i][1]; // Cột 'expire'
+        
+        if (dbKey && dbKey === userKey) {
           if (dbExpire) {
             const expireDate = new Date(dbExpire);
             if (expireDate > now) {
@@ -61,94 +60,35 @@ document.addEventListener("DOMContentLoaded", () => {
       if (isValid) {
         localStorage.setItem("chicong_authenticated", "true");
         authOverlay.classList.add("hidden");
-        onboardingView.classList.remove("hidden"); // Hiện bảng chào mừng chicongdz
+        onboardingView.classList.remove("hidden"); // Hiển thị bảng chào mừng chicongdz
       } else {
         if (!authError.textContent) {
-          authError.textContent = "Key hoặc Server Key không chính xác!";
+          authError.textContent = "Key không tồn tại hoặc không chính xác!";
         }
       }
     } catch (err) {
       console.error(err);
-      // Fallback cho phép bypass nhẹ hoặc báo lỗi kết nối mạng
-      authError.textContent = "Không thể kết nối tới Google Sheets kiểm tra Key!";
+      authError.textContent = "Không thể kết nối tới Google Sheets để kiểm tra Key!";
     } finally {
       authBtn.textContent = "Xác Nhận";
       authBtn.disabled = false;
     }
   }
 
-  authBtn.addEventListener("click", verifyKeys);
-  keyInput.addEventListener("keypress", (e) => { if (e.key === "Enter") verifyKeys(); });
-  serverKeyInput.addEventListener("keypress", (e) => { if (e.key === "Enter") verifyKeys(); });
+  authBtn.addEventListener("click", verifyKey);
+  keyInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") verifyKey();
+  });
 
   closeOnboardingBtn.addEventListener("click", () => {
     onboardingView.classList.add("hidden");
   });
 
   // Tải danh sách nhạc từ Google Sheets cho trình phát nhạc nền
-  loadMusicListFromSheet();
-});
-
-async function loadMusicListFromSheet() {
-  const songSelect = document.getElementById("songSelect");
-  const bgAudio = document.getElementById("bgAudio");
-  const togglePlayBtn = document.getElementById("togglePlayBtn");
-
-  try {
-    const response = await fetch(SHEET_CSV_URL);
-    const csvText = await response.text();
-    const rows = csvText.split("\n").map(row => row.split(",").map(cell => cell.trim().replace(/^"|"$/g, '')));
-
-    songSelect.innerHTML = '<option value="">-- Chọn bài hát từ hệ thống --</option>';
-    
-    // Giả lập đưa dữ liệu dòng Sheet vào danh sách chọn nhạc (hoặc bạn có thể bổ sung cột link nhạc vào sheet)
-    rows.slice(1).forEach((row, index) => {
-      if (row[0]) {
-        const opt = document.createElement("option");
-        opt.value = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-" + ((index % 16) + 1) + ".mp3";
-        opt.textContent = "Nhạc nền định vị #" + (index + 1) + " (Key: " + row[0] + ")";
-        songSelect.appendChild(opt);
-      }
-    });
-  } catch (e) {
-    songSelect.innerHTML = '<option value="">Không thể tải danh sách nhạc</option>';
-  }
-
-  songSelect.addEventListener("change", () => {
-    if (songSelect.value) {
-      bgAudio.src = songSelect.value;
-      bgAudio.play();
-      togglePlayBtn.textContent = "Tạm dừng nhạc";
-    }
-  });
-
-  togglePlayBtn.addEventListener("click", () => {
-    if (!bgAudio.src && songSelect.options.length > 1) {
-      songSelect.selectedIndex = 1;
-      bgAudio.src = songSelect.value;
-    }
-    if (bgAudio.paused) {
-      bgAudio.play();
-      togglePlayBtn.textContent = "Tạm dừng nhạc";
-    } else {
-      bgAudio.pause();
-      togglePlayBtn.textContent = "Bật nhạc";
-    }
-  });
-}
-/* ═══════════ XỬ LÝ ONBOARDING VIEW ═══════════ */
-document.getElementById('closeOnboardingBtn').addEventListener('click', (e) => {
-  e.preventDefault();
-  const overlay = document.getElementById('onboardingView');
-  overlay.classList.add('hidden');
-  setTimeout(() => {
-    overlay.remove(); // Xóa hẳn khỏi DOM để tránh tình trạng chiếm diện tích màn hình
-  }, 300);
+  loadPlaylistFromGoogleSheets();
 });
 
 /* ═══════════ KẾT NỐI GOOGLE SHEETS & TRÌNH PHÁT NHẠC ═══════════ */
-const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1WJq4EWe-hlahMC0GPcLkjYkKXcDJnA6FX4f-pVgCTpY/export?format=csv';
-
 const audioEl = document.getElementById('bgAudio');
 const songSelect = document.getElementById('songSelect');
 const togglePlayBtn = document.getElementById('togglePlayBtn');
@@ -158,16 +98,16 @@ async function loadPlaylistFromGoogleSheets() {
   try {
     const response = await fetch(SHEET_CSV_URL);
     const csvText = await response.text();
-    const rows = csvText.split('\n').map(r => r.split(','));
+    const rows = csvText.split('\n').map(r => r.split(',').map(cell => cell.trim().replace(/^"|"$/g, '')));
     let playlist = [];
+
+    // Giả lập đưa danh sách bài hát dựa trên các dòng key/dữ liệu hoặc tuỳ chỉnh theo ý muốn
     for (let i = 1; i < rows.length; i++) {
       const row = rows[i];
-      if (row.length >= 2) {
-        let name = row[0].replace(/^"|"$/g, '').trim();
-        let link = row.slice(1).join(',').replace(/^"|"$/g, '').trim();
-        if (name && link) {
-          playlist.push({ name, link });
-        }
+      if (row[0]) {
+        let name = "Nhạc nền định vị #" + i + " (Key: " + row[0] + ")";
+        let link = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-" + ((i % 16) + 1) + ".mp3";
+        playlist.push({ name, link });
       }
     }
 
@@ -220,8 +160,6 @@ togglePlayBtn.addEventListener('click', () => {
     });
   }
 });
-
-loadPlaylistFromGoogleSheets();
 
 /* ═══════════ TIỆN ÍCH ═══════════ */
 const $ = s => document.querySelector(s);
@@ -1404,7 +1342,7 @@ async function applyPreset4(orig, b, opt){
 /* ═══════════ giao diện ═══════════ */
 let FILE = null, ORIG = null, BUN = null, KIND = null, DET = null;
 
-function render(el, html){ $(el).innerHTML = html; }
+function render(el, html){ \$(el).innerHTML = html; }
 
 const BUILDS = {
   uma: [
@@ -1437,9 +1375,9 @@ function sha1b64(bytes){
     let a=h0,b2=h1,c=h2,d=h3,e=h4;
     for (let j = 0; j < 80; j++){
       let f, k;
-      if (j < 20)      { f = (b2 & c) | (~b2 & d);              k = 0x5A827999; }
+      if (j < 20)      { f = (b2 & c) | (~b2 & d);            k = 0x5A827999; }
       else if (j < 40) { f = b2 ^ c ^ d;                        k = 0x6ED9EBA1; }
-      else if (j < 60) { f = (b2 & c) | (b2 & d) | (c & d);     k = 0x8F1BBCDC; }
+      else if (j < 60) { f = (b2 & c) | (b2 & d) | (c & d);    k = 0x8F1BBCDC; }
       else             { f = b2 ^ c ^ d;                        k = 0xCA62C1D6; }
       const t = (rol(a,5) + f + e + k + w[j]) >>> 0;
       e = d; d = c; c = rol(b2, 30); b2 = a; a = t;
@@ -1568,7 +1506,7 @@ function syncPanels(){
   const v = sel ? sel.value : null;
   for (const el of document.querySelectorAll('.pre'))
     el.classList.toggle('sel', el.querySelector('input') === sel);
-  const adv = $('#advBox'), col = $('#colBox'), holo = $('#holoBox');
+  const adv = \$('#advBox'), col = $('#colBox'), holo = $('#holoBox');
   adv.classList.toggle('off',  v !== '2');
   col.classList.toggle('off',  v !== '3');
   holo.classList.toggle('off', v !== '4');
@@ -1579,7 +1517,7 @@ function syncPanels(){
 
 async function load(file){
   FILE = file; ORIG = null; BUN = null; KIND = null; DET = null;
-  $('#go').disabled = true;
+  \$('#go').disabled = true;
   render('#out', '');
   let buf;
   try { buf = await file.arrayBuffer(); }
@@ -1615,19 +1553,19 @@ async function load(file){
     <tr><td>Định dạng</td><td>UnityFS fmt ${BUN.fmt} · ${esc(BUN.rev)}</td></tr>
     <tr><td>Block</td><td>${BUN.blocks.length} · ${comp ? 'có nén' : 'uncompressed'} · flags 0x${hx(BUN.flags)}</td></tr>
     ${node ? `<tr><td>Node</td><td>${esc(node.name)} ·${node.size.toLocaleString('vi-VN')} byte</td></tr>` : ''}
-    ${det.detail ? `<tr><td>Nhận diện</td><td>${esc(det.detail)}</td></tr>` : ''}
+    ${det.detail ? `<tr><td>Nhận diện</td><td>\${esc(det.detail)}</td></tr>` : ''}
   </table></div>`);
 
-  $('#drop').classList.add('has');
-  $('#dropText').innerHTML =
+  \$('#drop').classList.add('has');
+  \$('#dropText').innerHTML =
     `<b>${esc(file.name)}</b><span>${ORIG.length.toLocaleString('vi-VN')} byte — bấm để chọn file khác</span>`;
   applyKind(KIND);
-  $('#go').disabled = !KIND;
+  \$('#go').disabled = !KIND;
 }
 
-$('#go').onclick = async () => {
+\$('#go').onclick = async () => {
   const p = document.querySelector('input[name=p]:checked').value;
-  const btn = $('#go');
+  const btn = \$('#go');
   btn.disabled = true;
   const label = btn.textContent;
   btn.textContent = 'Đang xử lý…';
@@ -1640,7 +1578,7 @@ $('#go').onclick = async () => {
     });
     else if (p === '3') {
       const grab = (id, name) => {
-        const v = hex2rgb($('#' + id).value);
+        const v = hex2rgb(\$('#' + id).value);
         if (!v) throw new Error(`Mã màu ${name} không hợp lệ: "${$('#'+id).value}" (cần dạng #RRGGBB).`);
         return v;
       };
@@ -1648,23 +1586,23 @@ $('#go').onclick = async () => {
         xray:  grab('tXray', 'súng'),
         line:  grab('tLine', 'viền súng'),
         dim:   grab('tDim',  'keo'),
-        width: parseFloat($('#rWidth').value),
-        alpha: parseFloat($('#rAlpha').value)
+        width: parseFloat(\$('#rWidth').value),
+        alpha: parseFloat(\$('#rAlpha').value)
       });
     }
     else {
       const grab = (id, name) => {
-        const v = hex2rgb($('#' + id).value);
+        const v = hex2rgb(\$('#' + id).value);
         if (!v) throw new Error(`Mã màu ${name} không hợp lệ: "${$('#'+id).value}" (cần dạng #RRGGBB).`);
         return v;
       };
       res = await applyPreset4(ORIG, BUN, {
-        tint:  grab('tTint', 'nhân vật'),  tintA:  parseFloat($('#rTintA').value),
-        rim:   grab('tRim',  'viền'),      rimA:   parseFloat($('#rRimA').value),
-        scan:  grab('tScan', 'quét'),      scanA:  parseFloat($('#rScanA').value),
-        xray:   $('#kXray').checked,
-        line:   $('#kLine').checked,
-        glitch: $('#kGlitch').checked
+        tint:  grab('tTint', 'nhân vật'),  tintA:  parseFloat(\$('#rTintA').value),
+        rim:   grab('tRim',  'viền'),      rimA:   parseFloat(\$('#rRimA').value),
+        scan:  grab('tScan', 'quét'),      scanA:  parseFloat(\$('#rScanA').value),
+        xray:   \$('#kXray').checked,
+        line:   \$('#kLine').checked,
+        glitch: \$('#kGlitch').checked
       });
     }
   } catch(e){
@@ -1682,25 +1620,25 @@ $('#go').onclick = async () => {
   render('#out', `
     <div class="msg ok">${res.note}</div>
     <div class="panel"><h2>Thay đổi</h2><div class="hexwrap"><table class="hex">
-      <tr>${res.cols.map(c => `<th>${esc(c)}</th>`).join('')}</tr>
+      <tr>${res.cols.map(c => `<th>\${esc(c)}</th>`).join('')}</tr>
       ${res.rows.map(r => `<tr>
-        <td class="dim">${esc(r[0])}</td><td class="dim">${esc(r[1])}</td>
-        <td class="old">${res.html ? r[2] : esc(r[2])}</td>
-        <td class="new">${res.html ? r[3] : esc(r[3])}</td></tr>`).join('')}
+        <td class="dim">\${esc(r[0])}</td><td class="dim">\${esc(r[1])}</td>
+        <td class="old">\${res.html ? r[2] : esc(r[2])}</td>
+        <td class="new">\${res.html ? r[3] : esc(r[3])}</td></tr>`).join('')}
     </table></div>
-    ${res.extra ? `<div class="note"><b>_Path sau khi rút gọn</b> (chỉ dùng ở editor; runtime tra bằng _Name và PPtr):<br>${
+    ${res.extra ? `<div class="note"><b>_Path sau khi rút gọn</b> (chỉ dùng ở editor; runtime tra bằng _Name và PPtr):<br>\${
       res.extra.names.map((n,i) => `<code>${esc(n)}</code> → ${esc(res.extra.paths[i])}`).join('<br>')}</div>` : ''}
     </div>
     <div class="panel"><h2>Kết quả</h2><table>
       <tr><td>Dung lượng</td><td>${res.out.length.toLocaleString('vi-VN')} byte ${same ? '— khớp file nguồn' : `— <b>khác nguồn ${(res.out.length-ORIG.length > 0 ? '+' : '')}${res.out.length-ORIG.length}</b>`}</td></tr>
-      ${same ? `<tr><td>Số byte đổi</td><td>${nd.toLocaleString('vi-VN')}</td></tr>` : ''}
-      ${KIND && DET && DET.build ? `<tr><td>Phiên bản</td><td>${esc(DET.build)}</td></tr>` : ''}
+      ${same ? `<tr><td>Số byte đổi</td><td>\${nd.toLocaleString('vi-VN')}</td></tr>` : ''}
+      ${KIND && DET && DET.build ? `<tr><td>Phiên bản</td><td>\${esc(DET.build)}</td></tr>` : ''}
     </table>
     <div class="note" style="margin-top:12px">File tải về giữ nguyên tên gốc, chép đè thẳng lên file cũ:</div>
     <span class="fname">${esc(FILE.name)}</span>
     <div class="row" style="margin-top:14px"><button id="dl" type="button">Tải file đã sửa</button></div></div>`);
 
-  $('#dl').onclick = () => {
+  \$('#dl').onclick = () => {
     if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.saveFile) {
       const bytes = res.out;
       const CHUNK = 65536;
@@ -1730,11 +1668,11 @@ for (const el of document.querySelectorAll('.pre')){
   el.classList.add('off');
   el.querySelector('input').checked = false;
 }
-for (const id of ['advBox', 'colBox', 'holoBox']) $('#' + id).classList.add('off');
-$('#go').disabled = true;
+for (const id of ['advBox', 'colBox', 'holoBox']) \$('#' + id).classList.add('off');
+\$('#go').disabled = true;
 
 for (const [c, t] of [['cXray','tXray'], ['cLine','tLine'], ['cDim','tDim'],
-                      ['cTint','tTint'], ['cRim','tRim'], ['cScan','tScan']]){
+                     ['cTint','tTint'], ['cRim','tRim'], ['cScan','tScan']]){
   const cel = $('#' + c), tel = $('#' + t);
   cel.addEventListener('input', () => {
     tel.value = cel.value.toUpperCase();
