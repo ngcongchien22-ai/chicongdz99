@@ -141,6 +141,17 @@
     display: block;
   }
 
+  .empty-tab {
+    text-align: center;
+    color: var(--muted);
+    padding: 40px 20px;
+    font-size: 14px;
+    background: linear-gradient(145deg,rgba(14,23,41,.84),rgba(7,13,25,.78));
+    border: 1px solid var(--line);
+    border-radius: 15px;
+    backdrop-filter: blur(15px);
+  }
+
   /* ── hướng dẫn ── */
   .wrap{max-width:100%;margin:0 auto}
 
@@ -662,35 +673,17 @@ input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer}
     <button class="tab-btn" data-tab="dinh-vi">Định Vị</button>
   </div>
 
-  <!-- TAB 1: AIM THƯỜNG -->
+  <!-- TAB 1: AIM THƯỜNG (Để trống) -->
   <div id="aim-thuong" class="tab-content active">
-    <div class="presets">
-      <label class="pre sel">
-        <input type="radio" name="p" value="1" checked>
-        <div>
-          <div class="t">1 · Dị Tật Aim Head</div>
-          <div class="d">Tráo tên <code>bone_Hips</code> ↔ <code>bone_Neck</code> trong 2 mesh xương. Sửa tại chỗ, đổi 16 byte.</div>
-          <div class="n">bone_Hips ⇄ bone_Neck · nam + nữ</div>
-        </div>
-      </label>
-    </div>
+    <div class="empty-tab">Tab Aim Thường đang trống.</div>
   </div>
 
-  <!-- TAB 2: AIM VIP -->
+  <!-- TAB 2: AIM VIP (Để trống) -->
   <div id="aim-vip" class="tab-content">
-    <div class="presets">
-      <label class="pre">
-        <input type="radio" name="p" value="2">
-        <div>
-          <div class="t">2 · AimDrag Cân Cap USP</div>
-          <div class="d">Đổi <code>bone_Left_Spine_Backpack</code> thành <code>bone_Head</code> giả ở cả hai mesh, kèm indexer 12 mục. Dựng lại bundle.</div>
-          <div class="n">nam x=−0.313340 · nữ x=−0.23 z=−0.01 · scale ±1.5555556</div>
-        </div>
-      </label>
-    </div>
+    <div class="empty-tab">Tab Aim VIP đang trống.</div>
   </div>
 
-  <!-- TAB 3: ĐỊNH VỊ (Bao gồm chọn file, màu sắc, tinh chỉnh preset 2 và hướng dẫn sử dụng) -->
+  <!-- TAB 3: ĐỊNH VỊ (Chứa chọn file, màu sắc, cấu hình và hướng dẫn) -->
   <div id="dinh-vi" class="tab-content">
     <div id="drop">
       <div id="dropText">
