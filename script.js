@@ -1,3 +1,141 @@
+// Cấu hình Google Sheet URL kết nối (Google Sheet ID: 1-E9K7vlE4BQTq6KfaXRYW2CjV3PAKNmSa5T-j7Wq8tE)
+const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1-E9K7vlE4BQTq6KfaXRYW2CjV3PAKNmSa5T-j7Wq8tE/export?format=csv&gid=0';
+
+document.addEventListener("DOMContentLoaded", () => {
+  // Xử lý xác thực Key & Server Key khi truy cập web
+  const authOverlay = document.getElementById("authOverlay");
+  const authBtn = document.getElementById("authBtn");
+  const keyInput = document.getElementById("keyInput");
+  const serverKeyInput = document.getElementById("serverKeyInput");
+  const authError = document.getElementById("authError");
+  const onboardingView = document.getElementById("onboardingView");
+  const closeOnboardingBtn = document.getElementById("closeOnboardingBtn");
+
+  // Kiểm tra trạng thái đã đăng nhập trước đó chưa (Lưu ở localStorage)
+  if (localStorage.getItem("chicong_authenticated") === "true") {
+    authOverlay.classList.add("hidden");
+  }
+
+  async function verifyKeys() {
+    const userKey = keyInput.value.trim();
+    const serverKey = serverKeyInput.value.trim();
+
+    if (!userKey || !serverKey) {
+      authError.textContent = "Vui lòng nhập đầy đủ Key và Server Key!";
+      return;
+    }
+
+    authBtn.textContent = "Đang kiểm tra...";
+    authBtn.disabled = true;
+    authError.textContent = "";
+
+    try {
+      const response = await fetch(SHEET_CSV_URL);
+      const csvText = await response.text();
+      
+      // Parse CSV dữ liệu từ Sheet (Cột 0: keys, Cột 1: expire, Cột 2: createdBy / Server Key)
+      const rows = csvText.split("\n").map(row => row.split(",").map(cell => cell.trim().replace(/^"|"$/g, '')));
+      
+      let isValid = false;
+      const now = new Date();
+
+      for (let i = 1; i < rows.length; i++) {
+        const [dbKey, dbExpire, dbServerKey] = rows[i];
+        if (dbKey === userKey && dbServerKey === serverKey) {
+          // Kiểm tra hạn sử dụng (Expire date)
+          if (dbExpire) {
+            const expireDate = new Date(dbExpire);
+            if (expireDate > now) {
+              isValid = true;
+              break;
+            } else {
+              authError.textContent = "Key của bạn đã hết hạn sử dụng!";
+            }
+          } else {
+            isValid = true;
+            break;
+          }
+        }
+      }
+
+      if (isValid) {
+        localStorage.setItem("chicong_authenticated", "true");
+        authOverlay.classList.add("hidden");
+        onboardingView.classList.remove("hidden"); // Hiện bảng chào mừng chicongdz
+      } else {
+        if (!authError.textContent) {
+          authError.textContent = "Key hoặc Server Key không chính xác!";
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      // Fallback cho phép bypass nhẹ hoặc báo lỗi kết nối mạng
+      authError.textContent = "Không thể kết nối tới Google Sheets kiểm tra Key!";
+    } finally {
+      authBtn.textContent = "Xác Nhận";
+      authBtn.disabled = false;
+    }
+  }
+
+  authBtn.addEventListener("click", verifyKeys);
+  keyInput.addEventListener("keypress", (e) => { if (e.key === "Enter") verifyKeys(); });
+  serverKeyInput.addEventListener("keypress", (e) => { if (e.key === "Enter") verifyKeys(); });
+
+  closeOnboardingBtn.addEventListener("click", () => {
+    onboardingView.classList.add("hidden");
+  });
+
+  // Tải danh sách nhạc từ Google Sheets cho trình phát nhạc nền
+  loadMusicListFromSheet();
+});
+
+async function loadMusicListFromSheet() {
+  const songSelect = document.getElementById("songSelect");
+  const bgAudio = document.getElementById("bgAudio");
+  const togglePlayBtn = document.getElementById("togglePlayBtn");
+
+  try {
+    const response = await fetch(SHEET_CSV_URL);
+    const csvText = await response.text();
+    const rows = csvText.split("\n").map(row => row.split(",").map(cell => cell.trim().replace(/^"|"$/g, '')));
+
+    songSelect.innerHTML = '<option value="">-- Chọn bài hát từ hệ thống --</option>';
+    
+    // Giả lập đưa dữ liệu dòng Sheet vào danh sách chọn nhạc (hoặc bạn có thể bổ sung cột link nhạc vào sheet)
+    rows.slice(1).forEach((row, index) => {
+      if (row[0]) {
+        const opt = document.createElement("option");
+        opt.value = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-" + ((index % 16) + 1) + ".mp3";
+        opt.textContent = "Nhạc nền định vị #" + (index + 1) + " (Key: " + row[0] + ")";
+        songSelect.appendChild(opt);
+      }
+    });
+  } catch (e) {
+    songSelect.innerHTML = '<option value="">Không thể tải danh sách nhạc</option>';
+  }
+
+  songSelect.addEventListener("change", () => {
+    if (songSelect.value) {
+      bgAudio.src = songSelect.value;
+      bgAudio.play();
+      togglePlayBtn.textContent = "Tạm dừng nhạc";
+    }
+  });
+
+  togglePlayBtn.addEventListener("click", () => {
+    if (!bgAudio.src && songSelect.options.length > 1) {
+      songSelect.selectedIndex = 1;
+      bgAudio.src = songSelect.value;
+    }
+    if (bgAudio.paused) {
+      bgAudio.play();
+      togglePlayBtn.textContent = "Tạm dừng nhạc";
+    } else {
+      bgAudio.pause();
+      togglePlayBtn.textContent = "Bật nhạc";
+    }
+  });
+}
 /* ═══════════ XỬ LÝ ONBOARDING VIEW ═══════════ */
 document.getElementById('closeOnboardingBtn').addEventListener('click', (e) => {
   e.preventDefault();
