@@ -60,225 +60,531 @@
     0% { transform: scale(0.9); opacity: 0; }
     100% { transform: scale(1); opacity: 1; }
   }
-  .onboarding-icon { font-size: 42px; margin-bottom: 14px; }
+  .onboarding-icon {
+    font-size: 42px;
+    margin-bottom: 14px;
+  }
   .onboarding-title {
-    font-size: 22px; font-weight: 700; color: #fff; margin: 0 0 8px; letter-spacing: -0.01em;
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 8px;
+    letter-spacing: -0.01em;
   }
   .onboarding-title span {
     background: linear-gradient(135deg, #4A7DFF, #a855f7);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
-  .onboarding-desc { color: var(--muted); font-size: 14px; margin: 0 0 24px; line-height: 1.5; }
+  .onboarding-desc {
+    color: var(--muted);
+    font-size: 14px;
+    margin: 0 0 24px;
+    line-height: 1.5;
+  }
   .onboarding-btn {
-    width: 100%; padding: 13px; font-size: 15px; font-weight: 600; border-radius: 12px;
-    background: linear-gradient(135deg, #2E63DB, #6040C8); color: #fff; border: 0; cursor: pointer;
-    box-shadow: 0 4px 15px rgba(74, 125, 255, 0.4); transition: filter 0.15s;
+    width: 100%;
+    padding: 13px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #2E63DB, #6040C8);
+    color: #fff;
+    border: 0;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(74, 125, 255, 0.4);
+    transition: filter 0.15s;
   }
-  .onboarding-btn:hover { filter: brightness(1.08); }
-
-  /* ── NAVIGATION TABS ── */
-  .nav-tabs {
-    display: flex; gap: 8px; margin-bottom: 16px;
-    background: rgba(7, 13, 26, 0.6); padding: 6px; border-radius: 14px;
-    border: 1px solid var(--line); backdrop-filter: blur(10px);
-  }
-  .tab-btn {
-    flex: 1; padding: 10px; background: transparent; border: none; color: var(--muted);
-    font-weight: 700; font-size: 13.5px; border-radius: 10px; cursor: pointer;
-    transition: all 0.2s ease; box-shadow: none;
-  }
-  .tab-btn:hover { color: #fff; background: rgba(91,140,255,0.08); transform: none; }
-  .tab-btn.active {
-    background: linear-gradient(135deg, #4e80ff, #7055e8); color: #fff;
-    box-shadow: 0 4px 15px rgba(74,125,255,0.3);
+  .onboarding-btn:hover {
+    filter: brightness(1.08);
   }
 
-  .tab-content { display: none; }
-  .tab-content.active { display: block; }
-
-  /* ── GIAO DIỆN CHỨC NĂNG (AIM THƯỜNG / VIP) ── */
-  .section-title {
-    font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase;
-    color: #9db7ff; margin: 0 0 10px; display: flex; align-items: center; gap: 8px;
-  }
-  .section-title span {
-    width: 22px; height: 22px; border-radius: 6px; display: inline-flex;
-    align-items: center; justify-content: center; color: #fff;
-    background: linear-gradient(135deg, var(--accent), #784fe9); font-size: 11px;
-  }
-
-  .upload-wrapper {
-    border: 1.5px dashed rgba(91,140,255,.42); border-radius: 15px; padding: 20px 16px;
-    text-align: center; cursor: pointer; transition: .2s ease;
-    background: radial-gradient(circle at 50% 0%, rgba(91,140,255,.12), transparent 58%), rgba(8,15,29,.62);
-    margin-bottom: 12px; position: relative; overflow: hidden;
-  }
-  .upload-wrapper input[type="file"] {
-    position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;
-  }
-  .upload-wrapper:hover { border-color: rgba(91,140,255,.8); background: rgba(14,26,48,.76); }
-  .up-icon { font-size: 24px; margin-bottom: 6px; }
-  .up-text { font-weight: 700; font-size: 14px; color: #f1f5ff; margin-bottom: 3px; }
-  .up-sub { color: var(--muted); font-size: 11.5px; }
-
-  .file-info {
-    background: var(--chip); border: 1px solid rgba(91,140,255,.12); border-radius: 10px;
-    padding: 10px 12px; margin-bottom: 16px; display: none;
-  }
-  .file-info.show { display: block; }
-  .file-name { font-family: var(--mono); font-size: 12px; color: #d9e5fb; word-break: break-all; margin-bottom: 4px; }
-  .file-meta { display: flex; justify-content: space-between; font-size: 11.5px; color: var(--muted); }
-  .file-meta .val { color: var(--ok); font-family: var(--mono); }
-
-  .pkg-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
-  @media(max-width: 480px) { .pkg-grid { grid-template-columns: repeat(2, 1fr); } }
-
-  .pkg-card {
-    background: linear-gradient(145deg, rgba(14,23,41,.78), rgba(8,14,27,.70));
-    border: 1px solid rgba(91,140,255,.17); border-radius: 12px; padding: 12px 10px;
-    cursor: pointer; transition: .18s ease; position: relative; text-align: center;
-  }
-  .pkg-card:hover { border-color: rgba(91,140,255,.45); transform: translateY(-1px); }
-  .pkg-card.selected {
-    border-color: rgba(91,140,255,.85);
-    background: linear-gradient(145deg, rgba(91,140,255,.2), rgba(91,140,255,.05)), rgba(10,17,32,.8);
-    box-shadow: 0 6px 20px rgba(42,75,150,.25);
-  }
-  .badges { position: absolute; top: 6px; right: 6px; display: flex; gap: 4px; }
-  .badge { font-size: 9px; font-weight: 800; padding: 2px 5px; border-radius: 4px; color: #fff; }
-  .badge.hot { background: #E85060; }
-  .badge.new { background: #E8A030; }
-  .badge.vip { background: #a855f7; }
-  .pkg-title span { display: block; font-size: 18px; margin-bottom: 4px; }
-  .pkg-title { font-size: 12.5px; font-weight: 700; color: #f0f5ff; }
-
-  .btn-submit {
-    width: 100%; padding: 13px; font-size: 14.5px; font-weight: 750; border: 0;
-    border-radius: 11px; background: linear-gradient(135deg,#4e80ff,#7055e8); color: #fff;
-    cursor: pointer; box-shadow: 0 8px 23px rgba(74,125,255,.28); transition: .18s ease;
-  }
-  .btn-submit:hover:not(:disabled) { filter: brightness(1.08); transform: translateY(-1px); }
-  .btn-submit:disabled { opacity: .42; cursor: not-allowed; box-shadow: none; }
-
-  /* VIP Lock Screen */
-  #vipLockScreen {
-    background: linear-gradient(145deg, rgba(14,24,43,.9), rgba(7,13,26,.85));
-    border: 1px solid rgba(168, 85, 247, 0.3); border-radius: 18px; padding: 24px; text-align: center;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-  }
-  .lock-icon { font-size: 40px; margin-bottom: 10px; }
-  #vipLockScreen h3 { font-size: 16px; color: #c084fc; margin: 0 0 6px; text-transform: uppercase; letter-spacing: 1px; }
-  #vipLockScreen p { color: var(--muted); font-size: 13px; margin: 0 0 16px; }
-  .vip-input-wrap { display: flex; gap: 8px; max-width: 320px; margin: 0 auto 10px; }
-  .vip-input {
-    flex: 1; font: inherit; font-family: var(--mono); font-size: 12.5px; padding: 10px;
-    border: 1px solid rgba(168, 85, 247, 0.4); border-radius: 10px; background: rgba(5,10,20,.8);
-    color: #fff; text-align: center; text-transform: uppercase; outline: none; letter-spacing: 1px;
-  }
-  .vip-input:focus { border-color: #a855f7; box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.15); }
-  .btn-unlock {
-    padding: 0 16px; font-weight: 700; font-size: 13px; border-radius: 10px; border: 0;
-    background: linear-gradient(135deg, #a855f7, #7e22ce); color: #fff; cursor: pointer;
-  }
-  .vip-msg { font-size: 12.5px; margin-top: 8px; }
-  .vip-msg.bad { color: var(--bad); }
-  .vip-msg.ok { color: var(--ok); }
-
-  /* Overlay Progress */
-  #overlay {
-    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-    background: rgba(3, 7, 18, 0.85); backdrop-filter: blur(12px);
-    display: none; align-items: center; justify-content: center; z-index: 999999; padding: 20px;
-  }
-  .processing-card {
-    background: rgba(13, 21, 38, 0.95); border: 1px solid rgba(74, 125, 255, 0.35);
-    border-radius: 20px; padding: 26px 20px; max-width: 320px; width: 100%; text-align: center;
-  }
-  .proc-icon { font-size: 38px; margin-bottom: 10px; animation: bounce 1s infinite alternate; }
-  @keyframes bounce { 0% { transform: translateY(0); } 100% { transform: translateY(-6px); } }
-  .proc-title { font-size: 17px; font-weight: 700; color: #fff; margin-bottom: 4px; }
-  .proc-desc { color: var(--muted); font-size: 12.5px; margin-bottom: 18px; }
-  .proc-bar-bg { width: 100%; height: 8px; background: rgba(91,140,255,0.15); border-radius: 4px; overflow: hidden; margin-bottom: 8px; }
-  .proc-bar-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #4e80ff, #a855f7); border-radius: 4px; transition: width 0.1s linear; }
-  .proc-percent { font-family: var(--mono); font-size: 13px; color: #a5b4fc; font-weight: 700; }
-
-  .msg { border-radius: 10px; padding: 11px 14px; font-size: 13.5px; margin-top: 14px; display: none; border: 1px solid; }
-  .msg.ok { color: var(--ok); border-color: rgba(40,217,139,.3); background: rgba(40,217,139,.07); display: block; }
-  .msg.bad { color: var(--bad); border-color: rgba(255,100,120,.3); background: rgba(255,100,120,.07); display: block; }
-
-  /* ── Các style cho tab định vị, bảng màu, hướng dẫn ── */
+  /* ── hướng dẫn ── */
   .wrap{max-width:100%;margin:0 auto}
-  .panel{
-    background:linear-gradient(145deg,rgba(14,23,41,.84),rgba(7,13,25,.78));
-    border:1px solid var(--line); border-radius:15px; padding:16px; margin-bottom:14px;
-    box-shadow:0 12px 32px rgba(0,0,0,.19); backdrop-filter:blur(15px);
-  }
-  #drop{
-    border:1.5px dashed rgba(91,140,255,.42); border-radius:17px; padding:30px 16px;
-    text-align:center; cursor:pointer; background:rgba(8,15,29,.62); margin-bottom:15px; position: relative;
-  }
-  #drop b{display:block;font-size:15px;margin-bottom:5px;color:#f1f5ff}
-  #drop span{color:var(--muted);font-size:12.5px}
-  .hide{display:none}
 
-  h2{
-    font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted);
-    margin:0 0 11px; font-weight:800;
-  }
-  .cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-top:12px}
-  .cfld label{display:block;font-size:11.5px;color:var(--muted);margin-bottom:6px}
-  .cfld label .dim{font-family:var(--mono);font-size:11px}
-  .crow{display:flex;gap:8px;align-items:center}
-  .crow input[type=color]{
-    width:44px;height:36px;padding:2px;border:1px solid rgba(91,140,255,.2);
-    border-radius:8px;background:rgba(5,10,20,.68);cursor:pointer;flex:none;
-  }
-  .crow input[type=text]{
-    flex:1;min-width:0;font:inherit;font-family:var(--mono);font-size:12.5px;
-    padding:8px 9px;border:1px solid rgba(91,140,255,.2);border-radius:8px;
-    background:rgba(5,10,20,.68);color:var(--ink);text-transform:uppercase;outline:none;
-  }
-  .wfld,.afld{margin-top:16px}
-  .wfld label,.afld label{display:block;font-size:11.5px;color:var(--muted);margin-bottom:7px}
-  .wfld label b,.afld label b{color:var(--ink);font-family:var(--mono)}
-  input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer}
-  .note{color:var(--muted);font-size:12px;margin-top:10px;line-height:1.55}
+.guide{
+  border-radius:18px;
+  padding:17px;
+  margin-bottom:15px;
+  background:linear-gradient(145deg,rgba(14,24,43,.88),rgba(7,13,26,.78));
+  border:1px solid var(--line);
+  box-shadow:0 14px 36px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.035);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  position:relative;
+  overflow:hidden;
+}
 
-  .adv{margin-top:12px;border-top:1px solid var(--line);padding-top:12px}
-  .adv summary{
-    cursor:pointer;color:#9aabca;font-size:12.5px;font-weight:650;user-select:none;list-style:none;
-    display:flex;align-items:center;gap:8px;
-  }
-  .adv summary::-webkit-details-marker{display:none}
-  .adv summary::before{
-    content:"›";width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;
-    border-radius:7px;background:rgba(91,140,255,.08);color:#8eabef;font-size:17px;transition:.2s ease;
-  }
-  .adv[open] summary::before{transform:rotate(90deg);background:rgba(91,140,255,.15)}
+.guide::before{
+  content:"";
+  position:absolute;
+  left:8%;right:8%;top:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--accent),var(--accent2),transparent);
+}
 
-  .fxrow{display:flex;gap:12px 20px;flex-wrap:wrap;margin-top:16px;padding-top:13px;border-top:1px solid rgba(91,140,255,.1)}
-  .chk{display:flex;gap:8px;align-items:center;cursor:pointer;font-size:13.5px}
-  .chk input{accent-color:var(--accent);width:16px;height:16px;cursor:pointer}
-  .chk .dim{color:var(--muted);font-family:var(--mono);font-size:11px}
+.guide-title{
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:#9db7ff;
+  margin:0 0 13px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
 
-  .guide{
-    border-radius:18px; padding:17px; margin-top:14px;
-    background:linear-gradient(145deg,rgba(14,24,43,.88),rgba(7,13,26,.78));
-    border:1px solid var(--line); backdrop-filter:blur(16px);
+.guide-title::before{
+  content:"ℹ";
+  width:23px;height:23px;
+  border-radius:8px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  color:#fff;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  box-shadow:0 5px 16px rgba(91,140,255,.25);
+}
+
+.steps{
+  list-style:none;
+  margin:0;
+  padding:0;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.steps li{
+  display:flex;
+  gap:10px;
+  align-items:flex-start;
+  font-size:13px;
+  color:var(--ink);
+  padding:7px 8px;
+  border-radius:10px;
+  transition:.18s ease;
+}
+
+.steps li:hover{
+  background:rgba(91,140,255,.055);
+  transform:translateX(2px);
+}
+
+.step-n{
+  min-width:23px;
+  height:23px;
+  border-radius:8px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:11px;
+  font-weight:900;
+  background:linear-gradient(135deg,#477cff,#784fe9);
+  color:#fff;
+  margin-top:1px;
+  box-shadow:0 5px 14px rgba(91,140,255,.22);
+}
+
+.steps li b{color:#f1f5ff}
+.steps li span{color:var(--muted);font-size:12px;display:block;margin-top:2px}
+
+.panel{
+  background:linear-gradient(145deg,rgba(14,23,41,.84),rgba(7,13,25,.78));
+  border:1px solid var(--line);
+  border-radius:15px;
+  padding:16px;
+  margin-bottom:14px;
+  box-shadow:0 12px 32px rgba(0,0,0,.19),inset 0 1px 0 rgba(255,255,255,.025);
+  backdrop-filter:blur(15px);
+  -webkit-backdrop-filter:blur(15px);
+}
+
+#drop{
+  border:1.5px dashed rgba(91,140,255,.42);
+  border-radius:17px;
+  padding:30px 16px;
+  text-align:center;
+  cursor:pointer;
+  transition:.2s ease;
+  background:
+    radial-gradient(circle at 50% 0%,rgba(91,140,255,.12),transparent 58%),
+    rgba(8,15,29,.62);
+  margin-bottom:15px;
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+}
+
+#drop::before{
+  content:"↥";
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:46px;height:46px;
+  margin:0 auto 11px;
+  border-radius:13px;
+  color:#dce7ff;
+  font-size:22px;
+  background:linear-gradient(145deg,rgba(91,140,255,.17),rgba(139,92,246,.12));
+  border:1px solid rgba(116,151,255,.22);
+}
+
+#drop:hover,#drop.over{
+  border-color:rgba(91,140,255,.8);
+  background:
+    radial-gradient(circle at 50% 0%,rgba(91,140,255,.18),transparent 58%),
+    rgba(14,26,48,.76);
+  transform:translateY(-1px);
+  box-shadow:0 12px 30px rgba(0,0,0,.18),0 0 26px rgba(91,140,255,.1);
+}
+
+#drop b{display:block;font-size:15px;margin-bottom:5px;color:#f1f5ff}
+#drop span{color:var(--muted);font-size:12.5px}
+#drop.has{padding:15px 16px;border-style:solid;border-color:rgba(91,140,255,.62)}
+
+h2{
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  color:var(--muted);
+  margin:0 0 11px;
+  font-weight:800;
+}
+
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+td{padding:6px 0;vertical-align:top}
+td:first-child{color:var(--muted);width:180px;padding-right:14px;white-space:nowrap}
+td:last-child{font-family:var(--mono);font-size:12.5px;word-break:break-all;color:#dfe8fa}
+
+.hexwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+table.hex{
+  font-family:var(--mono);
+  font-size:12px;
+  white-space:nowrap;
+  width:auto;
+  min-width:100%;
+}
+
+table.hex th{
+  text-align:left;
+  font-weight:700;
+  color:var(--muted);
+  font-size:10px;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  padding:0 16px 7px 0;
+  border-bottom:1px solid var(--line);
+}
+
+table.hex td{
+  padding:6px 16px 6px 0;
+  border-bottom:1px solid var(--line);
+  width:auto;
+  color:var(--ink);
+}
+
+table.hex td:first-child{width:auto;color:var(--muted)}
+table.hex tr:last-child td{border-bottom:0}
+.old{color:var(--bad)!important}
+.new{color:var(--ok)!important}
+.dim{color:var(--muted)}
+
+.presets{display:grid;gap:10px;margin-bottom:16px}
+
+.pre{
+  display:flex;
+  gap:12px;
+  align-items:flex-start;
+  border:1px solid rgba(91,140,255,.17);
+  border-radius:14px;
+  padding:13px 14px;
+  cursor:pointer;
+  background:linear-gradient(145deg,rgba(14,23,41,.78),rgba(8,14,27,.70));
+  transition:.2s ease;
+  backdrop-filter:blur(9px);
+  -webkit-backdrop-filter:blur(9px);
+  position:relative;
+  overflow:hidden;
+}
+
+.pre:hover{
+  border-color:rgba(91,140,255,.45);
+  transform:translateY(-1px);
+  box-shadow:0 9px 26px rgba(0,0,0,.18);
+}
+
+.pre.sel{
+  border-color:rgba(91,140,255,.85);
+  background:
+    linear-gradient(145deg,rgba(91,140,255,.13),rgba(91,140,255,.045)),
+    rgba(10,17,32,.8);
+  box-shadow:0 10px 28px rgba(42,75,150,.18);
+}
+
+.pre.sel::before{
+  content:"";
+  position:absolute;
+  left:0;top:11px;bottom:11px;
+  width:3px;
+  border-radius:0 4px 4px 0;
+  background:linear-gradient(180deg,#6d9bff,#8b5cf6);
+  box-shadow:0 0 13px rgba(91,140,255,.55);
+}
+
+.off{display:none !important}
+.pre input{margin:3px 0 0;accent-color:var(--accent);flex:none;width:16px;height:16px}
+.pre .t{font-weight:700;font-size:14.5px;margin-bottom:3px;color:#f0f5ff}
+.pre .d{color:var(--muted);font-size:12.5px;line-height:1.5}
+.pre .n{font-family:var(--mono);font-size:10.5px;color:#7184a6;margin-top:6px}
+
+.msg{
+  border-radius:10px;
+  padding:11px 14px;
+  font-size:13.5px;
+  margin-bottom:14px;
+  border:1px solid;
+}
+
+.msg.ok{
+  color:var(--ok);
+  border-color:rgba(40,217,139,.3);
+  background:rgba(40,217,139,.07);
+}
+
+.msg.bad{
+  color:var(--bad);
+  border-color:rgba(255,100,120,.3);
+  background:rgba(255,100,120,.07);
+}
+
+.msg.warn{
+  color:var(--warn);
+  border-color:rgba(255,184,77,.3);
+  background:rgba(255,184,77,.07);
+}
+
+button{
+  font:inherit;
+  font-size:14px;
+  font-weight:750;
+  border:0;
+  border-radius:11px;
+  padding:12px 24px;
+  background:linear-gradient(135deg,#4e80ff,#7055e8);
+  color:#fff;
+  cursor:pointer;
+  box-shadow:0 8px 23px rgba(74,125,255,.28),inset 0 1px 0 rgba(255,255,255,.13);
+  transition:.18s ease;
+}
+
+button:hover:not(:disabled){
+  filter:brightness(1.08);
+  transform:translateY(-1px);
+  box-shadow:0 11px 27px rgba(74,125,255,.35),inset 0 1px 0 rgba(255,255,255,.15);
+}
+
+button:active:not(:disabled){transform:scale(.985)}
+button:disabled{opacity:.42;cursor:not-allowed;box-shadow:none}
+
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.hide{display:none}
+
+code{
+  font-family:var(--mono);
+  font-size:11.5px;
+  color:#b9cbff;
+  background:rgba(91,140,255,.095);
+  border:1px solid rgba(91,140,255,.12);
+  padding:2px 6px;
+  border-radius:5px;
+}
+
+.note{color:var(--muted);font-size:12px;margin-top:10px;line-height:1.55}
+
+.fname{
+  font-family:var(--mono);
+  font-size:12px;
+  color:#d9e5fb;
+  background:var(--chip);
+  border:1px solid rgba(91,140,255,.12);
+  padding:8px 10px;
+  border-radius:8px;
+  word-break:break-all;
+  margin-top:6px;
+  display:block;
+}
+
+.adv{margin-top:12px;border-top:1px solid var(--line);padding-top:12px}
+
+.adv summary{
+  cursor:pointer;
+  color:#9aabca;
+  font-size:12.5px;
+  font-weight:650;
+  user-select:none;
+  list-style:none;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.adv summary::-webkit-details-marker{display:none}
+
+.adv summary::before{
+  content:"›";
+  width:22px;height:22px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:7px;
+  background:rgba(91,140,255,.08);
+  color:#8eabef;
+  font-size:17px;
+  transition:.2s ease;
+}
+
+.adv[open] summary::before{
+  transform:rotate(90deg);
+  background:rgba(91,140,255,.15);
+}
+
+.flds{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+  gap:10px;
+  margin-top:12px;
+}
+
+.fld label{display:block;font-size:11.5px;color:var(--muted);margin-bottom:4px}
+
+.fld input{
+  width:100%;
+  font:inherit;
+  font-family:var(--mono);
+  font-size:13px;
+  padding:8px 9px;
+  border:1px solid rgba(91,140,255,.2);
+  border-radius:8px;
+  background:rgba(5,10,20,.68);
+  color:var(--ink);
+  outline:none;
+}
+
+.fld input:focus,
+.crow input[type=text]:focus{
+  border-color:rgba(91,140,255,.62);
+  box-shadow:0 0 0 3px rgba(91,140,255,.08);
+}
+
+.cols{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+  gap:14px;
+  margin-top:12px;
+}
+
+.cfld label{display:block;font-size:11.5px;color:var(--muted);margin-bottom:6px}
+.cfld label .dim{font-family:var(--mono);font-size:11px}
+
+.crow{display:flex;gap:8px;align-items:center}
+
+.crow input[type=color]{
+  width:44px;height:36px;
+  padding:2px;
+  border:1px solid rgba(91,140,255,.2);
+  border-radius:8px;
+  background:rgba(5,10,20,.68);
+  cursor:pointer;
+  flex:none;
+}
+
+.crow input[type=text]{
+  flex:1;
+  min-width:0;
+  font:inherit;
+  font-family:var(--mono);
+  font-size:12.5px;
+  padding:8px 9px;
+  border:1px solid rgba(91,140,255,.2);
+  border-radius:8px;
+  background:rgba(5,10,20,.68);
+  color:var(--ink);
+  text-transform:uppercase;
+  outline:none;
+}
+
+.crow input[type=text].bad{border-color:var(--bad)}
+
+.wfld,.afld{margin-top:16px}
+.wfld label,.afld label{display:block;font-size:11.5px;color:var(--muted);margin-bottom:7px}
+.wfld label b,.afld label b{color:var(--ink);font-family:var(--mono)}
+input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer}
+
+.swatch{
+  display:inline-block;
+  width:11px;height:11px;
+  border-radius:3px;
+  vertical-align:-1px;
+  margin-right:6px;
+  border:1px solid rgba(128,128,128,.45);
+}
+
+.fxrow{
+  display:flex;
+  gap:12px 20px;
+  flex-wrap:wrap;
+  margin-top:16px;
+  padding-top:13px;
+  border-top:1px solid rgba(91,140,255,.1);
+}
+
+.chk{
+  display:flex;
+  gap:8px;
+  align-items:center;
+  cursor:pointer;
+  font-size:13.5px;
+}
+
+.chk input{
+  accent-color:var(--accent);
+  width:16px;height:16px;
+  cursor:pointer;
+}
+
+.chk .dim{color:var(--muted);font-family:var(--mono);font-size:11px}
+
+::-webkit-scrollbar{width:7px;height:7px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(105,130,180,.28);border-radius:99px}
+::-webkit-scrollbar-thumb:hover{background:rgba(105,130,180,.45)}
+
+::selection{background:rgba(91,140,255,.28);color:#fff}
+
+@media (max-width:620px){
+  body{padding:12px 11px 70px}
+  .panel,.guide{padding:14px;border-radius:15px}
+  .pre{padding:13px}
+  .presets-guide{grid-template-columns:1fr}
+  td:first-child{width:125px}
+  .cols{grid-template-columns:1fr}
+  .flds{grid-template-columns:1fr 1fr}
+  button{width:100%}
+}
+
+@media (max-width:390px){
+  .flds{grid-template-columns:1fr}
+  .pre .n{font-size:10px}
+}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    scroll-behavior:auto!important;
+    transition:none!important;
+    animation:none!important;
   }
-  .guide-title{
-    font-size:12px; font-weight:800; letter-spacing:.08em; text-transform:uppercase;
-    color:#9db7ff; margin:0 0 13px; display:flex; align-items:center; gap:8px;
-  }
-  .steps{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; }
-  .steps li{ display:flex; gap:10px; align-items:flex-start; font-size:13px; color:var(--ink); padding:7px 8px; border-radius:10px; }
-  .step-n{
-    min-width:23px; height:23px; border-radius:8px; display:flex; align-items:center;
-    justify-content:center; font-size:11px; font-weight:900; background:linear-gradient(135deg,#477cff,#784fe9); color:#fff;
-  }
-  .steps li b{color:#f1f5ff}
-  .steps li span{color:var(--muted);font-size:12px;display:block;margin-top:2px}
+}
 </style>
 </head>
 <body>
@@ -295,461 +601,202 @@
 
 <div class="wrap">
 
-  <!-- TRÌNH PHÁT NHẠC KẾT NỐI GOOGLE SHEETS (ĐỂ Ở TRÊN CÙNG 3 TAB) -->
+  <div id="drop">
+    <div id="dropText">
+      <b>Bấm để chọn file bundle</b>
+      <span>assetindexer / shaders / optionalavatarres_commonab_shader</span>
+    </div>
+    <input type="file" id="file" class="hide">
+  </div>
+
+  <div id="info"></div>
+
+  <!-- TRÌNH PHÁT NHẠC KẾT NỐI GOOGLE SHEETS -->
   <div class="panel" id="musicPanel">
     <h2>Trình phát nhạc nền</h2>
     <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
       <select id="songSelect" style="flex: 1; min-width: 200px; padding: 10px; border-radius: 8px; background: rgba(7,11,20,0.6); color: var(--ink); border: 1px solid rgba(74,125,255,0.22); font: inherit; font-size: 13.5px;">
         <option value="">-- Đang tải danh sách từ Google Sheets... --</option>
       </select>
-      <button id="togglePlayBtn" type="button" style="padding: 10px 16px; border-radius: 8px; background: linear-gradient(135deg,#4e80ff,#7055e8); color: #fff; border: 0; cursor: pointer; font-weight: 700;">Bật nhạc</button>
+      <button id="togglePlayBtn" type="button">Bật nhạc</button>
     </div>
     <audio id="bgAudio" loop></audio>
   </div>
 
-  <!-- HỆ THỐNG NAVIGATION TABS -->
-  <div class="nav-tabs">
-    <button class="tab-btn active" data-tab="tab-thuong">Aim Thường</button>
-    <button class="tab-btn" data-tab="tab-vip">Aim VIP</button>
-    <button class="tab-btn" data-tab="tab-dinhvi">Định Vị</button>
+  <div class="presets" id="presets">
+    <label class="pre sel">
+      <input type="radio" name="p" value="1" checked>
+      <div>
+        <div class="t">1 · Dị Tật Aim Head</div>
+        <div class="d">Tráo tên <code>bone_Hips</code> ↔ <code>bone_Neck</code> trong 2 mesh xương. Sửa tại chỗ, đổi 16 byte.</div>
+        <div class="n">bone_Hips ⇄ bone_Neck · nam + nữ</div>
+      </div>
+    </label>
+    <label class="pre">
+      <input type="radio" name="p" value="2">
+      <div>
+        <div class="t">2 · AimDrag Cân Cap USP</div>
+        <div class="d">Đổi <code>bone_Left_Spine_Backpack</code> thành <code>bone_Head</code> giả ở cả hai mesh, kèm indexer 12 mục. Dựng lại bundle.</div>
+        <div class="n">nam x=−0.313340 · nữ x=−0.23 z=−0.01 · scale ±1.5555556</div>
+      </div>
+    </label>
+    <label class="pre">
+      <input type="radio" name="p" value="3">
+      <div>
+        <div class="t">3 · Định vị súng</div>
+        <div class="d">Đổi màu súng, màu viền súng và màu keo của <code>backweapon</code>, <code>brmobilebumpspec</code>, <code>brmobilebumpspecdecal</code>. Nhận file <b>shaders</b> gốc hoặc đã mod.</div>
+        <div class="n">_XRayColor · _OutLineColor · _OutLineWidth · _DimColor</div>
+      </div>
+    </label>
+    <label class="pre">
+      <input type="radio" name="p" value="4">
+      <div>
+        <div class="t">4 · Định vị nhân vật</div>
+        <div class="d">Thay toàn bộ shader nhân vật (da, tóc, quần áo, mũ) bằng <code>hologram</code> phát sáng. Nhận file <b>optionalavatarres_commonab_shader</b> gốc hoặc đã mod.</div>
+        <div class="n">_TintColor · _RimColor · _ScanColor · đường quét · nhiễu</div>
+      </div>
+    </label>
   </div>
 
-  <!-- TAB 1: AIM THƯỜNG -->
-  <div id="tab-thuong" class="tab-content active">
-    <div class="section-title"><span>1</span> Tải File Bundle</div>
-    <div class="upload-wrapper">
-      <input type="file" id="fileThuong" onchange="handleFile('thuong', this)">
-      <div class="upload-btn" id="btnUploadThuong"><div class="up-icon">📂</div><div class="up-text" id="txtThuong">Chạm để chọn File</div><div class="up-sub">Hỗ trợ .bundle, .asset</div></div>
-    </div>
-    <div id="infoThuong" class="file-info">
-      <div class="file-name" id="nameThuong">—</div>
-      <div class="file-meta"><span class="label">Dung lượng</span><span class="val" id="sizeThuong">—</span></div>
-    </div>
-    <div class="section-title"><span>2</span> Chọn Chức Năng</div>
-    <div class="pkg-grid" id="listThuong">
-      <div class="pkg-card selected" data-val="aimchest" onclick="pickFunc('thuong', this)"><div class="badges"><span class="badge hot">HOT</span></div><div class="pkg-title"><span>🫀</span> AimChest</div></div>
-      <div class="pkg-card" data-val="aimneck" onclick="pickFunc('thuong', this)"><div class="badges"></div><div class="pkg-title"><span>🦴</span> AimNeck</div></div>
-      <div class="pkg-card" data-val="aimbody" onclick="pickFunc('thuong', this)"><div class="badges"></div><div class="pkg-title"><span>🧍</span> AimBody</div></div>
-      <div class="pkg-card" data-val="aimmagic" onclick="pickFunc('thuong', this)"><div class="badges"></div><div class="pkg-title"><span>🪄</span> Magic</div></div>
-      <div class="pkg-card" data-val="aimdrag" onclick="pickFunc('thuong', this)"><div class="badges"></div><div class="pkg-title"><span>🎣</span> AimDrag</div></div>
-      <div class="pkg-card" data-val="aimrobo" onclick="pickFunc('thuong', this)"><div class="badges"></div><div class="pkg-title"><span>🤖</span> AimRobo</div></div>
-      <div class="pkg-card" data-val="dragneck" onclick="pickFunc('thuong', this)"><div class="badges"></div><div class="pkg-title"><span>🎣🦴</span> Drag+Neck</div></div>
-      <div class="pkg-card" data-val="khoahead" onclick="pickFunc('thuong', this)"><div class="badges"></div><div class="pkg-title"><span>🔒💀</span> Khoá Đầu</div></div>
-      <div class="pkg-card" data-val="aimbung" onclick="pickFunc('thuong', this)"><div class="badges"><span class="badge new">NEW</span></div><div class="pkg-title"><span>🫃</span> Aim Bụng</div></div>
-    </div>
-    <button class="btn-submit" id="btnRunThuong" disabled onclick="runPatch('thuong')">Bắt Đầu Xử Lý</button>
-    <div id="msgThuong" class="msg"></div>
-  </div>
-
-  <!-- TAB 2: AIM VIP -->
-  <div id="tab-vip" class="tab-content">
-    <div id="vipLockScreen">
-      <div class="lock-icon">🔒</div>
-      <h3>VIP SECURITY LOCKED</h3>
-      <p>Yêu cầu nhập mã khóa VIP (15 ký tự) để mở khóa.</p>
-      <div class="vip-input-wrap">
-        <input type="text" id="vipKeyInput" class="vip-input" maxlength="15" placeholder="NHẬP MÃ 15 KÝ TỰ" autocomplete="off">
-        <button class="btn-unlock" onclick="unlockVip()">Mở Khóa</button>
-      </div>
-      <div id="vipKeyMsg" class="vip-msg"></div>
-    </div>
-
-    <div id="vipContent" style="display: none;">
-      <div class="section-title"><span>1</span> Tải File Bundle</div>
-      <div class="upload-wrapper">
-        <input type="file" id="fileVip" onchange="handleFile('vip', this)">
-        <div class="upload-btn" id="btnUploadVip"><div class="up-icon">📂</div><div class="up-text" id="txtVip">Chạm để chọn File</div><div class="up-sub">Hỗ trợ .bundle, .asset</div></div>
-      </div>
-      <div id="infoVip" class="file-info">
-        <div class="file-name" id="nameVip">—</div>
-        <div class="file-meta"><span class="label">Dung lượng</span><span class="val" id="sizeVip">—</span></div>
-      </div>
-      <div class="section-title"><span>2</span> Chức Năng VIP</div>
-      <div class="pkg-grid" id="listVip">
-        <div class="pkg-card selected" data-val="aimchestv2" onclick="pickFunc('vip', this)"><div class="badges"><span class="badge vip">VIP</span></div><div class="pkg-title"><span>🫀💥</span> AimChest V2</div></div>
-        <div class="pkg-card" data-val="aimhead" onclick="pickFunc('vip', this)"><div class="badges"><span class="badge vip">VIP</span></div><div class="pkg-title"><span>💀</span> AimHead</div></div>
-        <div class="pkg-card" data-val="lockneck" onclick="pickFunc('vip', this)"><div class="badges"><span class="badge vip">VIP</span></div><div class="pkg-title"><span>🔒🦴</span> LockNeck</div></div>
-        <div class="pkg-card" data-val="dragatena" onclick="pickFunc('vip', this)"><div class="badges"><span class="badge vip">VIP</span></div><div class="pkg-title"><span>🌠⚡</span> Drag+Athena</div></div>
-        <div class="pkg-card" data-val="draghead" onclick="pickFunc('vip', this)"><div class="badges"><span class="badge vip">VIP</span></div><div class="pkg-title"><span>🌠💀</span> Drag+Head</div></div>
-        <div class="pkg-card" data-val="ditat" onclick="pickFunc('vip', this)"><div class="badges"><span class="badge vip">VIP</span></div><div class="pkg-title"><span>👑</span> Dị Tật R8</div></div>
-        <div class="pkg-card" data-val="headatena" onclick="pickFunc('vip', this)"><div class="badges"><span class="badge new">NEW</span></div><div class="pkg-title"><span>💀⚡</span> Head+Athena</div></div>
-      </div>
-      <button class="btn-submit" id="btnRunVip" disabled onclick="runPatch('vip')">Bắt Đầu Xử Lý</button>
-      <div id="msgVip" class="msg"></div>
-    </div>
-  </div>
-
-  <!-- TAB 3: ĐỊNH VỊ (CHỨA PHẦN CHỌN FILE, MÀU SẮC, BLABLA VÀ HƯỚNG DẪN SỬ DỤNG) -->
-  <div id="tab-dinhvi" class="tab-content">
-    
-    <div id="drop">
-      <div id="dropText">
-        <b>Bấm để chọn file bundle định vị</b>
-        <span>assetindexer / shaders / optionalavatarres_commonab_shader</span>
-      </div>
-      <input type="file" id="file" class="hide">
-    </div>
-
-    <div id="info"></div>
-
-    <div class="presets">
-      <label class="pre sel" style="display:flex; gap:12px; align-items:flex-start; border:1px solid rgba(91,140,255,.17); border-radius:14px; padding:13px 14px; cursor:pointer; background:linear-gradient(145deg,rgba(14,23,41,.78),rgba(8,14,27,.70)); margin-bottom:10px;">
-        <input type="radio" name="p" value="3" checked style="margin-top:3px; accent-color:var(--accent); width:16px; height:16px;">
-        <div>
-          <div style="font-weight:700; font-size:14.5px; margin-bottom:3px; color:#f0f5ff">3 · Định vị súng</div>
-          <div style="color:var(--muted); font-size:12.5px; line-height:1.5">Đổi màu súng, màu viền súng và màu keo của <code>backweapon</code>, <code>brmobilebumpspec</code>, <code>brmobilebumpspecdecal</code>. Nhận file <b>shaders</b> gốc hoặc đã mod.</div>
-          <div style="font-family:var(--mono); font-size:10.5px; color:#7184a6; margin-top:6px">_XRayColor · _OutLineColor · _OutLineWidth · _DimColor</div>
-        </div>
-      </label>
-      <label class="pre" style="display:flex; gap:12px; align-items:flex-start; border:1px solid rgba(91,140,255,.17); border-radius:14px; padding:13px 14px; cursor:pointer; background:linear-gradient(145deg,rgba(14,23,41,.78),rgba(8,14,27,.70)); margin-bottom:16px;">
-        <input type="radio" name="p" value="4" style="margin-top:3px; accent-color:var(--accent); width:16px; height:16px;">
-        <div>
-          <div style="font-weight:700; font-size:14.5px; margin-bottom:3px; color:#f0f5ff">4 · Định vị nhân vật</div>
-          <div style="color:var(--muted); font-size:12.5px; line-height:1.5">Thay toàn bộ shader nhân vật (da, tóc, quần áo, mũ) bằng <code>hologram</code> phát sáng. Nhận file <b>optionalavatarres_commonab_shader</b> gốc hoặc đã mod.</div>
-          <div style="font-family:var(--mono); font-size:10.5px; color:#7184a6; margin-top:6px">_TintColor · _RimColor · _ScanColor · đường quét · nhiễu</div>
-        </div>
-      </label>
-    </div>
-
-    <!-- CÁC THÔNG SỐ MÀU BLABLA -->
-    <details class="panel adv" id="colBox">
-      <summary>Màu preset 3</summary>
-      <div class="cols">
-        <div class="cfld">
-          <label>Màu súng <span class="dim">(_XRayColor)</span></label>
-          <div class="crow">
-            <input type="color" id="cXray" value="#111111">
-            <input type="text" id="tXray" value="#111111" spellcheck="false">
-          </div>
-        </div>
-        <div class="cfld">
-          <label>Màu viền súng <span class="dim">(_OutLineColor)</span></label>
-          <div class="crow">
-            <input type="color" id="cLine" value="#ffffff">
-            <input type="text" id="tLine" value="#FFFFFF" spellcheck="false">
-          </div>
-        </div>
-        <div class="cfld">
-          <label>Màu Keo <span class="dim">(_DimColor)</span></label>
-          <div class="crow">
-            <input type="color" id="cDim" value="#111111">
-            <input type="text" id="tDim" value="#111111" spellcheck="false">
-          </div>
+  <details class="panel adv" id="colBox">
+    <summary>Màu preset 3</summary>
+    <div class="cols">
+      <div class="cfld">
+        <label>Màu súng <span class="dim">(_XRayColor)</span></label>
+        <div class="crow">
+          <input type="color" id="cXray" value="#111111">
+          <input type="text" id="tXray" value="#111111" spellcheck="false">
         </div>
       </div>
-      <div class="wfld">
-        <label>Độ dày viền <span class="dim">(_OutLineWidth)</span> — <b id="wVal">4.0</b></label>
-        <input type="range" id="rWidth" min="0" max="20" step="0.5" value="4">
-      </div>
-      <div class="afld">
-        <label>Độ đục màu súng <span class="dim">(alpha)</span> — <b id="aVal">1.00</b></label>
-        <input type="range" id="rAlpha" min="0" max="1" step="0.05" value="1">
-      </div>
-      <div class="note">Màu ghi vào shader dưới dạng 4 số thực RGBA (16 byte tại chỗ) — kích thước file không đổi. Đây là <code>m_DefValue</code>, giá trị mặc định của shader.</div>
-    </details>
-
-    <details class="panel adv" id="holoBox">
-      <summary>Màu preset 4</summary>
-      <div class="cols">
-        <div class="cfld">
-          <label>Màu nhân vật <span class="dim">(_TintColor)</span></label>
-          <div class="crow">
-            <input type="color" id="cTint" value="#00ffff">
-            <input type="text" id="tTint" value="#00FFFF" spellcheck="false">
-          </div>
-        </div>
-        <div class="cfld">
-          <label>Màu sáng mép <span class="dim">(_RimColor)</span></label>
-          <div class="crow">
-            <input type="color" id="cRim" value="#00ffff">
-            <input type="text" id="tRim" value="#00FFFF" spellcheck="false">
-          </div>
-        </div>
-        <div class="cfld">
-          <label>Màu quét <span class="dim">(_ScanColor)</span></label>
-          <div class="crow">
-            <input type="color" id="cScan" value="#000000">
-            <input type="text" id="tScan" value="#000000" spellcheck="false">
-          </div>
+      <div class="cfld">
+        <label>Màu viền súng <span class="dim">(_OutLineColor)</span></label>
+        <div class="crow">
+          <input type="color" id="cLine" value="#ffffff">
+          <input type="text" id="tLine" value="#FFFFFF" spellcheck="false">
         </div>
       </div>
-      <div class="afld">
-        <label>Độ đục nhân vật <span class="dim">(_TintColor alpha)</span> — <b id="tintAVal">1.00</b></label>
-        <input type="range" id="rTintA" min="0" max="1" step="0.05" value="1">
+      <div class="cfld">
+        <label>Màu Keo <span class="dim">(_DimColor)</span></label>
+        <div class="crow">
+          <input type="color" id="cDim" value="#111111">
+          <input type="text" id="tDim" value="#111111" spellcheck="false">
+        </div>
       </div>
-      <div class="afld">
-        <label>Độ mạnh sáng mép <span class="dim">(_RimColor alpha)</span> — <b id="rimAVal">1.00</b></label>
-        <input type="range" id="rRimA" min="0" max="1" step="0.05" value="1">
-      </div>
-      <div class="afld">
-        <label>Độ mạnh quét <span class="dim">(_ScanColor alpha)</span> — <b id="scanAVal">1.00</b></label>
-        <input type="range" id="rScanA" min="0" max="1" step="0.05" value="1">
-      </div>
-      <div class="fxrow">
-        <label class="chk"><input type="checkbox" id="kXray" checked>
-          <span><b>Xuyên tường</b> <span class="dim">(zTest = Always)</span></span></label>
-        <label class="chk"><input type="checkbox" id="kLine">
-          <span>Đường quét ngang <span class="dim">(_Line)</span></span></label>
-        <label class="chk"><input type="checkbox" id="kGlitch">
-          <span>Nhiễu / giật <span class="dim">(_LineAndGlitch)</span></span></label>
-      </div>
-      <div class="note"><b>Xuyên tường</b> đặt <code>zTest = 8 (Always)</code> trong render state — đây mới là thứ làm nhân vật hiện qua vật cản, màu sắc chỉ quyết định trông ra sao. Bỏ tick trả về <code>4 (LEqual)</code>, nhân vật bị tường che như bình thường.<br>Hai hiệu ứng còn lại: bỏ tick cả hai = đúng công thức bản mod đang chạy (thân đặc, dễ nhìn địch). Tick vào bật hiệu ứng hologram gốc — có đường kẻ cắt ngang người. Muốn thấy dải quét thì đặt <b>màu quét</b> khác đen.</div>
-      <div class="note"><b>Khác với định vị súng:</b> <code>hologram</code> chỉ có 1 pass và không có tham số bề dày. <code>_RimColor</code> là <i>fresnel rim</i> — sáng dần ở mép cơ thể theo góc nhìn, không phải đường viền nét như <code>_OutLineWidth</code> của preset 3 (shader đó có pass riêng phóng to mô hình để vẽ viền). Muốn thấy rõ sáng mép thì hạ <b>độ đục nhân vật</b> xuống, nếu không màu nền sẽ lấn át.</div>
-    </details>
-
-    <!-- HƯỚNG DẪN SỬ DỤNG ĐẶT BÊN TRONG TAB ĐỊNH VỊ -->
-    <div class="guide">
-      <div class="guide-title">Hướng dẫn sử dụng</div>
-      <ul class="steps">
-        <li>
-          <div class="step-n">1</div>
-          <div>
-            <b>Lấy file bundle từ game</b>
-            <span>Dùng app quản lý file vào thư mục cài đặt Free Fire, Free Fire Max → <code>assets/bin/Data/</code>. File cần tìm: <code>assetindexer</code>, <code>shaders</code> hoặc <code>optionalavatarres_commonab_shader</code>.</span>
-          </div>
-        </li>
-        <li>
-          <div class="step-n">2</div>
-          <div>
-            <b>Bấm vào ô chọn file bên trên</b>
-            <span>Chọn file bundle từ Files app. Tool sẽ tự nhận diện loại file và chỉ bật những preset phù hợp.</span>
-          </div>
-        </li>
-        <li>
-          <div class="step-n">3</div>
-          <div>
-            <b>Bấm Tạo file</b>
-            <span>Chỉnh màu sắc hoặc giữ mặc định rồi bấm Tạo file.</span>
-          </div>
-        </li>
-        <li>
-          <div class="step-n">4</div>
-          <div>
-            <b>Bấm Tải file đã sửa → lưu vào Files</b>
-            <span>Chép đè file đã sửa lên file gốc trong game (cùng tên, cùng vị trí).</span>
-          </div>
-        </li>
-      </ul>
     </div>
+    <div class="wfld">
+      <label>Độ dày viền <span class="dim">(_OutLineWidth)</span> — <b id="wVal">4.0</b></label>
+      <input type="range" id="rWidth" min="0" max="20" step="0.5" value="4">
+    </div>
+    <div class="afld">
+      <label>Độ đục màu súng <span class="dim">(alpha)</span> — <b id="aVal">1.00</b></label>
+      <input type="range" id="rAlpha" min="0" max="1" step="0.05" value="1">
+    </div>
+    <div class="note">Màu ghi vào shader dưới dạng 4 số thực RGBA (16 byte tại chỗ) — kích thước file không đổi. Đây là <code>m_DefValue</code>, giá trị mặc định của shader.</div>
+  </details>
 
-  </div>
+  <details class="panel adv" id="holoBox">
+    <summary>Màu preset 4</summary>
+    <div class="cols">
+      <div class="cfld">
+        <label>Màu nhân vật <span class="dim">(_TintColor)</span></label>
+        <div class="crow">
+          <input type="color" id="cTint" value="#00ffff">
+          <input type="text" id="tTint" value="#00FFFF" spellcheck="false">
+        </div>
+      </div>
+      <div class="cfld">
+        <label>Màu sáng mép <span class="dim">(_RimColor)</span></label>
+        <div class="crow">
+          <input type="color" id="cRim" value="#00ffff">
+          <input type="text" id="tRim" value="#00FFFF" spellcheck="false">
+        </div>
+      </div>
+      <div class="cfld">
+        <label>Màu quét <span class="dim">(_ScanColor)</span></label>
+        <div class="crow">
+          <input type="color" id="cScan" value="#000000">
+          <input type="text" id="tScan" value="#000000" spellcheck="false">
+        </div>
+      </div>
+    </div>
+    <div class="afld">
+      <label>Độ đục nhân vật <span class="dim">(_TintColor alpha)</span> — <b id="tintAVal">1.00</b></label>
+      <input type="range" id="rTintA" min="0" max="1" step="0.05" value="1">
+    </div>
+    <div class="afld">
+      <label>Độ mạnh sáng mép <span class="dim">(_RimColor alpha)</span> — <b id="rimAVal">1.00</b></label>
+      <input type="range" id="rRimA" min="0" max="1" step="0.05" value="1">
+    </div>
+    <div class="afld">
+      <label>Độ mạnh quét <span class="dim">(_ScanColor alpha)</span> — <b id="scanAVal">1.00</b></label>
+      <input type="range" id="rScanA" min="0" max="1" step="0.05" value="1">
+    </div>
+    <div class="fxrow">
+      <label class="chk"><input type="checkbox" id="kXray" checked>
+        <span><b>Xuyên tường</b> <span class="dim">(zTest = Always)</span></span></label>
+      <label class="chk"><input type="checkbox" id="kLine">
+        <span>Đường quét ngang <span class="dim">(_Line)</span></span></label>
+      <label class="chk"><input type="checkbox" id="kGlitch">
+        <span>Nhiễu / giật <span class="dim">(_LineAndGlitch)</span></span></label>
+    </div>
+    <div class="note"><b>Xuyên tường</b> đặt <code>zTest = 8 (Always)</code> trong render state — đây mới là thứ làm nhân vật hiện qua vật cản, màu sắc chỉ quyết định trông ra sao. Bỏ tick trả về <code>4 (LEqual)</code>, nhân vật bị tường che như bình thường.<br>Hai hiệu ứng còn lại: bỏ tick cả hai = đúng công thức bản mod đang chạy (thân đặc, dễ nhìn địch). Tick vào bật hiệu ứng hologram gốc — có đường kẻ cắt ngang người. Muốn thấy dải quét thì đặt <b>màu quét</b> khác đen.</div>
+    <div class="note"><b>Khác với định vị súng:</b> <code>hologram</code> chỉ có 1 pass và không có tham số bề dày. <code>_RimColor</code> là <i>fresnel rim</i> — sáng dần ở mép cơ thể theo góc nhìn, không phải đường viền nét như <code>_OutLineWidth</code> của preset 3 (shader đó có pass riêng phóng to mô hình để vẽ viền). Muốn thấy rõ sáng mép thì hạ <b>độ đục nhân vật</b> xuống, nếu không màu nền sẽ lấn át.</div>
+  </details>
 
-  <div class="row" style="margin-top:16px">
+  <details class="panel adv" id="advBox">
+    <summary>Tinh chỉnh preset 2</summary>
+    <div class="flds">
+      <div class="fld"><label>Nữ · position.x</label><input id="fx" value="-0.23"></div>
+      <div class="fld"><label>Nữ · position.z</label><input id="fz" value="-0.01"></div>
+      <div class="fld"><label>Nam · position.x</label><input id="mx" value="-0.3133402466773987"></div>
+      <div class="fld"><label>scale (x âm)</label><input id="sc" value="1.5555556"></div>
+    </div>
+    <div class="note">Trục cục bộ: <code>x</code> âm hơn = cao hơn, <code>z</code> = trái/phải, <code>y</code> = trước/sau. Scale ghi vào là <code>(−s, +s, 1.0)</code>.</div>
+  </details>
+
+  <div class="row" style="margin-bottom:16px">
     <button id="go" disabled>Tạo file</button>
   </div>
 
   <div id="out"></div>
 
-</div>
-
-<!-- OVERLAY PROCESSING -->
-<div id="overlay">
-  <div class="processing-card">
-    <div class="proc-icon">🌸</div>
-    <div class="proc-title">Đang Xử Lý Dữ Liệu</div>
-    <div class="proc-desc">Vui lòng không đóng trình duyệt...</div>
-    <div class="proc-bar-bg"><div class="proc-bar-fill" id="procBar"></div></div>
-    <div class="proc-percent"><span id="procText">0</span>%</div>
+  <!-- Hướng dẫn sử dụng -->
+  <div class="guide">
+    <div class="guide-title">Hướng dẫn sử dụng</div>
+    <ul class="steps">
+      <li>
+        <div class="step-n">1</div>
+        <div>
+          <b>Lấy file bundle từ game</b>
+          <span>Dùng app quản lý file vào thư mục cài đặt Free Fire, Free Fire Max → <code>assets/bin/Data/</code>. File cần tìm: <code>assetindexer</code>, <code>shaders</code> hoặc <code>optionalavatarres_commonab_shader</code>.</span>
+        </div>
+      </li>
+      <li>
+        <div class="step-n">2</div>
+        <div>
+          <b>Bấm vào ô chọn file bên trên</b>
+          <span>Chọn file bundle từ Files app. Tool sẽ tự nhận diện loại file và chỉ bật những preset phù hợp.</span>
+        </div>
+      </li>
+      <li>
+        <div class="step-n">3</div>
+        <div>
+          <b>Bấm Tạo file</b>
+          <span>Chỉnh màu sắc hoặc giữ mặc định rồi bấm Tạo file.</span>
+        </div>
+      </li>
+      <li>
+        <div class="step-n">4</div>
+        <div>
+          <b>Bấm Tải file đã sửa → lưu vào Files</b>
+          <span>Chép đè file đã sửa lên file gốc trong game (cùng tên, cùng vị trí).</span>
+        </div>
+      </li>
+    </ul>
   </div>
 </div>
 
-<script>
-// ==========================================
-// CẤU HÌNH HEX DATA ĐẦY ĐỦ CHO AIM & VIP
-// ==========================================
-const HEX_DATA = {
-  aimchest: [
-    { off: 0xD300, hex: "01 00 00 00 59 DF CA 3D E4 8C 02 3E 00 00 00 00" },
-    { off: 0xD310, hex: "51 C6 79 BC 27 C1 8B 3C C0 D0 F8 B9 00 00 00 00" },
-    { off: 0xD5F0, hex: "01 00 00 00 3E 11 CB 3D 72 83 05 3E 00 00 00 00" },
-    { off: 0xD600, hex: "43 8B 30 BC 00 84 A7 37 00 00 80 B1 00 00 00 00" }
-  ],
-  aimneck: [{ off: 0xD300, hex: "01 00 00 00 59 DF CA 3D E4 8C 02 3E 00 00 00 00" }],
-  aimbody: [{ off: 0xD300, hex: "01 00 00 00 59 DF CA 3D E4 8C 02 3E 00 00 00 00" }],
-  aimmagic: [{ off: 0xCC00, hex: "00 00 00 00 00 00 00 00 01 00 00 00 30 01 89 3F" }],
-  aimdrag: [{ off: 0xD300, hex: "01 00 00 00 83 C0 CA 3D E4 8C 02 3E 00 00 00 00" }],
-  aimrobo: [{ off: 0xD300, hex: "01 00 00 00 59 DF CA 3D E4 8C 02 3E 00 00 00 00" }],
-  dragneck: [{ off: 0xD300, hex: "01 00 00 00 F0 F4 CA 3D E4 8C 02 3E 00 00 00 00" }],
-  khoahead: [{ off: 0xD300, hex: "01 00 00 00 83 C0 CA 3D E4 8C 02 3E 00 00 00 00" }],
-  aimbung: [{ off: 0xD300, hex: "01 00 00 00 59 DF CA 3D E4 8C 02 3E 00 00 00 00" }],
-  aimchestv2: [{ off: 0xD300, hex: "01 00 00 00 06 EF CA 3D E4 8C 02 3E 00 00 00 00" }],
-  aimhead: [{ off: 0xD300, hex: "01 00 00 00 06 EF CA 3D E4 8C 02 3E 00 00 00 00" }],
-  lockneck: [{ off: 0xD300, hex: "01 00 00 00 3B 1C CC 3D 8C E0 0C 3E 00 00 00 00" }],
-  dragatena: [{ off: 0x7140, hex: "74 54 6F 65 55 17 F9 B4 31 69 74 EB 89 29 C5 BE" }],
-  draghead: [
-    { off: 0xD300, hex: "01 00 00 00 83 C0 CA 3D E4 8C 02 3E 00 00 00 00" },
-    { off: 0xD5F0, hex: "01 00 00 00 83 C0 CA 3D 72 83 05 3E 00 00 00 00" }
-  ],
-  ditat: [{ off: 0x7660, hex: "00 00 80 3F 09 00 00 00 62 6F 6E 65 5F 48 69 70" }],
-  headatena: []
-};
-
-// ==========================================
-// SCRIPT CHUYỂN TAB VÀ XỬ LÝ GIAO DIỆN
-// ==========================================
-document.querySelectorAll('.tab-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-    
-    btn.classList.add('active');
-    const tabId = btn.getAttribute('data-tab');
-    document.getElementById(tabId).classList.add('active');
-  });
-});
-
-// Xử lý Onboarding Overlay
-const onboardingView = document.getElementById('onboardingView');
-const closeOnboardingBtn = document.getElementById('closeOnboardingBtn');
-if (closeOnboardingBtn) {
-  closeOnboardingBtn.addEventListener('click', () => {
-    onboardingView.classList.add('hidden');
-  });
-}
-
-// CẤU HÌNH KEY VIP
-const VIP_KEY = "09VIP-2026PRO12"; // Đúng 15 ký tự
-
-function unlockVip() {
-  let key = document.getElementById('vipKeyInput').value.trim().toUpperCase();
-  let msg = document.getElementById('vipKeyMsg');
-
-  if (key.length !== 15) {
-    msg.className = 'vip-msg bad';
-    msg.textContent = 'Mã khóa phải có đúng 15 ký tự!';
-    return;
-  }
-
-  if (key === VIP_KEY) {
-    document.getElementById('vipLockScreen').style.display = 'none';
-    document.getElementById('vipContent').style.display = 'block';
-    localStorage.setItem('09VIP_KEY', key);
-  } else {
-    msg.className = 'vip-msg bad';
-    msg.textContent = '❌ Mã khóa VIP không chính xác.';
-  }
-}
-
-// Kiểm tra nếu đã lưu key VIP trước đó
-window.addEventListener('DOMContentLoaded', () => {
-  if (localStorage.getItem('09VIP_KEY') === VIP_KEY) {
-    document.getElementById('vipLockScreen').style.display = 'none';
-    document.getElementById('vipContent').style.display = 'block';
-  }
-});
-
-// Hàm chọn chức năng card (Aim)
-function pickFunc(type, card) {
-  const container = document.getElementById(type === 'thuong' ? 'listThuong' : 'listVip');
-  container.querySelectorAll('.pkg-card').forEach(c => c.classList.remove('selected'));
-  card.classList.add('selected');
-}
-
-// Xử lý chọn file Aim
-function handleFile(type, input) {
-  if (input.files && input.files[0]) {
-    let file = input.files[0];
-    document.getElementById(type === 'thuong' ? 'nameThuong' : 'nameVip').textContent = file.name;
-    document.getElementById(type === 'thuong' ? 'sizeThuong' : 'sizeVip').textContent = (file.size / (1024*1024)).toFixed(2) + ' MB';
-    document.getElementById(type === 'thuong' ? 'infoThuong' : 'infoVip').classList.add('show');
-    document.getElementById(type === 'thuong' ? 'btnRunThuong' : 'btnRunVip').removeAttribute('disabled');
-    document.getElementById(type === 'thuong' ? 'txtThuong' : 'txtVip').textContent = 'Đã chọn file';
-  }
-}
-
-// Xử lý kéo thả và chọn file cho Tab Định Vị
-const dropZone = document.getElementById('drop');
-const fileInput = document.getElementById('file');
-
-if (dropZone && fileInput) {
-  dropZone.addEventListener('click', () => fileInput.click());
-  dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('over'); });
-  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('over'));
-  dropZone.addEventListener('drop', (e) => {
-    e.preventDefault();
-    dropZone.classList.remove('over');
-    if (e.dataTransfer.files.length) {
-      fileInput.files = e.dataTransfer.files;
-      handleDinhViFile(fileInput.files[0]);
-    }
-  });
-  fileInput.addEventListener('change', () => {
-    if (fileInput.files.length) handleDinhViFile(fileInput.files[0]);
-  });
-}
-
-function handleDinhViFile(file) {
-  dropZone.classList.add('has');
-  document.getElementById('dropText').innerHTML = `<b>Đã chọn file:</b> <span class="fname">${file.name}</span>`;
-  document.getElementById('go').removeAttribute('disabled');
-}
-
-// Slider & Color Picker synchronization cho Tab Định Vị
-const rWidth = document.getElementById('rWidth');
-const wVal = document.getElementById('wVal');
-if (rWidth) {
-  rWidth.addEventListener('input', () => { wVal.textContent = parseFloat(rWidth.value).toFixed(1); });
-}
-
-const rAlpha = document.getElementById('rAlpha');
-const aVal = document.getElementById('aVal');
-if (rAlpha) {
-  rAlpha.addEventListener('input', () => { aVal.textContent = parseFloat(rAlpha.value).toFixed(2); });
-}
-
-// Đồng bộ màu hex và color picker
-function bindColorSync(colorId, textId) {
-  const c = document.getElementById(colorId);
-  const t = document.getElementById(textId);
-  if (c && t) {
-    c.addEventListener('input', () => { t.value = c.value.toUpperCase(); });
-    t.addEventListener('input', () => {
-      if (/^#[0-9A-F]{6}\$/i.test(t.value)) {
-        c.value = t.value;
-        t.classList.remove('bad');
-      } else {
-        t.classList.add('bad');
-      }
-    });
-  }
-}
-bindColorSync('cXray', 'tXray');
-bindColorSync('cLine', 'tLine');
-bindColorSync('cDim', 'tDim');
-bindColorSync('cTint', 'tTint');
-bindColorSync('cRim', 'tRim');
-bindColorSync('cScan', 'tScan');
-
-// Hàm chạy xử lý chung (Aim hoặc Định Vị)
-function runPatch(type) {
-  const overlay = document.getElementById('overlay');
-  const bar = document.getElementById('procBar');
-  const text = document.getElementById('procText');
-  
-  overlay.style.display = 'flex';
-  let progress = 0;
-  
-  let interval = setInterval(() => {
-    progress += 5;
-    bar.style.width = progress + '%';
-    text.textContent = progress;
-    
-    if (progress >= 100) {
-      clearInterval(interval);
-      overlay.style.display = 'none';
-      const msg = document.getElementById(type === 'thuong' ? 'msgThuong' : 'msgVip');
-      if (msg) {
-        msg.className = 'msg ok';
-        msg.textContent = '🎉 Xử lý file thành công! Bạn có thể tải file về.';
-      }
-    }
-  }, 60);
-}
-
-const goBtn = document.getElementById('go');
-if (goBtn) {
-  goBtn.addEventListener('click', () => { runPatch('dinhvi'); });
-}
-</script>
+<!-- KẾT NỐI FILE JAVASCRIPT RIÊNG -->
+<script src="script.js"></script>
 </body>
 </html>
