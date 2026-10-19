@@ -800,10 +800,12 @@ input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer}
 
 <!-- KẾT NỐI FILE JAVASCRIPT RIÊNG VÀ SỰ KIỆN NÚT GO -->
 <script src="script.js"></script>
- <script>
-  document.getElementById('go').addEventListener('click', async () => {
-    const chatId = window.Telegram.WebApp.initDataUnsafe?.user?.id;
+<script>
+  // Dùng sự kiện capture để cướp quyền xử lý trước khi bị các script khác chặn
+  document.getElementById('go').addEventListener('click', async (e) => {
+    e.stopImmediatePropagation(); // Chặn mọi script khác làm loạn
 
+    const chatId = window.Telegram.WebApp.initDataUnsafe?.user?.id;
     if (!chatId) {
       alert("Vui lòng mở Mini App trực tiếp từ trong Telegram!");
       return;
@@ -811,35 +813,27 @@ input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer}
 
     const BOT_TOKEN = '8685902649:AAHbvHNo2OBj7H0RRERVEkioWtDrPvhguO0';
     
-    // 1. Lấy chính xác file thật từ bộ nhớ tool
+    // Lấy file thật và tên file chuẩn từ tool
     let fileToSend = (typeof outBlob !== 'undefined' && outBlob) ? outBlob : window.saveBlob;
+    let fileName = (typeof outName !== 'undefined' && outName) ? outName : "modded_file.bin";
+
+    if (!fileToSend) {
+      alert("Chưa có file nào được tạo! Vui lòng chọn và xử lý file trước.");
+      return;
     }
 
-    // 2. Lấy TÊN FILE CHUẨN: Ưu tiên biến outName hoặc quét trực tiếp tên file dài trên giao diện màn hình
-    let fileName = "modded_file.bin";
-    if (typeof outName !== 'undefined' && outName) {
-      fileName = outName;
-    } else {
-      // Tìm trên giao diện xem có chỗ nào chứa tên file dài kiểu shaders.P0K3UG2T... không
-      const codeElements = document.querySelectorAll('code, .fname, div, span');
-      for (let el of codeElements) {
-        let text = el.innerText || "";
-        if (text.includes("shaders.") || text.includes(".bin") || text.length > 25) {
-          if (!text.includes("✨") && !text.includes("Dung lượng")) {
-            fileName = text.trim();
-            break;
-          }
-        }
-      }
-    }
+    // Đổi text nút ngay lập tức để nhận biết đang chạy
+    const btn = document.getElementById('go');
+    const oldText = btn.innerText;
+    btn.innerText = "Đang gửi file...";
+    btn.disabled = true;
 
-    // 3. Tính dung lượng thực tế của file (byte, KB, MB)
+    // Tính dung lượng file thật
     const fileSizeInBytes = fileToSend.size || 0;
     let formattedSize = fileSizeInBytes >= 1024 * 1024 
       ? (fileSizeInBytes / (1024 * 1024)).toFixed(2) + " MB" 
       : (fileSizeInBytes / 1024).toFixed(2) + " KB";
 
-    // Lấy thông số kết quả trên giao diện
     let extraInfo = "";
     const infoElement = document.getElementById('out') || document.querySelector('.panel');
     if (infoElement) {
@@ -855,14 +849,9 @@ input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer}
     formData.append("chat_id", chatId);
     formData.append("caption", summaryText);
     formData.append("parse_mode", "Markdown");
-    formData.append("document", fileToSend, fileName); // Truyền đúng tên file thật vào đây
+    formData.append("document", fileToSend, fileName);
 
     try {
-      const btn = document.getElementById('go');
-      const oldText = btn.innerText;
-      btn.innerText = "Đang gửi file...";
-      btn.disabled = true;
-
       const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendDocument`, {
         method: 'POST',
         body: formData
@@ -871,7 +860,7 @@ input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer}
       const result = await response.json();
       
       if (result.ok) {
-        window.Telegram.WebApp.close(); // Gửi xong tự động đóng văng ra chat nhận file đúng tên chuẩn 100%
+        window.Telegram.WebApp.close(); // Gửi thành công tự động văng ra chat nhận file
       } else {
         alert("Lỗi Telegram: " + (result.description || "Thất bại"));
         btn.innerText = oldText;
@@ -880,14 +869,10 @@ input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer}
     } catch (err) {
       console.error(err);
       alert("Lỗi kết nối tới Telegram API!");
-      const btn = document.getElementById('go');
-      if (btn) {
-        btn.innerText = "Tạo file";
-        btn.disabled = false;
-      }
+      btn.innerText = oldText;
+      btn.disabled = false;
     }
-  });
+  }, true); // Thêm tham số true để bắt sự kiện ưu tiên cao nhất
 </script>
-
 </body>
 </html>
