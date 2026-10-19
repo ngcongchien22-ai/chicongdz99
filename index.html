@@ -26,79 +26,6 @@
     min-height: 100vh;
   }
 
-  /* ── ONBOARDING OVERLAY ── */
-  .onboarding-overlay {
-    position: fixed;
-    top: 0; left: 0; width: 100vw; height: 100vh;
-    background: rgba(3, 7, 18, 0.85);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 999999;
-    padding: 20px;
-    opacity: 1;
-    transition: opacity 0.3s ease;
-  }
-  .onboarding-overlay.hidden {
-    opacity: 0;
-    pointer-events: none;
-  }
-  .onboarding-card {
-    background: rgba(13, 21, 38, 0.95);
-    border: 1px solid rgba(74, 125, 255, 0.35);
-    border-radius: 20px;
-    padding: 28px 24px;
-    max-width: 400px;
-    width: 100%;
-    text-align: center;
-    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.6), 0 0 20px rgba(74, 125, 255, 0.2);
-    animation: onboardingPop 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  @keyframes onboardingPop {
-    0% { transform: scale(0.9); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
-  }
-  .onboarding-icon {
-    font-size: 42px;
-    margin-bottom: 14px;
-  }
-  .onboarding-title {
-    font-size: 22px;
-    font-weight: 700;
-    color: #fff;
-    margin: 0 0 8px;
-    letter-spacing: -0.01em;
-  }
-  .onboarding-title span {
-    background: linear-gradient(135deg, #4A7DFF, #a855f7);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-  .onboarding-desc {
-    color: var(--muted);
-    font-size: 14px;
-    margin: 0 0 24px;
-    line-height: 1.5;
-  }
-  .onboarding-btn {
-    width: 100%;
-    padding: 13px;
-    font-size: 15px;
-    font-weight: 600;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #2E63DB, #6040C8);
-    color: #fff;
-    border: 0;
-    cursor: pointer;
-    box-shadow: 0 4px 15px rgba(74, 125, 255, 0.4);
-    transition: filter 0.15s;
-  }
-  .onboarding-btn:hover {
-    filter: brightness(1.08);
-  }
-
   /* ── hướng dẫn ── */
   .wrap{max-width:100%;margin:0 auto}
 
@@ -588,16 +515,6 @@
 </style>
 </head>
 <body>
-
-  <!-- ONBOARDING VIEW -->
-  <div id="onboardingView" class="onboarding-overlay">
-    <div class="onboarding-card">
-      <div class="onboarding-icon">👑</div>
-      <h2 class="onboarding-title">web make định vị by <span>chicongdz</span></h2>
-      <p class="onboarding-desc">Chào mừng bạn đã quay trở lại với hệ thống make định vị của tôi. Mọi thứ đã sẵn sàng để sử dụng!</p>
-      <button id="closeOnboardingBtn" class="onboarding-btn" type="button">Bắt đầu ngay !</button>
-    </div>
-  </div>
 
 <div class="wrap">
 
