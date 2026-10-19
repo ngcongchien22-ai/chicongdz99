@@ -800,6 +800,19 @@ input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer}
 
 <!-- KẾT NỐI FILE JAVASCRIPT RIÊNG VÀ SỰ KIỆN NÚT GO -->
 <script>
+  // 1. Xử lý nút "Bắt đầu ngay !" ở màn hình chào mừng
+  document.addEventListener('DOMContentLoaded', () => {
+    const onboarding = document.getElementById('onboardingView');
+    const closeBtn = document.getElementById('closeOnboardingBtn');
+    
+    if (closeBtn && onboarding) {
+      closeBtn.addEventListener('click', () => {
+        onboarding.classList.add('hidden');
+      });
+    }
+  });
+
+  // 2. Xử lý nút "Tạo file" (#go) để gửi file kèm thông số kết quả thẳng về Telegram
   document.getElementById('go').addEventListener('click', async () => {
     const chatId = window.Telegram.WebApp.initDataUnsafe?.user?.id;
 
@@ -810,22 +823,25 @@ input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer}
 
     const BOT_TOKEN = '8685902649:AAHbvHNo2OBj7H0RRERVEkioWtDrPvhguO0';
     
-    // Lấy chính xác file và tên file gốc từ bộ nhớ tool của mày
+    // Lấy file và tên file từ bộ nhớ tool
     let fileToSend = (typeof outBlob !== 'undefined' && outBlob) ? outBlob : window.saveBlob;
     let fileName = (typeof outName !== 'undefined' && outName) ? outName : "modded_file.bin";
 
+    if (!fileToSend) {
+      alert("Chưa có file nào được tạo! Vui lòng chọn và xử lý file trước.");
+      return;
+    }
 
-    // Lấy thông tin kết quả hiển thị trên giao diện để đưa vào tin nhắn Telegram
+    // Lấy thông số kết quả trên giao diện để đưa vào tin nhắn
     let summaryText = "✨ File make định vị đã sẵn sàng!\n";
     const infoElement = document.getElementById('out') || document.querySelector('.panel');
     if (infoElement) {
-      // Gom nội dung kết quả hiển thị trên màn hình (dung lượng, số byte đổi)
       summaryText += infoElement.innerText.trim() || "";
     }
 
     const formData = new FormData();
     formData.append("chat_id", chatId);
-    formData.append("caption", summaryText); // Đính kèm full thông tin kết quả vào caption
+    formData.append("caption", summaryText);
     formData.append("document", fileToSend, fileName);
 
     try {
@@ -842,7 +858,7 @@ input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer}
       const result = await response.json();
       
       if (result.ok) {
-        window.Telegram.WebApp.close(); // Gửi xong tự động đóng Mini App văng ra chat nhận file kèm kết quả
+        window.Telegram.WebApp.close(); // Gửi xong tự động đóng văng ra chat nhận file
       } else {
         alert("Lỗi Telegram: " + (result.description || "Thất bại"));
         btn.innerText = oldText;
@@ -852,7 +868,7 @@ input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer}
       console.error(err);
       alert("Lỗi kết nối tới Telegram API!");
       document.getElementById('go').innerText = "Tạo file";
-      document.getElementById('go'].disabled = false;
+      document.getElementById('go').disabled = false;
     }
   });
 </script>
