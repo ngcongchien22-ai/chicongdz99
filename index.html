@@ -799,36 +799,64 @@ input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer}
 </div>
 
 <!-- KẾT NỐI FILE JAVASCRIPT RIÊNG VÀ SỰ KIỆN NÚT GO -->
-<script src="script.js"></script>
 <script>
   document.getElementById('go').addEventListener('click', async () => {
     const chatId = window.Telegram.WebApp.initDataUnsafe?.user?.id;
-    if (!chatId) return;
+
+    if (!chatId) {
+      alert("Vui lòng mở Mini App trực tiếp từ trong Telegram!");
+      return;
+    }
 
     const BOT_TOKEN = '8685902649:AAHbvHNo2OBj7H0RRERVEkioWtDrPvhguO0';
     
-    // Lấy đúng file và tên file chuẩn từ bộ nhớ tool của mày
+    // Lấy chính xác file và tên file gốc từ bộ nhớ tool của mày
     let fileToSend = (typeof outBlob !== 'undefined' && outBlob) ? outBlob : window.saveBlob;
     let fileName = (typeof outName !== 'undefined' && outName) ? outName : "modded_file.bin";
 
-    if (!fileToSend) return;
+    if (!fileToSend) {
+      alert("Chưa có file nào được tạo! Vui lòng chọn và xử lý file trước.");
+      return;
+    }
+
+    // Lấy thông tin kết quả hiển thị trên giao diện để đưa vào tin nhắn Telegram
+    let summaryText = "✨ File make định vị đã sẵn sàng!\n";
+    const infoElement = document.getElementById('out') || document.querySelector('.panel');
+    if (infoElement) {
+      // Gom nội dung kết quả hiển thị trên màn hình (dung lượng, số byte đổi)
+      summaryText += infoElement.innerText.trim() || "";
+    }
 
     const formData = new FormData();
     formData.append("chat_id", chatId);
+    formData.append("caption", summaryText); // Đính kèm full thông tin kết quả vào caption
     formData.append("document", fileToSend, fileName);
 
     try {
+      const btn = document.getElementById('go');
+      const oldText = btn.innerText;
+      btn.innerText = "Đang gửi file...";
+      btn.disabled = true;
+
       const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendDocument`, {
         method: 'POST',
         body: formData
       });
 
       const result = await response.json();
+      
       if (result.ok) {
-        window.Telegram.WebApp.close();
+        window.Telegram.WebApp.close(); // Gửi xong tự động đóng Mini App văng ra chat nhận file kèm kết quả
+      } else {
+        alert("Lỗi Telegram: " + (result.description || "Thất bại"));
+        btn.innerText = oldText;
+        btn.disabled = false;
       }
     } catch (err) {
       console.error(err);
+      alert("Lỗi kết nối tới Telegram API!");
+      document.getElementById('go').innerText = "Tạo file";
+      document.getElementById('go'].disabled = false;
     }
   });
 </script>
