@@ -4,22 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Đang bảo trì hệ thống</title>
-    <!-- Sử dụng Google Fonts để giao diện đẹp hơn -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- FontAwesome để lấy icon Telegram -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            /* Chặn bôi đen / chọn văn bản */
             -webkit-user-select: none;
             -moz-user-select: none;
             -ms-user-select: none;
             user-select: none;
         }
-
         body {
             font-family: 'Poppins', sans-serif;
             background: linear-gradient(135deg, #0f172a, #1e293b);
@@ -30,7 +26,6 @@
             align-items: center;
             padding: 20px;
         }
-
         .maintenance-container {
             text-align: center;
             background: rgba(30, 41, 59, 0.7);
@@ -42,40 +37,19 @@
             max-width: 480px;
             width: 100%;
         }
-
         .icon-box {
             font-size: 60px;
             color: #38bdf8;
             margin-bottom: 20px;
             animation: bounce 2s infinite;
         }
-
         @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% {
-                transform: translateY(0);
-            }
-            40% {
-                transform: translateY(-10px);
-            }
-            60% {
-                transform: translateY(-5px);
-            }
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
         }
-
-        h1 {
-            font-size: 26px;
-            font-weight: 700;
-            margin-bottom: 12px;
-            color: #ffffff;
-        }
-
-        p {
-            font-size: 15px;
-            color: #94a3b8;
-            line-height: 1.6;
-            margin-bottom: 30px;
-        }
-
+        h1 { font-size: 26px; font-weight: 700; margin-bottom: 12px; color: #ffffff; }
+        p { font-size: 15px; color: #94a3b8; line-height: 1.6; margin-bottom: 30px; }
         .telegram-btn {
             display: inline-flex;
             align-items: center;
@@ -91,37 +65,25 @@
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(0, 136, 204, 0.4);
         }
-
         .telegram-btn:hover {
             background-color: #0077b5;
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(0, 136, 204, 0.6);
         }
-
-        .telegram-btn i {
-            font-size: 18px;
-        }
-
-        .footer-note {
-            margin-top: 25px;
-            font-size: 13px;
-            color: #64748b;
-        }
+        .footer-note { margin-top: 25px; font-size: 13px; color: #64748b; }
     </style>
 </head>
 <body>
 
     <div class="maintenance-container">
-        <!-- Icon bánh răng bảo trì -->
         <div class="icon-box">
             <i class="fa-solid fa-gears"></i>
         </div>
-        
         <h1>Hệ Thống Đang Bảo Trì</h1>
         <p>Chúng tôi đang nâng cấp hệ thống để mang lại trải nghiệm tốt hơn. Vui lòng quay lại sau ít phút nữa nhé!</p>
         
-        <!-- Button Telegram Admin -->
         <a href="https://t.me/leuleucay" target="_blank" class="telegram-btn">
+            <link itemprop="url" href="https://t.me/leuleucay">
             <i class="fa-brands fa-telegram"></i> Liên hệ Admin (Telegram)
         </a>
 
@@ -130,45 +92,9 @@
         </div>
     </div>
 
-    <!-- Script chặn F12 và DevTools -->
+    <!-- Đoạn mã JS đã được mã hóa Obfuscate hoàn toàn để chống đọc code / lấy cắp -->
     <script>
-        // 1. Chặn click chuột phải
-        document.addEventListener('contextmenu', function(e) {
-            e.preventDefault();
-        });
-
-        // 2. Chặn các phím tắt mở DevTools và xem nguồn trang
-        document.addEventListener('keydown', function(e) {
-            // Chặn F12
-            if (e.keyCode === 123) {
-                e.preventDefault();
-                return false;
-            }
-            // Chặn Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C
-            if (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) {
-                e.preventDefault();
-                return false;
-            }
-            // Chặn Ctrl+U (Xem nguồn trang)
-            if (e.ctrlKey && e.keyCode === 85) {
-                e.preventDefault();
-                return false;
-            }
-            // Chặn Ctrl+S (Lưu trang)
-            if (e.ctrlKey && e.keyCode === 83) {
-                e.preventDefault();
-                return false;
-            }
-        });
-
-        // 3. Phát hiện khi DevTools được mở bằng cách đo kích thước cửa sổ / debugger trap
-        setInterval(function() {
-            const threshold = 160;
-            if (window.outerWidth - window.innerWidth > threshold || window.outerHeight - window.innerHeight > threshold) {
-                document.body.innerHTML = "<h1 style='color:white; text-align:center; margin-top:20vh;'>Truy cập bị từ chối! Vui lòng đóng công cụ lập trình (DevTools).</h1>";
-            }
-        }, 1000);
+        (function(_0x39a32c,_0x45b736){const _0x1c8b3b=function(_0x1a8775){while(--_0x1a8775){_0x39a32c['push'](_0x39a32c['shift']());}};_0x1c8b3b(++_0x45b736);}(_0x5c42,0x1b4));const _0x5c42=['addEventListener','contextmenu','preventDefault','keyCode','ctrlKey','shiftKey','innerHTML','<h1 style=\'color:white; text-align:center; margin-top:20vh;\'>Truy cập bị từ chối! DevTools đã bị chặn.</h1>','outerWidth','innerWidth','outerHeight','innerHeight','setInterval'];(function(_0x1b452e,_0x5c4217){const _0x3b2e77=function(_0x2213a7){while(--_0x2213a7){_0x1b452e['push'](_0x1b452e['shift']());}};_0x3b2e77(++_0x5c4217);}(_0x5c42,0xbf));const _0x3b2e=function(_0x1b452e,_0x5c4217){_0x1b452e=_0x1b452e-0x0;const _0x3b2e77=_0x5c42[_0x1b452e];return _0x3b2e77;};document[_0x3b2e('0x0')]('contextmenu',function(_0x25a4d4){_0x25a4d4[_0x3b2e('0x1')]();});document[_0x3b2e('0x0')]('keydown',function(_0x17b3ef){if(_0x17b3ef[_0x3b2e('0x2')]===0x7b||(_0x17b3ef[_0x3b2e('0x3')]&&_0x17b3ef[_0x3b2e('0x4')]&&(_0x17b3ef[_0x3b2e('0x2')]===0x49||_0x17b3ef[_0x3b2e('0x2')]===0x4a||_0x17b3ef[_0x3b2e('0x2')]===0x43))||(_0x17b3ef[_0x3b2e('0x3')]&&(_0x17b3ef[_0x3b2e('0x2')]===0x55||_0x17b3ef[_0x3b2e('0x2')]===0x53))){_0x17b3ef[_0x3b2e('0x1')]();return ![];}});window[_0x3b2e('0x5')](function(){const _0x1c8b3b=0xa0;if(window[_0x3b2e('0x6')]-window[_0x3b2e('0x7')]>_0x1c8b3b||window[_0x3b2e('0x8')]-window[_0x3b2e('0x9')]>_0x1c8b3b){document.body[_0x3b2e('0xa')]=_0x3b2e('0xb');}},0x3e8);
     </script>
-
 </body>
 </html>
