@@ -1,12 +1,18 @@
 /* ═══════════ XỬ LÝ ONBOARDING VIEW ═══════════ */
-document.getElementById('closeOnboardingBtn').addEventListener('click', (e) => {
-  e.preventDefault();
-  const overlay = document.getElementById('onboardingView');
-  overlay.classList.add('hidden');
-  setTimeout(() => {
-    overlay.remove(); // Xóa hẳn khỏi DOM để tránh tình trạng chiếm diện tích màn hình
-  }, 300);
-});
+const closeBtn = document.getElementById('closeOnboardingBtn');
+if (closeBtn) {
+  closeBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    const overlay = document.getElementById('onboardingView');
+    if (overlay) {
+      overlay.classList.add('hidden');
+      setTimeout(() => {
+        overlay.remove();
+      }, 300);
+    }
+  });
+}
+
 
 /* ═══════════ KẾT NỐI GOOGLE SHEETS & TRÌNH PHÁT NHẠC ═══════════ */
 const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1WJq4EWe-hlahMC0GPcLkjYkKXcDJnA6FX4f-pVgCTpY/export?format=csv';
