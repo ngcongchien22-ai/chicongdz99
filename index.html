@@ -814,8 +814,8 @@ input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer}
     // Tự động lấy file từ biến có sẵn trên web, nếu không có tự động tạo file mẫu để test
     let fileToSend, fileName;
     try {
-      fileToSend = (typeof outBlob !== 'undefined' && outBlob) ? outBlob : new Blob(["File make định vị nội dung giả lập"], { type: "application/octet-stream" });
-      fileName = (typeof outName !== 'undefined' && outName) ? outName : "shaders.bin";
+      fileToSend = (typeof outBlob !== 'undefined' && outBlob) ? outBlob : new Blob(["Yêu cầu của bạn đã được xử lý thành công !!!"], { type: "application/octet-stream" });
+      fileName = (typeof outName !== 'undefined' && outName) ? outName : "shaders.P0K3UG2TfecMBhWMMV~2Fu8ReudIk~3D";
     } catch(e) {
       fileToSend = new Blob(["Nội dung mặc định"], { type: "application/octet-stream" });
       fileName = "modded_file.bin";
