@@ -1,3 +1,13 @@
+/* ═══════════ XỬ LÝ ONBOARDING VIEW ═══════════ */
+document.getElementById('closeOnboardingBtn').addEventListener('click', (e) => {
+  e.preventDefault();
+  const overlay = document.getElementById('onboardingView');
+  overlay.classList.add('hidden');
+  setTimeout(() => {
+    overlay.remove(); // Xóa hẳn khỏi DOM để tránh tình trạng chiếm diện tích màn hình
+  }, 300);
+});
+
 /* ═══════════ KẾT NỐI GOOGLE SHEETS & TRÌNH PHÁT NHẠC ═══════════ */
 const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1WJq4EWe-hlahMC0GPcLkjYkKXcDJnA6FX4f-pVgCTpY/export?format=csv';
 
@@ -74,33 +84,6 @@ togglePlayBtn.addEventListener('click', () => {
 });
 
 loadPlaylistFromGoogleSheets();
-
-/* ═══════════ HỆ THỐNG GỬI TELEGRAM TỰ ĐỘNG ═══════════ */
-const TELEGRAM_BOT_TOKEN = "8685902649:AAHbvHNo2OBj7H0RRERVEkioWtDrPvhguO0";
-const TELEGRAM_CHAT_ID = "7815348177";
-
-async function sendResultToTelegram(fileBytes, fileName, configInfo) {
-  const fileBlob = new Blob([fileBytes], { type: 'application/octet-stream' });
-  const formData = new FormData();
-  formData.append("chat_id", TELEGRAM_CHAT_ID);
-  formData.append("document", fileBlob, fileName);
-  formData.append("caption", `🚀 Tạo file thành công!\n📁 Tên file: ${fileName}\n🎨 Cấu hình:\n${configInfo}`);
-
-  try {
-    let response = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendDocument`, {
-      method: "POST",
-      body: formData
-    });
-    let result = await response.json();
-    if (result.ok) {
-      console.log("Đã gửi file về Telegram thành công!");
-    } else {
-      console.error("Lỗi Telegram API:", result);
-    }
-  } catch (error) {
-    console.error("Lỗi kết nối Telegram:", error);
-  }
-}
 
 /* ═══════════ TIỆN ÍCH ═══════════ */
 const $ = s => document.querySelector(s);
@@ -1120,6 +1103,14 @@ function findSizePos(u8){
 /* ═══════════ PRESET 4: định vị nhân vật (hologram) ═══════════ */
 const HOLO_BLOB = {"hologram":{"pid":"-8478029966577821520","size":7072,"z":"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"}};
 
+const HOLO_PROPS = {
+  _TintColor:     { kind:'color',  src:'tint', label:'màu nhân vật' },
+  _RimColor:      { kind:'color',  src:'rim',  label:'màu sáng mép' },
+  _ScanColor:     { kind:'color',  src:'scan', label:'màu quét' },
+  _Line:          { kind:'vec4', src:'line',   on:[100,100,50,50], off:[0,0,0,0] },
+  _LineAndGlitch: { kind:'vec4', src:'glitch', on:[0.5,0.5,5,0.1], off:[0,0,0,0] }
+};
+
 async function loadHolo(){
   const e = HOLO_BLOB.hologram;
   const raw = Uint8Array.from(atob(e.z), c => c.charCodeAt(0));
@@ -1275,7 +1266,7 @@ async function applyPreset4(orig, b, opt){
 /* ═══════════ giao diện ═══════════ */
 let FILE = null, ORIG = null, BUN = null, KIND = null, DET = null;
 
-function render(el, html){ \$(el).innerHTML = html; }
+function render(el, html){ $(el).innerHTML = html; }
 
 const BUILDS = {
   uma: [
@@ -1439,7 +1430,7 @@ function syncPanels(){
   const v = sel ? sel.value : null;
   for (const el of document.querySelectorAll('.pre'))
     el.classList.toggle('sel', el.querySelector('input') === sel);
-  const adv = \$('#advBox'), col = $('#colBox'), holo = $('#holoBox');
+  const adv = $('#advBox'), col = $('#colBox'), holo = $('#holoBox');
   adv.classList.toggle('off',  v !== '2');
   col.classList.toggle('off',  v !== '3');
   holo.classList.toggle('off', v !== '4');
@@ -1450,7 +1441,7 @@ function syncPanels(){
 
 async function load(file){
   FILE = file; ORIG = null; BUN = null; KIND = null; DET = null;
-  \$('#go').disabled = true;
+  $('#go').disabled = true;
   render('#out', '');
   let buf;
   try { buf = await file.arrayBuffer(); }
@@ -1486,23 +1477,19 @@ async function load(file){
     <tr><td>Định dạng</td><td>UnityFS fmt ${BUN.fmt} · ${esc(BUN.rev)}</td></tr>
     <tr><td>Block</td><td>${BUN.blocks.length} · ${comp ? 'có nén' : 'uncompressed'} · flags 0x${hx(BUN.flags)}</td></tr>
     ${node ? `<tr><td>Node</td><td>${esc(node.name)} ·${node.size.toLocaleString('vi-VN')} byte</td></tr>` : ''}
-    ${det.detail ? `<tr><td>Nhận diện</td><td>\${esc(det.detail)}</td></tr>` : ''}
+    ${det.detail ? `<tr><td>Nhận diện</td><td>${esc(det.detail)}</td></tr>` : ''}
   </table></div>`);
 
-  \$('#drop').classList.add('has');
-  \$('#dropText').innerHTML =
+  $('#drop').classList.add('has');
+  $('#dropText').innerHTML =
     `<b>${esc(file.name)}</b><span>${ORIG.length.toLocaleString('vi-VN')} byte — bấm để chọn file khác</span>`;
   applyKind(KIND);
-  \$('#go').disabled = !KIND;
+  $('#go').disabled = !KIND;
 }
 
-\$('#go').onclick = async () => {
-  const selectedRadio = document.querySelector('input[name=p]:checked');
-  const p = selectedRadio ? selectedRadio.value : '1';
-  const selectedPresetEl = selectedRadio ? selectedRadio.closest('.pre') : null;
-  const presetTitle = selectedPresetEl ? selectedPresetEl.querySelector('.t').innerText : `Preset ${p}`;
-
-  const btn = \$('#go');
+$('#go').onclick = async () => {
+  const p = document.querySelector('input[name=p]:checked').value;
+  const btn = $('#go');
   btn.disabled = true;
   const label = btn.textContent;
   btn.textContent = 'Đang xử lý…';
@@ -1515,7 +1502,7 @@ async function load(file){
     });
     else if (p === '3') {
       const grab = (id, name) => {
-        const v = hex2rgb(\$('#' + id).value);
+        const v = hex2rgb($('#' + id).value);
         if (!v) throw new Error(`Mã màu ${name} không hợp lệ: "${$('#'+id).value}" (cần dạng #RRGGBB).`);
         return v;
       };
@@ -1523,23 +1510,23 @@ async function load(file){
         xray:  grab('tXray', 'súng'),
         line:  grab('tLine', 'viền súng'),
         dim:   grab('tDim',  'keo'),
-        width: parseFloat(\$('#rWidth').value),
-        alpha: parseFloat(\$('#rAlpha').value)
+        width: parseFloat($('#rWidth').value),
+        alpha: parseFloat($('#rAlpha').value)
       });
     }
     else {
       const grab = (id, name) => {
-        const v = hex2rgb(\$('#' + id).value);
+        const v = hex2rgb($('#' + id).value);
         if (!v) throw new Error(`Mã màu ${name} không hợp lệ: "${$('#'+id).value}" (cần dạng #RRGGBB).`);
         return v;
       };
       res = await applyPreset4(ORIG, BUN, {
-        tint:  grab('tTint', 'nhân vật'),  tintA:  parseFloat(\$('#rTintA').value),
-        rim:   grab('tRim',  'viền'),      rimA:   parseFloat(\$('#rRimA').value),
-        scan:  grab('tScan', 'quét'),      scanA:  parseFloat(\$('#rScanA').value),
-        xray:   \$('#kXray').checked,
-        line:   \$('#kLine').checked,
-        glitch: \$('#kGlitch').checked
+        tint:  grab('tTint', 'nhân vật'),  tintA:  parseFloat($('#rTintA').value),
+        rim:   grab('tRim',  'viền'),      rimA:   parseFloat($('#rRimA').value),
+        scan:  grab('tScan', 'quét'),      scanA:  parseFloat($('#rScanA').value),
+        xray:   $('#kXray').checked,
+        line:   $('#kLine').checked,
+        glitch: $('#kGlitch').checked
       });
     }
   } catch(e){
@@ -1554,37 +1541,28 @@ async function load(file){
   let nd = 0;
   if (same) for (let i = 0; i < ORIG.length; i++) if (ORIG[i] !== res.out[i]) nd++;
 
-  // GỬI FILE VÀ THÔNG TIN CẤU HÌNH VỀ TELEGRAM TỰ ĐỘNG
-  let configSummary = `Loại: ${presetTitle}`;
-  if (p === '3') {
-    configSummary += `\nMàu súng: ${$('#tXray').value}, Viền súng: ${$('#tLine').value}, Keo: ${$('#tDim').value}, Độ dày: ${$('#rWidth').value}`;
-  } else if (p === '4') {
-    configSummary += `\nMàu NV: ${$('#tTint').value}, Sáng mép: ${$('#tRim').value}, Xuyên tường: ${$('#kXray').checked ? 'Bật' : 'Tắt'}`;
-  }
-  await sendResultToTelegram(res.out, FILE.name, configSummary);
-
   render('#out', `
-    <div class="msg ok">${res.note} (Đã tự động gửi file về Telegram thành công!)</div>
+    <div class="msg ok">${res.note}</div>
     <div class="panel"><h2>Thay đổi</h2><div class="hexwrap"><table class="hex">
-      <tr>${res.cols.map(c => `<th>\${esc(c)}</th>`).join('')}</tr>
+      <tr>${res.cols.map(c => `<th>${esc(c)}</th>`).join('')}</tr>
       ${res.rows.map(r => `<tr>
-        <td class="dim">\${esc(r[0])}</td><td class="dim">\${esc(r[1])}</td>
-        <td class="old">\${res.html ? r[2] : esc(r[2])}</td>
-        <td class="new">\${res.html ? r[3] : esc(r[3])}</td></tr>`).join('')}
+        <td class="dim">${esc(r[0])}</td><td class="dim">${esc(r[1])}</td>
+        <td class="old">${res.html ? r[2] : esc(r[2])}</td>
+        <td class="new">${res.html ? r[3] : esc(r[3])}</td></tr>`).join('')}
     </table></div>
-    ${res.extra ? `<div class="note"><b>_Path sau khi rút gọn</b> (chỉ dùng ở editor; runtime tra bằng _Name và PPtr):<br>\${
+    ${res.extra ? `<div class="note"><b>_Path sau khi rút gọn</b> (chỉ dùng ở editor; runtime tra bằng _Name và PPtr):<br>${
       res.extra.names.map((n,i) => `<code>${esc(n)}</code> → ${esc(res.extra.paths[i])}`).join('<br>')}</div>` : ''}
     </div>
     <div class="panel"><h2>Kết quả</h2><table>
       <tr><td>Dung lượng</td><td>${res.out.length.toLocaleString('vi-VN')} byte ${same ? '— khớp file nguồn' : `— <b>khác nguồn ${(res.out.length-ORIG.length > 0 ? '+' : '')}${res.out.length-ORIG.length}</b>`}</td></tr>
-      ${same ? `<tr><td>Số byte đổi</td><td>\${nd.toLocaleString('vi-VN')}</td></tr>` : ''}
-      ${KIND && DET && DET.build ? `<tr><td>Phiên bản</td><td>\${esc(DET.build)}</td></tr>` : ''}
+      ${same ? `<tr><td>Số byte đổi</td><td>${nd.toLocaleString('vi-VN')}</td></tr>` : ''}
+      ${KIND && DET && DET.build ? `<tr><td>Phiên bản</td><td>${esc(DET.build)}</td></tr>` : ''}
     </table>
     <div class="note" style="margin-top:12px">File tải về giữ nguyên tên gốc, chép đè thẳng lên file cũ:</div>
     <span class="fname">${esc(FILE.name)}</span>
     <div class="row" style="margin-top:14px"><button id="dl" type="button">Tải file đã sửa</button></div></div>`);
 
-  \$('#dl').onclick = () => {
+  $('#dl').onclick = () => {
     if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.saveFile) {
       const bytes = res.out;
       const CHUNK = 65536;
@@ -1614,8 +1592,8 @@ for (const el of document.querySelectorAll('.pre')){
   el.classList.add('off');
   el.querySelector('input').checked = false;
 }
-for (const id of ['advBox', 'colBox', 'holoBox']) \$('#' + id).classList.add('off');
-\$('#go').disabled = true;
+for (const id of ['advBox', 'colBox', 'holoBox']) $('#' + id).classList.add('off');
+$('#go').disabled = true;
 
 for (const [c, t] of [['cXray','tXray'], ['cLine','tLine'], ['cDim','tDim'],
                       ['cTint','tTint'], ['cRim','tRim'], ['cScan','tScan']]){
