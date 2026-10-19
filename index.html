@@ -812,7 +812,8 @@ input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer}
     }
 
     try {
-      const response = await fetch('https://chicongdz99.vercel.app/api/tao-file', {
+      // Dùng đường dẫn tương đối để Vercel tự điều hướng nội bộ, tránh lỗi kết nối
+      const response = await fetch('/api/tao-file', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
