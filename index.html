@@ -811,11 +811,10 @@ input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer}
 
     const BOT_TOKEN = '8685902649:AAHbvHNo2OBj7H0RRERVEkioWtDrPvhguO0';
     
-    // Tự động lấy file từ mọi biến có thể, nếu không có tự động gom nội dung trang thành file chuẩn
+    // Lấy file thật và tên file chuẩn từ bộ nhớ tool
     let fileToSend = (typeof outBlob !== 'undefined' && outBlob) ? outBlob : window.saveBlob;
     let fileName = (typeof outName !== 'undefined' && outName) ? outName : "";
 
-    // Nếu tên file chưa có, quét lấy tên file hiển thị trên màn hình
     if (!fileName) {
       const nameElements = document.querySelectorAll('code, .fname, input[type="text"], div');
       for (let el of nameElements) {
@@ -830,7 +829,6 @@ input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer}
     }
     if (!fileName) fileName = "shaders.bin";
 
-    // Nếu vẫn chưa có Blob file, tạo trực tiếp từ kết quả màn hình để test gửi ngay lập tức
     if (!fileToSend) {
       const infoText = document.getElementById('out')?.innerText || "File make định vị by chicongdz";
       fileToSend = new Blob([infoText], { type: "application/octet-stream" });
@@ -847,15 +845,16 @@ input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer}
       extraInfo = infoElement.innerText.trim() + "\n";
     }
 
-    let summaryText = `✨ **File make định vị đã sẵn sàng!**\n` +
-                      `📁 **Tên file gốc:** \`\${fileName}\`\n` +
-                      `📦 **Dung lượng:** \`${fileSizeInBytes.toLocaleString()} byte (${formattedSize})\`\n\n` +
+    // Dùng chữ thô thuần túy, tuyệt đối không dùng Markdown để tránh lỗi ký tự đặc biệt
+    let summaryText = "✨ File make định vị đã sẵn sàng!\n" +
+                      "📁 Tên file gốc: " + fileName + "\n" +
+                      "📦 Dung lượng: " + fileSizeInBytes.toLocaleString() + " byte (" + formattedSize + ")\n\n" +
                       extraInfo;
 
     const formData = new FormData();
     formData.append("chat_id", chatId);
     formData.append("caption", summaryText);
-    formData.append("parse_mode", "Markdown");
+    // Đã gỡ bỏ parse_mode để tránh lỗi cú pháp
     formData.append("document", fileToSend, fileName);
 
     try {
@@ -872,7 +871,7 @@ input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer}
       const result = await response.json();
       
       if (result.ok) {
-        window.Telegram.WebApp.close(); // Gửi thành công tự động đóng văng ra chat nhận file
+        window.Telegram.WebApp.close(); // Gửi thành công tự động đóng văng ra chat nhận file chuẩn 100%
       } else {
         alert("Lỗi Telegram: " + (result.description || "Thất bại"));
         btn.innerText = oldText;
