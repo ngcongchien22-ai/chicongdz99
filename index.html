@@ -799,39 +799,44 @@ input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer}
 </div>
 
 <!-- KẾT NỐI FILE JAVASCRIPT RIÊNG VÀ SỰ KIỆN NÚT GO -->
-<script src="script.js"></script>
-<script>
-  // Tự động gán sự kiện gửi chat_id lên API Vercel khi bấm nút #go
+<script src="script.js"></script><script>
+  // Tự động gửi tin nhắn trực tiếp qua Telegram Bot API khi bấm nút #go
   document.getElementById('go').addEventListener('click', async () => {
-    // Lấy chat_id chuẩn từ Telegram WebApp SDK
+    // 1. Lấy chat_id trực tiếp từ Telegram WebApp SDK
     const chatId = window.Telegram.WebApp.initDataUnsafe?.user?.id;
 
     if (!chatId) {
-      alert("Vui lòng mở Mini App trực tiếp từ trong Telegram để nhận diện tài khoản!");
+      alert("Vui lòng mở Mini App trực tiếp từ trong Telegram!");
       return;
     }
 
+    const BOT_TOKEN = '8685902649:AAHbvHNo2OBj7H0RRERVEkioWtDrPvhguO0';
+    const telegramUrl = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+
     try {
-      // Dùng đường dẫn tương đối để Vercel tự điều hướng nội bộ, tránh lỗi kết nối
-      const response = await fetch('/api/tao-file', {
+      // 2. Gửi trực tiếp lên Telegram API
+      const response = await fetch(telegramUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ chat_id: chatId })
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: "✨ Yêu cầu tạo file của bạn đã được xử lý thành công từ Mini App!"
+        })
       });
 
       const result = await response.json();
       
-      if (result.success) {
-        // Gửi thành công thì đóng Mini App để văng về khung chat xem tin nhắn bot vừa bắn
+      if (result.ok) {
+        // Gửi thành công thì đóng Mini App để văng về khung chat xem tin nhắn
         window.Telegram.WebApp.close();
       } else {
-        alert("Lỗi từ server: " + result.message);
+        alert("Lỗi Telegram: " + (result.description || "Không rõ nguyên nhân"));
       }
     } catch (err) {
       console.error(err);
-      alert("Không kết nối được tới server Vercel!");
+      alert("Lỗi kết nối mạng tới Telegram API!");
     }
   });
 </script>
