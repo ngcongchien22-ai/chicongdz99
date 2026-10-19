@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Nhớ thay '#tao-file-btn' bằng ID hoặc class thật của cái nút "Tạo file" trên giao diện của mày nhé
-    const taoFileBtn = document.querySelector('#tao-file-btn'); 
+    // Đã đổi thành '#go' khớp với id của nút "Tạo file" trong index.html của mày
+    const taoFileBtn = document.querySelector('#go'); 
 
     if (taoFileBtn) {
         taoFileBtn.addEventListener('click', async () => {
