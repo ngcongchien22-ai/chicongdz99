@@ -809,29 +809,28 @@ input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer}
       return;
     }
 
-    const BOT_TOKEN = '8685902649:AAHbvHNo2OBj7H0RRERVEkioWtDrPvhguO0';
-    
-    // Tự động lấy file từ biến có sẵn trên web, nếu không có tự động tạo file mẫu để test
-    let fileToSend, fileName;
-    try {
-      fileToSend = (typeof outBlob !== 'undefined' && outBlob) ? outBlob : new Blob(["File make định vị nội dung giả lập"], { type: "application/octet-stream" });
-      fileName = (typeof outName !== 'undefined' && outName) ? outName : "shaders.bin";
-    } catch(e) {
-      fileToSend = new Blob(["Nội dung mặc định"], { type: "application/octet-stream" });
-      fileName = "modded_file.bin";
+    // Lấy chính xác file kết quả và tên file chuẩn từ trong script.js của ứng dụng
+    if (typeof outBlob === 'undefined' || !outBlob) {
+      alert("Vui lòng chọn và bấm tạo file trước!");
+      return;
     }
+
+    const fileName = (typeof outName !== 'undefined' && outName) ? outName : "shaders";
+
+    const BOT_TOKEN = '8685902649:AAHbvHNo2OBj7H0RRERVEkioWtDrPvhguO0';
+    const telegramUrl = `https://api.telegram.org/bot${BOT_TOKEN}/sendDocument`;
 
     const formData = new FormData();
     formData.append("chat_id", chatId);
-    formData.append("caption", "✨ File make định vị của mày đã sẵn sàng!");
-    formData.append("document", fileToSend, fileName);
+    formData.append("caption", "✨ File định vị đã mod thành công của mày đây!");
+    formData.append("document", outBlob, fileName); // Truyền đúng outBlob và tên file gốc chuẩn xác
 
     try {
       const btn = document.getElementById('go');
       btn.innerText = "Đang gửi file...";
       btn.disabled = true;
 
-      const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendDocument`, {
+      const response = await fetch(telegramUrl, {
         method: 'POST',
         body: formData
       });
@@ -839,7 +838,7 @@ input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer}
       const result = await response.json();
       
       if (result.ok) {
-        window.Telegram.WebApp.close(); // Gửi xong tự động đóng văng về chat nhận file
+        window.Telegram.WebApp.close(); // Gửi xong tự động đóng app văng ra chat nhận file
       } else {
         alert("Lỗi Telegram: " + (result.description || "Thất bại"));
         btn.innerText = "Tạo file";
@@ -853,8 +852,5 @@ input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer}
     }
   });
 </script>
-
-
-
 </body>
 </html>
