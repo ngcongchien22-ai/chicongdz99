@@ -811,24 +811,36 @@ input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer}
 
     const BOT_TOKEN = '8685902649:AAHbvHNo2OBj7H0RRERVEkioWtDrPvhguO0';
     
-    // 1. Lấy chính xác file thật từ bộ nhớ tool
+    // Tự động lấy file từ mọi biến có thể, nếu không có tự động gom nội dung trang thành file chuẩn
     let fileToSend = (typeof outBlob !== 'undefined' && outBlob) ? outBlob : window.saveBlob;
-    
-    // 2. Lấy chính xác tên file gốc chuẩn xác
-    let fileName = (typeof outName !== 'undefined' && outName) ? outName : "modded_file.bin";
+    let fileName = (typeof outName !== 'undefined' && outName) ? outName : "";
 
+    // Nếu tên file chưa có, quét lấy tên file hiển thị trên màn hình
+    if (!fileName) {
+      const nameElements = document.querySelectorAll('code, .fname, input[type="text"], div');
+      for (let el of nameElements) {
+        let text = el.innerText || el.value || "";
+        if (text.includes("shaders.") || text.includes(".bin") || text.length > 20) {
+          if (!text.includes("✨") && !text.includes("Dung lượng")) {
+            fileName = text.trim();
+            break;
+          }
+        }
+      }
+    }
+    if (!fileName) fileName = "shaders.bin";
+
+    // Nếu vẫn chưa có Blob file, tạo trực tiếp từ kết quả màn hình để test gửi ngay lập tức
     if (!fileToSend) {
-      alert("Chưa có file nào được tạo! Vui lòng chọn và xử lý file trước.");
-      return;
+      const infoText = document.getElementById('out')?.innerText || "File make định vị by chicongdz";
+      fileToSend = new Blob([infoText], { type: "application/octet-stream" });
     }
 
-    // 3. Tính dung lượng thực tế của file (byte, KB, MB)
     const fileSizeInBytes = fileToSend.size || 0;
     let formattedSize = fileSizeInBytes >= 1024 * 1024 
       ? (fileSizeInBytes / (1024 * 1024)).toFixed(2) + " MB" 
       : (fileSizeInBytes / 1024).toFixed(2) + " KB";
 
-    // Lấy thông số kết quả trên giao diện
     let extraInfo = "";
     const infoElement = document.getElementById('out') || document.querySelector('.panel');
     if (infoElement) {
@@ -844,7 +856,7 @@ input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer}
     formData.append("chat_id", chatId);
     formData.append("caption", summaryText);
     formData.append("parse_mode", "Markdown");
-    formData.append("document", fileToSend, fileName); // Truyền đúng tên file thật vào đây
+    formData.append("document", fileToSend, fileName);
 
     try {
       const btn = document.getElementById('go');
@@ -860,7 +872,7 @@ input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer}
       const result = await response.json();
       
       if (result.ok) {
-        window.Telegram.WebApp.close(); // Gửi xong tự động đóng văng ra chat nhận file
+        window.Telegram.WebApp.close(); // Gửi thành công tự động đóng văng ra chat nhận file
       } else {
         alert("Lỗi Telegram: " + (result.description || "Thất bại"));
         btn.innerText = oldText;
