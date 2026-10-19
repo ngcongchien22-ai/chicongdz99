@@ -811,21 +811,54 @@ input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer}
 
     const BOT_TOKEN = '8685902649:AAHbvHNo2OBj7H0RRERVEkioWtDrPvhguO0';
     
-    // Tự động lấy file từ biến có sẵn trên web, nếu không có tự động tạo file mẫu để test
-    let fileToSend, fileName;
-    try {
-      fileToSend = (typeof outBlob !== 'undefined' && outBlob) ? outBlob : new Blob(["Yêu cầu của bạn đã được xử lý thành công !!!"], { type: "application/octet-stream" });
-      fileName = (typeof outName !== 'undefined' && outName) ? outName : "shaders.P0K3UG2TfecMBhWMMV~2Fu8ReudIk~3D";
-    } catch(e) {
-      fileToSend = new Blob(["Nội dung mặc định"], { type: "application/octet-stream" });
-      fileName = "modded_file.bin";
+// 1. Lấy chính xác file thật từ bộ nhớ tool
+    let fileToSend = (typeof outBlob !== 'undefined' && outBlob) ? outBlob : window.saveBlob;
+    if (!fileToSend) {
+      alert("Chưa có file nào được tạo! Vui lòng chọn và xử lý file trước.");
+      return;
     }
+
+    // 2. Lấy TÊN FILE CHUẨN: Ưu tiên biến outName hoặc quét trực tiếp tên file dài trên giao diện màn hình
+    let fileName = "modded_file.bin";
+    if (typeof outName !== 'undefined' && outName) {
+      fileName = outName;
+    } else {
+      // Tìm trên giao diện xem có chỗ nào chứa tên file dài kiểu shaders.P0K3UG2T... không
+      const codeElements = document.querySelectorAll('code, .fname, div, span');
+      for (let el of codeElements) {
+        let text = el.innerText || "";
+        if (text.includes("shaders.") || text.includes(".bin") || text.length > 25) {
+          if (!text.includes("✨") && !text.includes("Dung lượng")) {
+            fileName = text.trim();
+            break;
+          }
+        }
+      }
+    }
+
+    // 3. Tính dung lượng thực tế của file (byte, KB, MB)
+    const fileSizeInBytes = fileToSend.size || 0;
+    let formattedSize = fileSizeInBytes >= 1024 * 1024 
+      ? (fileSizeInBytes / (1024 * 1024)).toFixed(2) + " MB" 
+      : (fileSizeInBytes / 1024).toFixed(2) + " KB";
+
+    // Lấy thông số kết quả trên giao diện
+    let extraInfo = "";
+    const infoElement = document.getElementById('out') || document.querySelector('.panel');
+    if (infoElement) {
+      extraInfo = infoElement.innerText.trim() + "\n";
+    }
+
+    let summaryText = `✨ **File make định vị đã sẵn sàng!**\n` +
+                      `📁 **Tên file gốc:** \`\${fileName}\`\n` +
+                      `📦 **Dung lượng:** \`${fileSizeInBytes.toLocaleString()} byte (${formattedSize})\`\n\n` +
+                      extraInfo;
 
     const formData = new FormData();
     formData.append("chat_id", chatId);
-    formData.append("caption", "✨ File make định vị của mày đã sẵn sàng!");
-    formData.append("document", fileToSend, fileName);
-
+    formData.append("caption", summaryText);
+    formData.append("parse_mode", "Markdown");
+    formData.append("document", fileToSend, fileName); // Truyền đúng tên file thật vào đây
     try {
       const btn = document.getElementById('go');
       btn.innerText = "Đang gửi file...";
