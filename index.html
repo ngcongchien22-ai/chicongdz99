@@ -814,10 +814,6 @@ input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer}
     let fileToSend = (typeof outBlob !== 'undefined' && outBlob) ? outBlob : window.saveBlob;
     let fileName = (typeof outName !== 'undefined' && outName) ? outName : "modded_file.bin";
 
-    if (!fileToSend) {
-      alert("Chưa có file nào được tạo! Vui lòng chọn và xử lý file trước.");
-      return;
-    }
 
     // Lấy thông tin kết quả hiển thị trên giao diện để đưa vào tin nhắn Telegram
     let summaryText = "✨ File make định vị đã sẵn sàng!\n";
