@@ -13,6 +13,11 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            /* Chặn bôi đen / chọn văn bản */
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
 
         body {
@@ -124,6 +129,46 @@
             &copy; 2026 - All rights reserved.
         </div>
     </div>
+
+    <!-- Script chặn F12 và DevTools -->
+    <script>
+        // 1. Chặn click chuột phải
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+
+        // 2. Chặn các phím tắt mở DevTools và xem nguồn trang
+        document.addEventListener('keydown', function(e) {
+            // Chặn F12
+            if (e.keyCode === 123) {
+                e.preventDefault();
+                return false;
+            }
+            // Chặn Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C
+            if (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) {
+                e.preventDefault();
+                return false;
+            }
+            // Chặn Ctrl+U (Xem nguồn trang)
+            if (e.ctrlKey && e.keyCode === 85) {
+                e.preventDefault();
+                return false;
+            }
+            // Chặn Ctrl+S (Lưu trang)
+            if (e.ctrlKey && e.keyCode === 83) {
+                e.preventDefault();
+                return false;
+            }
+        });
+
+        // 3. Phát hiện khi DevTools được mở bằng cách đo kích thước cửa sổ / debugger trap
+        setInterval(function() {
+            const threshold = 160;
+            if (window.outerWidth - window.innerWidth > threshold || window.outerHeight - window.innerHeight > threshold) {
+                document.body.innerHTML = "<h1 style='color:white; text-align:center; margin-top:20vh;'>Truy cập bị từ chối! Vui lòng đóng công cụ lập trình (DevTools).</h1>";
+            }
+        }, 1000);
+    </script>
 
 </body>
 </html>
