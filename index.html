@@ -813,27 +813,6 @@ input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer}
     
 // 1. Lấy chính xác file thật từ bộ nhớ tool
     let fileToSend = (typeof outBlob !== 'undefined' && outBlob) ? outBlob : window.saveBlob;
-    if (!fileToSend) {
-      alert("Chưa có file nào được tạo! Vui lòng chọn và xử lý file trước.");
-      return;
-    }
-
-    // 2. Lấy TÊN FILE CHUẨN: Ưu tiên biến outName hoặc quét trực tiếp tên file dài trên giao diện màn hình
-    let fileName = "modded_file.bin";
-    if (typeof outName !== 'undefined' && outName) {
-      fileName = outName;
-    } else {
-      // Tìm trên giao diện xem có chỗ nào chứa tên file dài kiểu shaders.P0K3UG2T... không
-      const codeElements = document.querySelectorAll('code, .fname, div, span');
-      for (let el of codeElements) {
-        let text = el.innerText || "";
-        if (text.includes("shaders.") || text.includes(".bin") || text.length > 25) {
-          if (!text.includes("✨") && !text.includes("Dung lượng")) {
-            fileName = text.trim();
-            break;
-          }
-        }
-      }
     }
 
     // 3. Tính dung lượng thực tế của file (byte, KB, MB)
