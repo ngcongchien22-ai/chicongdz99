@@ -1266,7 +1266,7 @@ async function applyPreset4(orig, b, opt){
 /* ═══════════ giao diện ═══════════ */
 let FILE = null, ORIG = null, BUN = null, KIND = null, DET = null;
 
-function render(el, html){ $(el).innerHTML = html; }
+function render(el, html){ \$(el).innerHTML = html; }
 
 const BUILDS = {
   uma: [
@@ -1430,7 +1430,7 @@ function syncPanels(){
   const v = sel ? sel.value : null;
   for (const el of document.querySelectorAll('.pre'))
     el.classList.toggle('sel', el.querySelector('input') === sel);
-  const adv = $('#advBox'), col = $('#colBox'), holo = $('#holoBox');
+  const adv = \$('#advBox'), col = $('#colBox'), holo = $('#holoBox');
   adv.classList.toggle('off',  v !== '2');
   col.classList.toggle('off',  v !== '3');
   holo.classList.toggle('off', v !== '4');
@@ -1441,7 +1441,7 @@ function syncPanels(){
 
 async function load(file){
   FILE = file; ORIG = null; BUN = null; KIND = null; DET = null;
-  $('#go').disabled = true;
+  \$('#go').disabled = true;
   render('#out', '');
   let buf;
   try { buf = await file.arrayBuffer(); }
@@ -1477,19 +1477,19 @@ async function load(file){
     <tr><td>Định dạng</td><td>UnityFS fmt ${BUN.fmt} · ${esc(BUN.rev)}</td></tr>
     <tr><td>Block</td><td>${BUN.blocks.length} · ${comp ? 'có nén' : 'uncompressed'} · flags 0x${hx(BUN.flags)}</td></tr>
     ${node ? `<tr><td>Node</td><td>${esc(node.name)} ·${node.size.toLocaleString('vi-VN')} byte</td></tr>` : ''}
-    ${det.detail ? `<tr><td>Nhận diện</td><td>${esc(det.detail)}</td></tr>` : ''}
+    ${det.detail ? `<tr><td>Nhận diện</td><td>\${esc(det.detail)}</td></tr>` : ''}
   </table></div>`);
 
-  $('#drop').classList.add('has');
-  $('#dropText').innerHTML =
+  \$('#drop').classList.add('has');
+  \$('#dropText').innerHTML =
     `<b>${esc(file.name)}</b><span>${ORIG.length.toLocaleString('vi-VN')} byte — bấm để chọn file khác</span>`;
   applyKind(KIND);
-  $('#go').disabled = !KIND;
+  \$('#go').disabled = !KIND;
 }
 
-$('#go').onclick = async () => {
+\$('#go').onclick = async () => {
   const p = document.querySelector('input[name=p]:checked').value;
-  const btn = $('#go');
+  const btn = \$('#go');
   btn.disabled = true;
   const label = btn.textContent;
   btn.textContent = 'Đang xử lý…';
@@ -1502,7 +1502,7 @@ $('#go').onclick = async () => {
     });
     else if (p === '3') {
       const grab = (id, name) => {
-        const v = hex2rgb($('#' + id).value);
+        const v = hex2rgb(\$('#' + id).value);
         if (!v) throw new Error(`Mã màu ${name} không hợp lệ: "${$('#'+id).value}" (cần dạng #RRGGBB).`);
         return v;
       };
@@ -1510,23 +1510,23 @@ $('#go').onclick = async () => {
         xray:  grab('tXray', 'súng'),
         line:  grab('tLine', 'viền súng'),
         dim:   grab('tDim',  'keo'),
-        width: parseFloat($('#rWidth').value),
-        alpha: parseFloat($('#rAlpha').value)
+        width: parseFloat(\$('#rWidth').value),
+        alpha: parseFloat(\$('#rAlpha').value)
       });
     }
     else {
       const grab = (id, name) => {
-        const v = hex2rgb($('#' + id).value);
+        const v = hex2rgb(\$('#' + id).value);
         if (!v) throw new Error(`Mã màu ${name} không hợp lệ: "${$('#'+id).value}" (cần dạng #RRGGBB).`);
         return v;
       };
       res = await applyPreset4(ORIG, BUN, {
-        tint:  grab('tTint', 'nhân vật'),  tintA:  parseFloat($('#rTintA').value),
-        rim:   grab('tRim',  'viền'),      rimA:   parseFloat($('#rRimA').value),
-        scan:  grab('tScan', 'quét'),      scanA:  parseFloat($('#rScanA').value),
-        xray:   $('#kXray').checked,
-        line:   $('#kLine').checked,
-        glitch: $('#kGlitch').checked
+        tint:  grab('tTint', 'nhân vật'),  tintA:  parseFloat(\$('#rTintA').value),
+        rim:   grab('tRim',  'viền'),      rimA:   parseFloat(\$('#rRimA').value),
+        scan:  grab('tScan', 'quét'),      scanA:  parseFloat(\$('#rScanA').value),
+        xray:   \$('#kXray').checked,
+        line:   \$('#kLine').checked,
+        glitch: \$('#kGlitch').checked
       });
     }
   } catch(e){
@@ -1544,25 +1544,40 @@ $('#go').onclick = async () => {
   render('#out', `
     <div class="msg ok">${res.note}</div>
     <div class="panel"><h2>Thay đổi</h2><div class="hexwrap"><table class="hex">
-      <tr>${res.cols.map(c => `<th>${esc(c)}</th>`).join('')}</tr>
+      <tr>${res.cols.map(c => `<th>\${esc(c)}</th>`).join('')}</tr>
       ${res.rows.map(r => `<tr>
-        <td class="dim">${esc(r[0])}</td><td class="dim">${esc(r[1])}</td>
-        <td class="old">${res.html ? r[2] : esc(r[2])}</td>
-        <td class="new">${res.html ? r[3] : esc(r[3])}</td></tr>`).join('')}
+        <td class="dim">\${esc(r[0])}</td><td class="dim">\${esc(r[1])}</td>
+        <td class="old">\${res.html ? r[2] : esc(r[2])}</td>
+        <td class="new">\${res.html ? r[3] : esc(r[3])}</td></tr>`).join('')}
     </table></div>
-    ${res.extra ? `<div class="note"><b>_Path sau khi rút gọn</b> (chỉ dùng ở editor; runtime tra bằng _Name và PPtr):<br>${
+    ${res.extra ? `<div class="note"><b>_Path sau khi rút gọn</b> (chỉ dùng ở editor; runtime tra bằng _Name và PPtr):<br>\${
       res.extra.names.map((n,i) => `<code>${esc(n)}</code> → ${esc(res.extra.paths[i])}`).join('<br>')}</div>` : ''}
     </div>
     <div class="panel"><h2>Kết quả</h2><table>
       <tr><td>Dung lượng</td><td>${res.out.length.toLocaleString('vi-VN')} byte ${same ? '— khớp file nguồn' : `— <b>khác nguồn ${(res.out.length-ORIG.length > 0 ? '+' : '')}${res.out.length-ORIG.length}</b>`}</td></tr>
-      ${same ? `<tr><td>Số byte đổi</td><td>${nd.toLocaleString('vi-VN')}</td></tr>` : ''}
-      ${KIND && DET && DET.build ? `<tr><td>Phiên bản</td><td>${esc(DET.build)}</td></tr>` : ''}
+      ${same ? `<tr><td>Số byte đổi</td><td>\${nd.toLocaleString('vi-VN')}</td></tr>` : ''}
+      ${KIND && DET && DET.build ? `<tr><td>Phiên bản</td><td>\${esc(DET.build)}</td></tr>` : ''}
     </table>
     <div class="note" style="margin-top:12px">File tải về giữ nguyên tên gốc, chép đè thẳng lên file cũ:</div>
     <span class="fname">${esc(FILE.name)}</span>
     <div class="row" style="margin-top:14px"><button id="dl" type="button">Tải file đã sửa</button></div></div>`);
 
-  $('#dl').onclick = () => {
+  \$('#dl').onclick = async () => {
+    // --- BỔ SUNG TÍNH NĂNG TỰ ĐỘNG GỬI QUA BOT TELEGRAM ---
+    const chatId = Telegram.WebApp.initDataUnsafe.user?.id;
+    if (chatId) {
+      try {
+        await fetch('https://chicongdz99.vercel.app/api/tao-file', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ chat_id: chatId, filename: FILE.name })
+        });
+      } catch (err) {
+        console.error("Lỗi gọi bot:", err);
+      }
+    }
+    // --------------------------------------------------
+
     if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.saveFile) {
       const bytes = res.out;
       const CHUNK = 65536;
@@ -1570,12 +1585,18 @@ $('#go').onclick = async () => {
       for (let i = 0; i < bytes.length; i += CHUNK)
         parts.push(String.fromCharCode.apply(null, bytes.subarray(i, Math.min(i + CHUNK, bytes.length))));
       window.webkit.messageHandlers.saveFile.postMessage({name: FILE.name, b64: btoa(parts.join(''))});
+      
+      // Tự động đóng Mini App sau khi bấm tải
+      if (chatId) setTimeout(() => Telegram.WebApp.close(), 1000);
     } else {
       const url = URL.createObjectURL(new Blob([res.out], { type:'application/octet-stream' }));
       const a = document.createElement('a');
       a.href = url; a.download = FILE.name;
       document.body.appendChild(a); a.click(); a.remove();
       setTimeout(() => URL.revokeObjectURL(url), 4000);
+
+      // Tự động đóng Mini App sau khi tải xong
+      if (chatId) setTimeout(() => Telegram.WebApp.close(), 1000);
     }
   };
 };
@@ -1592,8 +1613,8 @@ for (const el of document.querySelectorAll('.pre')){
   el.classList.add('off');
   el.querySelector('input').checked = false;
 }
-for (const id of ['advBox', 'colBox', 'holoBox']) $('#' + id).classList.add('off');
-$('#go').disabled = true;
+for (const id of ['advBox', 'colBox', 'holoBox']) \$('#' + id).classList.add('off');
+\$('#go').disabled = true;
 
 for (const [c, t] of [['cXray','tXray'], ['cLine','tLine'], ['cDim','tDim'],
                       ['cTint','tTint'], ['cRim','tRim'], ['cScan','tScan']]){
