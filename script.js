@@ -1,20 +1,3 @@
-/* ═══════════ XỬ LÝ ONBOARDING VIEW (ĐÃ FIX CHẠM LÀ ĂN NGAY) ═══════════ */
-const closeBtn = document.getElementById('closeOnboardingBtn');
-const onboardingOverlay = document.getElementById('onboardingView');
-
-if (closeBtn && onboardingOverlay) {
-  const removeOnboarding = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    onboardingOverlay.classList.add('hidden');
-    setTimeout(() => {
-      onboardingOverlay.remove();
-    }, 300);
-  };
-  closeBtn.addEventListener('click', removeOnboarding);
-  closeBtn.addEventListener('touchstart', removeOnboarding, { passive: false });
-}
-
 /* ═══════════ KẾT NỐI GOOGLE SHEETS & TRÌNH PHÁT NHẠC ═══════════ */
 const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1WJq4EWe-hlahMC0GPcLkjYkKXcDJnA6FX4f-pVgCTpY/export?format=csv';
 
